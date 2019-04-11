@@ -1,0 +1,32 @@
+﻿<Application x:Class="MediaBrowserWPF.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Startup="Application_Startup" Exit="Application_Exit" DispatcherUnhandledException="Application_DispatcherUnhandledException">
+    <Application.Resources>
+        <DataTemplate x:Key="AutoCompleteBoxCategoryTemplate">
+            <StackPanel Orientation="Horizontal">
+                <Label Content="{Binding Name}" />
+                <Label Content="{Binding BreadCrumpReverse}" FontStyle="Italic" Foreground="DarkGray" />    
+            </StackPanel>
+        </DataTemplate>
+
+            <Style x:Key="GlobalTreeViewItemStyle"
+               TargetType="{x:Type TreeViewItem}">
+                <Setter Property="IsExpanded"
+                        Value="{Binding IsExpanded, Mode=TwoWay}" />
+                <Setter Property="IsSelected"
+                        Value="{Binding IsSelected, Mode=TwoWay}" />
+                <Setter Property="FontWeight"
+                        Value="Normal" />
+                <Style.Triggers>
+                    <Trigger Property="IsSelected"
+                              Value="True">
+                        <Setter Property="FontWeight"
+                                    Value="Bold" />
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+
+
+    </Application.Resources>
+</Application>

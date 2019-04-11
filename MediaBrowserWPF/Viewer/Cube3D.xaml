@@ -1,0 +1,15 @@
+﻿<Window x:Class="MediaBrowserWPF.Viewer.Cube3D"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Icon="/MediaBrowserWPF;component/Images/green-leaf-icon.ico" 
+        Title="Cube3D" Height="300" Width="300" Background="Black" MouseDoubleClick="Window_MouseDoubleClick" Loaded="Window_Loaded" WindowStyle="None" PreviewKeyDown="Window_PreviewKeyDown">
+    <Grid Name="mainContainer">
+        <TextBlock Name="InfoTextCenter" Grid.ZIndex="3" Visibility="Visible"  TextWrapping="Wrap" HorizontalAlignment="Center" Margin="0, 0, 10, 0" VerticalAlignment="Center" FontFamily="Eras ITC" Foreground="WhiteSmoke" FontSize="42">Lade Bilder ...</TextBlock>
+        <TextBlock Name="InfoTextCenterBlur" Grid.ZIndex="2" Visibility="Visible" TextWrapping="Wrap" HorizontalAlignment="Center" Margin="3, 3, 10, 0" VerticalAlignment="Center" FontFamily="Eras ITC" Foreground="Black" FontSize="42">Lade Bilder ...
+                        <TextBlock.Effect>
+            <BlurEffect Radius="15" KernelType="Gaussian">                                                                    
+            </BlurEffect>                                        
+         </TextBlock.Effect>
+        </TextBlock>
+    </Grid>
+</Window>

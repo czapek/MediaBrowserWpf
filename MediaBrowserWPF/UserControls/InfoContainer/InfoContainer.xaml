@@ -1,0 +1,23 @@
+﻿<UserControl x:Class="MediaBrowserWPF.UserControls.InfoContainer"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:uc="clr-namespace:MediaBrowserWPF.UserControls"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300" SizeChanged="UserControl_SizeChanged">
+    <StackPanel>    
+
+        <Expander Name="BaseInfoExpander" Header="Basis-Informationen" IsExpanded="True" Collapsed="Expander_Expanded" Expanded="Expander_Expanded">
+            <uc:InfoContainerBaseInfo x:Name="infoBase" VerticalAlignment="Stretch" />
+        </Expander>
+
+        <Expander Name="CategoryExpander" Header="Alle vergebenen Kategorien" IsExpanded="False" Collapsed="Expander_Expanded" Expanded="Expander_Expanded">
+            <uc:InfoContainerCategories x:Name="infoCategories" VerticalAlignment="Stretch" />
+        </Expander>
+
+        <Expander Name="ExifExpander" Header="Meta-Daten" IsExpanded="True" Collapsed="Expander_Expanded" Expanded="Expander_Expanded">
+            <uc:InfoContainerExif x:Name="infoExif" VerticalAlignment="Stretch" />
+        </Expander>
+    </StackPanel>
+</UserControl>

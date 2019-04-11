@@ -1,0 +1,204 @@
+﻿<ContextMenu x:Class="MediaBrowserWPF.UserControls.ThumblistContainerContextMenu"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:c="clr-namespace:MediaBrowserWPF.UserControls.CategoryContainer"
+             xmlns:t="clr-namespace:MediaBrowserWPF.UserControls.ThumbListContainer"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300" Opened="ContextMenu_Opened">
+    <MenuItem Name="MenuItemSort" Header="Sortieren nach ...">
+        <MenuItem Name="MenuItemSortAsc" Header="Aufsteigend sortieren" ToolTip="Die Medien werden aufsteigend sortiert." IsCheckable="true" Click="MenuItem_Sort_Asc"/>
+        <MenuItem Name="MenuItemSortDesc" Header="Absteigend sortieren" ToolTip="Die Medien werden absteigend sortiert." IsCheckable="true" Click="MenuItem_Sort_Desc"/>
+        <Separator/>
+        <MenuItem Name="MenuItemSortFolder" StaysOpenOnClick="True" Header="Ordner" IsCheckable="true"  IsChecked="True" />
+        <MenuItem Name="MenuItemSortMediadate" StaysOpenOnClick="True"  Header="Datum" IsCheckable="true" />
+        <MenuItem Name="MenuItemSortFilename" StaysOpenOnClick="True" InputGestureText="F7"  Header="Dateiname" IsCheckable="true"  IsChecked="True" />
+        <MenuItem Name="MenuItemSortType" StaysOpenOnClick="True" Header="Medientyp" IsCheckable="true"  />
+        <MenuItem Name="MenuItemSortLength" StaysOpenOnClick="True" Header="Dateigröße" IsCheckable="true"   />
+        <MenuItem Name="MenuItemSortDuration" StaysOpenOnClick="True" Header="Abspieldauer" IsCheckable="true"   />
+        <MenuItem Name="MenuItemSortViewed" StaysOpenOnClick="True" Header="Betrachtungsdauer" IsCheckable="true" />
+        <MenuItem Name="MenuItemSortArea" StaysOpenOnClick="True" Header="Bildfläche" IsCheckable="true" />
+        <MenuItem Name="MenuItemSortRelation" StaysOpenOnClick="True" Header="Seitenverhältnis" IsCheckable="true" />
+        <Separator/>
+        <MenuItem Name="MenuItemSortShuffle" Header="Zufällig sortieren" InputGestureText="F6" ToolTip="Die Medien werden zufällig sortiert." IsCheckable="true" Click="MenuItemSortShuffle_Click" />
+        <MenuItem Name="MenuItemSortShuffle5" Header="Zufällige 5er-Gruppen" InputGestureText="Shift+F6" ToolTip="Die Medien werden in Gruppen zu fünf zufällig sortiert." IsCheckable="true" Click="MenuItemSortShuffle5_Click" />
+        <MenuItem Name="MenuItemSortShuffleMedia" Header="Zufällig nach Medien" InputGestureText="Strg+F6" ToolTip="Die Medien werden zufällig sortiert, wobei Videos und Bilder gleichmäßig verteilt sind." IsCheckable="true" Click="MenuItemSortShuffleMedia_Click"/>
+        <MenuItem Name="MenuItemSortShuffleCategoryDay" Header="Zufällig nach Tagen" ToolTip="Die Medien werden nach Tagen zufällig sortiert." IsCheckable="true" Click="MenuItemSortShuffleCategoryDay_Click"/>
+        <Separator/>
+        <MenuItem Name="MenuItemSortCritera" StaysOpenOnClick="True" Header="Umgekehrt anwenden" ToolTip="Die obigen Kriterien werden in umgekehrter Reihenfolge zum Sortieren verwendet." IsCheckable="true" />
+        <MenuItem Name="MenuItemSortUncheckAll" StaysOpenOnClick="True" Header="Alle abwählen" ToolTip="Alle obigen Kriterien werden zurückgesetzt." Click="MenuItem_Sort_UncheckAll" />
+    </MenuItem>
+
+    <MenuItem Header="Öffne ...">
+        <MenuItem Name="MenuItemOpenInExplorer" Header="Zeige in Windows Explorer" InputGestureText="Umschalt+Enter" Click="MenuItemOpenInExplorer_Click"  />
+        <MenuItem Name="MenuItemOpenWith" Header="Öffnen mit ..."  InputGestureText="Strg+Enter" Click="MenuItemOpenWith_Click"  />
+        <MenuItem Name="MenuItemOpenDbTree" Header="Zeige in MediaBrowser-Ordner" InputGestureText="Strg+Umschalt+Enter"  Click="MenuItemOpenDbTree_Click"/>
+        <MenuItem Name="MenuItemOpenPlayerIntern" Header="Interner Betrachter"  InputGestureText="Enter" Click="MenuItemOpenPlayerIntern_Click" />
+
+        <MenuItem  Header="Leuchttisch ...">
+            <MenuItem Name="MenuItemOpenMultiplayer" Header="... automatisch"  InputGestureText="Strg+M" Click="MenuItemOpenMultiplayer_Click"  />
+            <Separator></Separator>
+            <MenuItem Name="MenuItemOpenMultiplayerx1" Header="... 1 Reihe ...">
+                <MenuItem Name="MenuItemOpenMultiplayer2x1" Header="... 2 Spalten" Click="MenuItemOpenMultiplayerXxX_Click" />
+                <MenuItem Name="MenuItemOpenMultiplayer3x1" Header="... 3 Spalten" Click="MenuItemOpenMultiplayerXxX_Click" />
+                <MenuItem Name="MenuItemOpenMultiplayer4x1" Header="... 4 Spalten" Click="MenuItemOpenMultiplayerXxX_Click" />
+                <MenuItem Name="MenuItemOpenMultiplayer5x1" Header="... 5 Spalten" Click="MenuItemOpenMultiplayerXxX_Click" />
+            </MenuItem>
+            <MenuItem Name="MenuItemOpenMultiplayerx2" Header="... 2 Reihen ...">
+                <MenuItem Name="MenuItemOpenMultiplayer2x2" Header="... 2 Spalten" Click="MenuItemOpenMultiplayerXxX_Click" />
+                <MenuItem Name="MenuItemOpenMultiplayer3x2" Header="... 3 Spalten" Click="MenuItemOpenMultiplayerXxX_Click" />
+                <MenuItem Name="MenuItemOpenMultiplayer4x2" Header="... 4 Spalten" Click="MenuItemOpenMultiplayerXxX_Click" />
+                <MenuItem Name="MenuItemOpenMultiplayer5x2" Header="... 5 Spalten" Click="MenuItemOpenMultiplayerXxX_Click" />
+            </MenuItem>
+            <MenuItem Name="MenuItemOpenMultiplayerx3" Header="... 3 Reihen ...">
+                <MenuItem Name="MenuItemOpenMultiplayer2x3" Header="... 2 Spalten" Click="MenuItemOpenMultiplayerXxX_Click" />
+                <MenuItem Name="MenuItemOpenMultiplayer3x3" Header="... 3 Spalten" Click="MenuItemOpenMultiplayerXxX_Click" />
+                <MenuItem Name="MenuItemOpenMultiplayer4x3" Header="... 4 Spalten" Click="MenuItemOpenMultiplayerXxX_Click" />
+                <MenuItem Name="MenuItemOpenMultiplayer5x3" Header="... 5 Spalten" Click="MenuItemOpenMultiplayerXxX_Click" />
+            </MenuItem>
+            <MenuItem Name="MenuItemOpenMultiplayerx4" Header="... 4 Reihen ...">
+                <MenuItem Name="MenuItemOpenMultiplayer2x4" Header="... 2 Spalten" Click="MenuItemOpenMultiplayerXxX_Click" />
+                <MenuItem Name="MenuItemOpenMultiplayer3x4" Header="... 3 Spalten" Click="MenuItemOpenMultiplayerXxX_Click" />
+                <MenuItem Name="MenuItemOpenMultiplayer4x4" Header="... 4 Spalten" Click="MenuItemOpenMultiplayerXxX_Click" />
+                <MenuItem Name="MenuItemOpenMultiplayer5x4" Header="... 5 Spalten" Click="MenuItemOpenMultiplayerXxX_Click" />
+            </MenuItem>
+        </MenuItem>
+        <MenuItem Name="MenuItemOpen3DCube" Header="3D Würfel" ToolTip="Lesezeichen werden als Hintergrundbilder verwendet" Click="MenuItemOpen3DCube_Click"  />
+        <MenuItem Name="MenuItemOpen3DSphere" Header="Psychodelische Kugel" ToolTip="Verwende die Maus und Rad, Leertaste mit und ohne Strg, Pfeiltasten, Plus/Minus, Ziffern mit und ohne Strg, Bild hoch/runter, Pause, F10 für Diashow und Esc" InputGestureText="Strg+W" Click="MenuItemOpen3DSphere_Click"  />
+        <MenuItem Name="MenuItemOpenDublicate" Header="... Dubletten" InputGestureText="Strg+M" Click="MenuItemOpenDublicate_Click"  />
+        <MenuItem Name="MenuItemPreviewWindow" Header="Zeige Vorschaufenster" InputGestureText="F4" Click="MenuItemOpenPreviewWindow_Click" />
+        <MenuItem Name="MenuItemOpenWithHugin" Header="Öffnen mit Hugin" Click="MenuItemOpenWithHugin_Click"  />
+        <MenuItem Name="MenuItemOpenWithICE" Header="Öffnen mit ICE" Click="MenuItemOpenWithICE_Click"  />
+        <MenuItem Header="Öffnen mit PanoramaStudio ..." Name="MenuItemPanoramaStudio">
+            <MenuItem Name="MenuItemOpenWithPanorama" Header="... einreihig" Click="MenuItemOpenWithPanorama_Click"  />
+            <MenuItem Name="MenuItemOpenWithPanoramaMehrreihig" Header="... mehrreihig" Click="MenuItemOpenWithPanoramaMehrreihig_Click" />
+            <MenuItem Name="MenuItemOpenWithPanoramaDocument" Header="... dokumentenmodus" Click="MenuItemOpenWithPanoramaDocument_Click" />
+        </MenuItem>
+    </MenuItem>
+
+    <MenuItem Header="Geodaten ..." Name="MenuItemGeo">    
+        <MenuItem Name="MenuItemOpenGeoDay" Header="Geodaten Medien Zeitraum" Click="MenuItemOpenGeoDay_Click" />
+        <MenuItem Name="MenuItemOpenGeoLast1Day" Header="Geodaten heute" Click="MenuItemOpenGeo_Click" />       
+        <MenuItem Name="MenuItemOpenGeoYesterday" Header="Geodaten gestern" Click="MenuItemOpenGeoYesterday_Click" />
+        <MenuItem Name="MenuItemOpenGeoCustom" Header="Geodaten Zeitraum wählbar" Click="MenuItemOpenGeoCustom_Click" />
+        <Separator></Separator>
+        <MenuItem Name="MenuItemExportGpxMedia" Header="Export Medien Zeitraum" Click="MenuItemExportGpxMedia_Click" />
+        <MenuItem Name="MenuItemExportGpxLast1Day" Header="Export heute" Click="MenuItemOpenGps_Click" />
+        <MenuItem Name="MenuItemExportGpxYesterday" Header="Export gestern" Click="MenuItemOpenYesterday_Click" />
+        <MenuItem Name="MenuItemExportGpxCustom" Header="Export Zeitraum wählbar" Click="MenuItemOpenCustom_Click" />
+        <Separator></Separator>
+        <MenuItem Name="MenuItemOpenGeoNearest" Header="nächste Position in Browser" Click="MenuItemOpenGeoNearest_Click" />
+        <MenuItem Name="MenuItemOpenGeoAdress" Header="nächste Adresse" InputGestureText="Umschalt+A" Click="MenuItemOpenGeoAdress_Click" />
+        <MenuItem Name="MenuItemOpenGeoWeather" Header="Wetter" Click="MenuItemOpenGeoWeather_Click" />
+        <MenuItem Name="MenuItemGoogleTimeline" Header="Google Timeline" Click="MenuItemGoogleTimeline_Click" />        
+        <MenuItem Name="MenuItemDistance" Header="Entfernung Medien Zeitraum" Click="MenuItemDistance_Click" />
+    </MenuItem>
+
+    <MenuItem Header="Markieren ...">
+        <MenuItem Name="MenuItemBookmarked" Header="... mit Lesezeichen" IsCheckable="true" InputGestureText="Strg+B" Click="MenuItemBookmark_Click" />
+        <MenuItem Name="MenuItemMarkDeleted" Header="... als gelöscht" IsCheckable="true" InputGestureText="Entf" Click="MenuItemMarkDeleted_Click"/>
+    </MenuItem>
+
+    <MenuItem Header="Bearbeiten ...">
+        <MenuItem Name="MenuItemRenameSmart" Header="Umbenennen" InputGestureText="F2" Click="MenuItemRenameSmart_Click" />
+        <MenuItem Name="MenuItemRedateToSummerTime" Header="... nach Winterzeit (-1h)" Click="MenuItemRedateToSummerTime_Click" />
+        <MenuItem Name="MenuItemRedateToWinterTime" Header="... nach Sommerzeit (+1h)" Click="MenuItemRedateToWinterTime_Click" />
+        <MenuItem Name="MenuItemAdjustMediaDate" Header="... frei einstellen" Click="MenuItemAdjustExifTime_Click" />
+    </MenuItem>
+
+    <MenuItem Header="Entferne ...">
+        <MenuItem Name="MenuItemDeleteFromDb" Header="... aus der Datenbank" Click="MenuItemDeleteFromDb_Click" />
+        <MenuItem Name="MenuItemRemoveTemp" Header="... vorübergehend" InputGestureText="Strg+Entf" Click="MenuItemRemoveTemp_Click" />
+    </MenuItem>
+
+    <MenuItem Header="Selektiere ...">
+        <MenuItem Name="MenuItemSelectDeleted" Header="... als gelöscht markierten" Click="MenuItemSelectDeleted_Click"  />
+        <MenuItem Name="MenuItemSelectDublicates" Header="... überzählige Dubletten" Click="MenuItemSelectDublicates_Click"/>
+        <MenuItem Name="MenuItemSelectFolder" Header="... Ordner" InputGestureText="Strg+O" Click="MenuItemSelectFolder_Click"/>
+        <MenuItem Name="MenuItemSelect50Next" Header="... die nächsten 50" InputGestureText="F12" Click="MenuItemSelect50Next_Click"/>
+        <MenuItem Name="MenuItemSelectMonthNext" Header="... nach Monat" Click="MenuItemSelectMonthNext_Click" />
+        <MenuItem Name="MenuItemSelectWeekNext" Header="... nach Woche" Click="MenuItemSelectWeekNext_Click"/>
+        <MenuItem Name="MenuItemSelectDayNext" Header="... nach Tag" Click="MenuItemSelectDayNext_Click"/>
+        <MenuItem Name="MenuItemSelectHourNext" Header="... nach Stunde" Click="MenuItemSelectHourNext_Click"/>
+        <Separator></Separator>      
+        <MenuItem Name="MenuItemOneSelectFaceDetection" Header="Selektiere Gesichter" Click="MenuItemFaceDetectionSelect_Click" />
+        <MenuItem Header="Auswahl für ... ">
+            <MenuItem Name="MenuItemFaceDetectionPortraitBig" StaysOpenOnClick="True" Header="... größeres Portrait" IsChecked="True" IsCheckable="True" />
+            <MenuItem Name="MenuItemFaceDetectionPortraitSmall" StaysOpenOnClick="True" Header="... Gruppengesichter"  IsChecked="True" IsCheckable="True" />
+            <MenuItem Name="MenuItemFaceDetectionPortraitTiny" StaysOpenOnClick="True" Header="... sehr kleine Gesichter"  IsChecked="False" IsCheckable="True" />
+            <Separator></Separator>
+            <MenuItem Name="MenuItemFaceDetectionSingle" StaysOpenOnClick="True" Header="... einzelnes Gesicht" IsChecked="True" IsCheckable="True" />
+            <MenuItem Name="MenuItemFaceDetectionHandsfull" StaysOpenOnClick="True" Header="... zwei bis fünf Gesichter" IsChecked="True" IsCheckable="True" />
+            <MenuItem Name="MenuItemFaceDetectionBigGroup" StaysOpenOnClick="True" Header="... mehr als fünf"  IsChecked="False" IsCheckable="True" />
+        </MenuItem>
+        <MenuItem Name="MenuItemOneViewFaceDetection" Header="Zeige Gesichter" Click="MenuItemFaceDetectionShow_Click" />
+        <Separator></Separator>
+        <MenuItem Name="MenuItemMarkInvert" Header="Auswahl umkehren" Click="MenuItemSelectInvert_Click"/>
+    </MenuItem>
+
+    <c:CategorizeMenuItem x:Name="CategorizeMenuItem" SubmenuOpened="CategorizeMenuItem_SubmenuOpened" Header="Kategorisieren ..." ShowRemoveAll="True" ShowCategorizeByDate="True"></c:CategorizeMenuItem>
+    <t:CopyMenuItem x:Name="CopyMenuItem" Header="Kopiere ..."></t:CopyMenuItem>
+
+    <MenuItem Header="Exportiere ...">
+        <MenuItem Name="MenuItemExport800" Header="Exportieren (800x800 Pix)" Click="MenuItemExport800_Click" />
+        <MenuItem Name="MenuItemExport1024" Header="Exportieren (1024x1024 Pix)" Click="MenuItemExport1024_Click" />
+        <MenuItem Name="MenuItemExport1920" Header="Exportieren (1920x1920 Pix)" Click="MenuItemExport1920_Click" />
+        <MenuItem Name="MenuItemExport3840" Header="Exportieren (3840x3840  Pix)" Click="MenuItemExport3840_Click" />
+        <MenuItem Name="MenuItemExportImageOptions" Header="Optionen">
+            <MenuItem Name="MenuItemExportImageOptionsBorder05" Header=".5% Rahmen" StaysOpenOnClick="True" IsCheckable="True" Unchecked="MenuItemExportImageOptionsBorder_Unchecked" Checked="MenuItemExportImageOptionsBorder_Checked" IsChecked="False" />
+            <MenuItem Name="MenuItemExportImageOptionsBorder1" Header="1% Rahmen" StaysOpenOnClick="True" IsCheckable="True" Unchecked="MenuItemExportImageOptionsBorder_Unchecked" Checked="MenuItemExportImageOptionsBorder_Checked" IsChecked="False" />
+            <MenuItem Name="MenuItemExportImageOptionsBorder2" Header="2% Rahmen" StaysOpenOnClick="True" IsCheckable="True" Unchecked="MenuItemExportImageOptionsBorder_Unchecked" Checked="MenuItemExportImageOptionsBorder_Checked" IsChecked="False" />
+            <MenuItem Name="MenuItemExportImageOptionsBorder4" Header="4% Rahmen" StaysOpenOnClick="True" IsCheckable="True" Unchecked="MenuItemExportImageOptionsBorder_Unchecked" Checked="MenuItemExportImageOptionsBorder_Checked" IsChecked="False" />
+            <Separator></Separator>
+            <MenuItem Name="MenuItemExportImageOptionsForceCrop" Header="Auf Seitenverhältnis Zuschneiden" StaysOpenOnClick="True" Unchecked="MenuItemExportImageOptionsBorder_Unchecked" Checked="MenuItemExportImageOptionsForceCrop_Checked" IsCheckable="True" IsChecked="False" />
+            <Separator></Separator>
+            <MenuItem Name="MenuItemExportImageOptionsBorder11" Header="Seitenverhältnis 1:1 (1,0)" StaysOpenOnClick="True" IsCheckable="True" Checked="MenuItemExportImageOptionsBorder2_Checked" Unchecked="MenuItemExportImageOptionsBorder11_Unchecked" IsChecked="False" />
+            <MenuItem Name="MenuItemExportImageOptionsBorder43" Header="Seitenverhältnis 4:3 (1,3)" StaysOpenOnClick="True" IsCheckable="True" Checked="MenuItemExportImageOptionsBorder2_Checked" Unchecked="MenuItemExportImageOptionsBorder11_Unchecked" IsChecked="False" />
+            <MenuItem Name="MenuItemExportImageOptionsBorder32" Header="Seitenverhältnis 3:2 (1,5)" StaysOpenOnClick="True" IsCheckable="True" Checked="MenuItemExportImageOptionsBorder2_Checked" Unchecked="MenuItemExportImageOptionsBorder11_Unchecked" IsChecked="False" />
+            <MenuItem Name="MenuItemExportImageOptionsBorder169" Header="Seitenverhältnis 16:9 (1,77)" StaysOpenOnClick="True" IsCheckable="True" Checked="MenuItemExportImageOptionsBorder2_Checked" Unchecked="MenuItemExportImageOptionsBorder11_Unchecked" IsChecked="False" />
+            <Separator></Separator>
+            <MenuItem Name="MenuItemExportImageOptionsQuality65" Header="Qualität 65" StaysOpenOnClick="True" IsCheckable="True" Checked="MenuItemExportImageOptionsQuality_Checked" Unchecked="MenuItemExportImageOptionsQuality_Unchecked" IsChecked="False" />
+            <MenuItem Name="MenuItemExportImageOptionsQuality75" Header="Qualität 75" StaysOpenOnClick="True" IsCheckable="True" Checked="MenuItemExportImageOptionsQuality_Checked" Unchecked="MenuItemExportImageOptionsQuality_Unchecked" IsChecked="False" />
+            <MenuItem Name="MenuItemExportImageOptionsQuality90" Header="Qualität 90" StaysOpenOnClick="True" IsCheckable="True" Checked="MenuItemExportImageOptionsQuality_Checked" Unchecked="MenuItemExportImageOptionsQuality_Unchecked" IsChecked="True" />
+            <MenuItem Name="MenuItemExportImageOptionsQuality100" Header="Qualität 100" StaysOpenOnClick="True" IsCheckable="True" Checked="MenuItemExportImageOptionsQuality_Checked" Unchecked="MenuItemExportImageOptionsQuality_Unchecked" IsChecked="False" />
+            <Separator></Separator>
+            <MenuItem Name="MenuItemExportImageOptionsSharpenSoft" Header="leicht Schärfen" StaysOpenOnClick="True" IsCheckable="True" Checked="MenuItemExportImageOptionsSharpen_Checked" IsChecked="True" />
+            <MenuItem Name="MenuItemExportImageOptionsSharpenMedium" Header="mehr Schärfen" StaysOpenOnClick="True" IsCheckable="True" Checked="MenuItemExportImageOptionsSharpen_Checked" IsChecked="False" />
+            <MenuItem Name="MenuItemExportImageOptionsSharpenStrong" Header="stark Schärfen" StaysOpenOnClick="True" IsCheckable="True" Checked="MenuItemExportImageOptionsSharpen_Checked" IsChecked="False" />
+            <Separator></Separator>
+            <MenuItem Name="MenuItemExportImageOptionsFullName" Header="ausführlicher Name" StaysOpenOnClick="True" IsCheckable="True" IsChecked="False" />
+        </MenuItem>
+        <Separator/>
+        <MenuItem Name="MenuItemExportLightbox" Header="Lightbox (1024x768 Pix)" Click="MenuItemExportLigtbox_Click" />
+        <Separator/>
+        <MenuItem Name="MenuItemFFMpegH264_NoResize" Header="FFMpeg-Skript MP4 (h264/aac)" Click="MenuItemFFMpegH264_NoResize_Click" />
+        <MenuItem Name="MenuItemFFMpegH264_1280x720" Header="FFMpeg-Skript MP4 (h264/aac), 1280x720 Pixel" Click="MenuItemFFMpegH264_1280x720_Click" />
+        <MenuItem Name="MenuItemFFMpegH264_1920x1080" Header="FFMpeg-Skript MP4 (h264/aac), 1920x1080 Pixel" Click="MenuItemFFMpegH264_1920x1080_Click" />
+        <MenuItem Name="MenuItemFFMpegXVid_NoResize" Header="FFMpeg-Skript AVI (xvid/mp3)" Click="MenuItemFFMpegXVid_NoResize_Click" />
+        <MenuItem Name="MenuItemFFMpegXVid_640x480" Header="FFMpeg-Skript AVI (xvid/mp3), 640x480 Pixel" Click="MenuItemFFMpegXVid_640x480_Click" />
+        <MenuItem Name="MenuItemFFMpeg_MP3" Header="FFMpeg-Skript Audio MP3 extrahieren" Click="MenuItemFFMpeg_Mp3_Click" />
+        <!--<MenuItem Name="MenuItemFFMpegMpeg2_720x576" Header="FFMpeg-Skript MPEG2, 720x576 Pixel" Click="MenuItemFFMpegMpeg2_720x57_Click" />-->
+        <MenuItem Name="MenuItemFFMpegImage25" Header="FFMpeg-Skript 25 Thumbnails" Click="MenuItemFFMpegImage25_Click" />
+        <MenuItem Name="MenuItemFFMpegOgg_NoREsize" Header="FFMpeg-Skript Ogg Theora" Click="MenuItemFFMpegOggTheora_NoResize_Click" />
+        <MenuItem Name="MenuItemFFMpeg_Copy" Header="FFMpeg-Skript in MKV kopieren" Click="MenuItemFFMpeg_Copy_Click" />
+        <MenuItem Name="MenuItemMKVMerge_Join" Header="MKVMerge-Skript aneinander fügen" Click="MenuItemMKVMerge_Join_Click" />
+        <Separator/>
+        <MenuItem Name="MenuItemPreviewDbExport" Header="für Vorschau-Datenbank vorbereiten" Click="MenuItemPreviewDbExport_Click" />
+        <MenuItem Name="MenuItemPreviewDbDelete" Header="aus Vorschau-Datenbank löschen" Click="MenuItemPreviewDbDelete_Click" />
+        <Separator/>
+        <MenuItem Name="MenuItemExportMediaList" Header="Dateiliste (*.txt)"  ToolTip="Erstellt eine Textdatei mit absoluten Dateipfaden" Click="MenuItemExportMediaList_Click"/>
+        <MenuItem Name="MenuItemExportChecksumList" Header="Prüfsummenliste (*.hash)"  ToolTip="Erstellt eine Textdatei mit den Prüfsummen der originaldateien" Click="MenuItemExportChecksumList_Click"/>
+        <MenuItem Name="MenuItemExportPlayList" Header="Playlist (*.m3u)" ToolTip="Erstellt eine M3U-Liste mit relativen Dateipfaden" Click="MenuItemExportPlayList_Click"/>
+        <MenuItem Name="MenuItemExportXmlFull" Header="Metadaten (*.xml)"  ToolTip="Erstellt eine XML-Datei mit allen Metadaten" Click="MenuItemExportXmlFull_Click" />
+    </MenuItem>
+
+    <MenuItem Header="Varianten ...">
+        <MenuItem Name="MenuItemVariationsComplete" Header="... ergänzen" Click="MenuItemVariationsComplete_Click"  />
+        <MenuItem Name="MenuItemVariationsNew" Header="... neu erstellen" Click="MenuItemVariationsNew_Click" />
+        <MenuItem Name="MenuItemVariationsDelete" Header="... löschen" Click="MenuItemVariationsDelete_Click" />
+        <MenuItem Name="MenuItemVariationsRename" Header="... umbenennen" Click="MenuItemVariationsRename_Click" />
+        <MenuItem Name="MenuItemVariationsDefault" Header="... zur Hauptvariante machen" Click="MenuItemVariationsDefault_Click" />
+    </MenuItem>
+</ContextMenu>
+

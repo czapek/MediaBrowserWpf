@@ -1,0 +1,637 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{7FCF4861-1059-4762-AFDC-658B6C871F65}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>MediaBrowserWPF</RootNamespace>
+    <AssemblyName>MediaBrowserWPF</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WarningLevel>4</WarningLevel>
+    <IsWebBootstrapper>true</IsWebBootstrapper>
+    <PublishUrl>http://localhost/MediaBrowserWPF/</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Web</InstallFrom>
+    <UpdateEnabled>true</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Images\green-leaf-icon.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="3DTools">
+      <HintPath>..\Resources\3DTools.dll</HintPath>
+    </Reference>
+    <Reference Include="DirectShowLib-2005, Version=2.1.0.17035, Culture=neutral, PublicKeyToken=67e7b740cdfc2d3f, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Resources\DirectShowLib-2005.dll</HintPath>
+    </Reference>
+    <Reference Include="dragonz.actb">
+      <HintPath>..\Resources\dragonz.actb.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.0.0\lib\net45\EntityFramework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.0.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="MouseGestures">
+      <HintPath>..\Resources\MouseGestures.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.SQLite, Version=1.0.103.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Data.SQLite.Core.1.0.103\lib\net46\System.Data.SQLite.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Data.SQLite.EF6, Version=1.0.103.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Data.SQLite.EF6.1.0.103\lib\net46\System.Data.SQLite.EF6.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Data.SQLite.Linq, Version=1.0.103.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Data.SQLite.Linq.1.0.103\lib\net46\System.Data.SQLite.Linq.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Device" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Windows.Controls.Input.Toolkit, Version=3.5.40128.1, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\WPFToolkit.3.5.50211.1\lib\System.Windows.Controls.Input.Toolkit.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Windows.Controls.Layout.Toolkit, Version=3.5.40128.1, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\WPFToolkit.3.5.50211.1\lib\System.Windows.Controls.Layout.Toolkit.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Xaml">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="WindowsFormsIntegration" />
+    <Reference Include="WpfAnimatedGif, Version=1.4.14.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\WpfAnimatedGif.1.4.14\lib\net\WpfAnimatedGif.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="WPFMediaKit, Version=2.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Resources\WPFMediaKit.dll</HintPath>
+    </Reference>
+    <Reference Include="WPFToolkit, Version=3.5.40128.1, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\WPFToolkit.3.5.50211.1\lib\WPFToolkit.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="WPFToolkit.Extended, Version=1.5.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Resources\WPFToolkit.Extended.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+    <Compile Include="Adorned\AdornedControl.cs" />
+    <Compile Include="Adorned\AdornerPlacement.cs" />
+    <Compile Include="Adorned\FrameworkElementAdorner.cs" />
+    <Compile Include="Dialogs\CopySdCardDialog.xaml.cs">
+      <DependentUpon>CopySdCardDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Help.xaml.cs">
+      <DependentUpon>Help.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\ImageViewer.xaml.cs">
+      <DependentUpon>ImageViewer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\RenameDialog.xaml.cs">
+      <DependentUpon>RenameDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\StartStopDialog.xaml.cs">
+      <DependentUpon>StartStopDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Tag.xaml.cs">
+      <DependentUpon>Tag.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\TagEditor.xaml.cs">
+      <DependentUpon>TagEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\TagEditorSingleton.cs" />
+    <Compile Include="Dialogs\VariationDialog.xaml.cs">
+      <DependentUpon>VariationDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Helpers\TreeViewHelper.cs" />
+    <Compile Include="UserControls\AttachmentsContainer\AttachmentsContainer.xaml.cs">
+      <DependentUpon>AttachmentsContainer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\CategoryContainer\AutoCompleteComboBoxCategory.cs" />
+    <Compile Include="UserControls\CategoryContainer\CategorizeMenuItem.xaml.cs">
+      <DependentUpon>CategorizeMenuItem.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\CategoryContainer\CategoryButton.cs" />
+    <Compile Include="UserControls\CategoryContainer\CategoryEditor.xaml.cs">
+      <DependentUpon>CategoryEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\CategoryContainer\CategoryEventArgs.cs" />
+    <Compile Include="UserControls\FolderContainer\AutoCompleteComboBoxFolder.cs" />
+    <Compile Include="UserControls\CategoryContainer\CategoryAutoCompleteProvider.cs" />
+    <Compile Include="UserControls\CategoryContainer\CategoryRequestMessageArgs.cs" />
+    <Compile Include="UserControls\CategoryContainer\CategoryTree.xaml.cs">
+      <DependentUpon>CategoryTree.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\CloseableHeader.xaml.cs">
+      <DependentUpon>CloseableHeader.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\FolderContainer\FolderTree.xaml.cs">
+      <DependentUpon>FolderTree.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\FolderContainer\FolderArgument.cs" />
+    <Compile Include="UserControls\FolderContainer\FolderAutoCompleteProvider.cs" />
+    <Compile Include="UserControls\FolderContainer\FolderEditor.xaml.cs">
+      <DependentUpon>FolderEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\FolderContainer\FolderEventArgs.cs" />
+    <Compile Include="UserControls\InfoContainer\InfoContainerBaseHelper.cs" />
+    <Compile Include="UserControls\InfoContainer\InfoContainerExif.xaml.cs">
+      <DependentUpon>InfoContainerExif.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\InfoContainer\InfoContainer.xaml.cs">
+      <DependentUpon>InfoContainer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\InfoContainer\InfoContainerBaseInfo.xaml.cs">
+      <DependentUpon>InfoContainerBaseInfo.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\InfoContainer\InfoContainerCategories.xaml.cs">
+      <DependentUpon>InfoContainerCategories.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\InfoContainer\InfoContainerCategoryHelper.cs" />
+    <Compile Include="UserControls\Levels\GammaRemap.cs" />
+    <Compile Include="UserControls\Levels\HistogrammSlider.xaml.cs">
+      <DependentUpon>HistogrammSlider.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\Levels\HistoRemap.cs" />
+    <Compile Include="UserControls\Levels\LevelsToolbox.xaml.cs">
+      <DependentUpon>LevelsToolbox.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\Levels\RGBLevels.xaml.cs">
+      <DependentUpon>RGBLevels.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\MediaItemArgument.cs" />
+    <Compile Include="UserControls\MediaItemListContainer\MediaItemListContainer.xaml.cs">
+      <DependentUpon>MediaItemListContainer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\MediaItemRequestMessageArgs.cs" />
+    <Compile Include="UserControls\FolderContainer\FolderTreeViewItem.cs" />
+    <Compile Include="UserControls\RequestContainer\RequestContainer.xaml.cs">
+      <DependentUpon>RequestContainer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\RequestContainer\RequestContainerElement.cs" />
+    <Compile Include="UserControls\RgbImage\CacheBitmapImage.cs" />
+    <Compile Include="UserControls\RgbImage\ImageControl.xaml.cs">
+      <DependentUpon>ImageControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\SearchContainer\SearchContainer.xaml.cs">
+      <DependentUpon>SearchContainer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\ThumbListContainer\AdjustMediaDateDialog.xaml.cs">
+      <DependentUpon>AdjustMediaDateDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\ThumbListContainer\CopyMenuItem.xaml.cs">
+      <DependentUpon>CopyMenuItem.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\ThumbListContainer\ThumblistContainer.xaml.cs">
+      <DependentUpon>ThumblistContainer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\ThumbListContainer\ThumblistContainerContextMenu.xaml.cs">
+      <DependentUpon>ThumblistContainerContextMenu.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\ThumbListContainer\ThumblistContainerTabItem.cs" />
+    <Compile Include="UserControls\ThumbListContainer\ThumblistContainerTabItemContextMenu.xaml.cs">
+      <DependentUpon>ThumblistContainerTabItemContextMenu.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\ThumbListContainer\ThumblistElement.xaml.cs">
+      <DependentUpon>ThumblistElement.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\ThumbListContainer\ThumblistNavigator.xaml.cs">
+      <DependentUpon>ThumblistNavigator.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\TimeControl.xaml.cs">
+      <DependentUpon>TimeControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\Video\IVideoControl.cs" />
+    <Compile Include="UserControls\Video\Multiviewer.xaml.cs">
+      <DependentUpon>Multiviewer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\Video\TrackInfo.cs" />
+    <Compile Include="UserControls\Video\VideoControl.xaml.cs">
+      <DependentUpon>VideoControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\Video\VideoPlayer.xaml.cs">
+      <DependentUpon>VideoPlayer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\Video\WpfMediaElement.xaml.cs">
+      <DependentUpon>WpfMediaElement.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\Video\WpfMediaKit.xaml.cs">
+      <DependentUpon>WpfMediaKit.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Utilities\CategoryTreeWebPage.cs" />
+    <Compile Include="Utilities\ConsoleManager.cs" />
+    <Compile Include="Utilities\FilesAndFolders.cs" />
+    <Compile Include="Utilities\KeyboardFocus.cs" />
+    <Compile Include="Utilities\Rundll32.cs" />
+    <Compile Include="Utilities\TakeSnapshot.xaml.cs">
+      <DependentUpon>TakeSnapshot.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Viewer\Cube3D.xaml.cs">
+      <DependentUpon>Cube3D.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Viewer\IMediaControl.cs" />
+    <Compile Include="Viewer\IMediaViewer.cs" />
+    <Compile Include="Viewer\IMultiplayerCtrl.cs" />
+    <Compile Include="Viewer\IViewer.cs" />
+    <Compile Include="Viewer\MediaControlHelper.cs" />
+    <Compile Include="Viewer\MediaViewerContextMenu.xaml.cs">
+      <DependentUpon>MediaViewerContextMenu.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Viewer\MediaViewerItemList.cs" />
+    <Compile Include="Viewer\MediaViewer.xaml.cs">
+      <DependentUpon>MediaViewer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\RgbImage\ViewerSource.cs" />
+    <Compile Include="Viewer\Multiplayer.xaml.cs">
+      <DependentUpon>Multiplayer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Viewer\MultiplayerCtrl_Generic.xaml.cs">
+      <DependentUpon>MultiplayerCtrl_Generic.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Viewer\SphereMeshGenerator.cs" />
+    <Compile Include="Viewer\SphereViewer.xaml.cs">
+      <DependentUpon>SphereViewer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Viewer\ViewerBaseControl.xaml.cs">
+      <DependentUpon>ViewerBaseControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Viewer\ViewerState.cs" />
+    <Page Include="Dialogs\CopySdCardDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\Help.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\ImageViewer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\RenameDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Dialogs\StartStopDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\Tag.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\TagEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\VariationDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MainWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MainWindow.xaml.cs">
+      <DependentUpon>MainWindow.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Page Include="UserControls\AttachmentsContainer\AttachmentsContainer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\CategoryContainer\CategorizeMenuItem.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\CategoryContainer\CategoryEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\CategoryContainer\CategoryTree.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\CloseableHeader.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\FolderContainer\FolderTree.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\FolderContainer\FolderEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\InfoContainer\InfoContainerExif.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\InfoContainer\InfoContainer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\InfoContainer\InfoContainerBaseInfo.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\InfoContainer\InfoContainerCategories.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\Levels\HistogrammSlider.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\Levels\LevelsToolbox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\Levels\RGBLevels.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\MediaItemListContainer\MediaItemListContainer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\RequestContainer\RequestContainer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\RgbImage\ImageControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\SearchContainer\SearchContainer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\ThumbListContainer\AdjustMediaDateDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\ThumbListContainer\CopyMenuItem.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\ThumbListContainer\ThumblistContainer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\ThumbListContainer\ThumblistContainerContextMenu.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\ThumbListContainer\ThumblistContainerTabItemContextMenu.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\ThumbListContainer\ThumblistElement.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\ThumbListContainer\ThumblistNavigator.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\TimeControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\Video\Multiviewer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\Video\VideoControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\Video\VideoPlayer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\Video\WpfMediaElement.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\Video\WpfMediaKit.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Utilities\TakeSnapshot.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Viewer\Cube3D.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Viewer\MediaViewer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Viewer\MediaViewerContextMenu.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Viewer\Multiplayer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Viewer\MultiplayerCtrl_Generic.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Viewer\SphereViewer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Viewer\ViewerBaseControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <None Include="app.config">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <AppDesigner Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MediaBrowser4Lib\MediaBrowser4Lib.csproj">
+      <Project>{E1AEDD72-719E-4B46-B193-3D1B1ED294B5}</Project>
+      <Name>MediaBrowser4Lib</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MediaProcessing\MediaProcessing.csproj">
+      <Project>{46071d22-d4f3-4fbe-a446-be1f7001a0f4}</Project>
+      <Name>MediaProcessing</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\preferences.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.0,Profile=Client">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4 Client Profile %28x86 und x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Button-Fast-Forward-icon-24.png" />
+    <Resource Include="Images\Button-First-icon-24.png" />
+    <Resource Include="Images\Button-Info-icon-24.png" />
+    <Resource Include="Images\Button-Last-icon-24.png" />
+    <Resource Include="Images\Button-Pause-icon-24.png" />
+    <Resource Include="Images\Button-Play-icon-24.png" />
+    <Resource Include="Images\Button-Rewind-icon-24.png" />
+    <Resource Include="Images\Button-Stop-icon-24.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\green-leaf-icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Splash.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\green-leaf-icon-hi.png" />
+    <Resource Include="Images\green-leaf-icon-md.png" />
+    <Resource Include="Images\green-leaf-icon-th.png" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>if $(ConfigurationName) == Release (
+xcopy "$(SolutionDir)Resources\Resources" "Resources\" /Y /I /E
+xcopy /Q /Y "$(TargetDir)$(TargetName).exe" "%25userprofile%25\OneDrive\MediaBrowserWpf"
+xcopy /Q /Y "$(TargetDir)$(TargetName).pdb" "%25userprofile%25\OneDrive\MediaBrowserWpf"
+)</PostBuildEvent>
+  </PropertyGroup>
+  <Import Project="..\packages\System.Data.SQLite.Core.1.0.103\build\net46\System.Data.SQLite.Core.targets" Condition="Exists('..\packages\System.Data.SQLite.Core.1.0.103\build\net46\System.Data.SQLite.Core.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>Dieses Projekt verweist auf mindestens ein NuGet-Paket, das auf diesem Computer fehlt. Verwenden Sie die Wiederherstellung von NuGet-Paketen, um die fehlenden Dateien herunterzuladen. Weitere Informationen finden Sie unter "http://go.microsoft.com/fwlink/?LinkID=322105". Die fehlende Datei ist "{0}".</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\System.Data.SQLite.Core.1.0.103\build\net46\System.Data.SQLite.Core.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\System.Data.SQLite.Core.1.0.103\build\net46\System.Data.SQLite.Core.targets'))" />
+  </Target>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

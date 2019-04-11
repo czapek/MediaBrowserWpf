@@ -1,0 +1,115 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD><TITLE>Slideshow</TITLE>
+<META http-equiv=Content-Type content="text/html; charset=windows-1252">
+<SCRIPT language=JavaScript type=text/javascript>
+
+var zeige = 0;
+var an_speed=2000;
+var tid1="";
+var cnt = 0;
+var Breite = 289; var aktuelleBreite = 0;
+var Geschwindigkeit = 20;
+var dur = 2;
+var my_border="5";
+var pause=3;
+var pause_cnt=0;
+
+my_folder_pos = 1;
+
+
+</SCRIPT>
+
+<META content="MSHTML 6.00.2900.3059" name=GENERATOR></HEAD>
+<BODY 
+onclick="document.getElementsByTagName('iframe')[0].style.visibility = 'hidden';" 
+text=#ffffff vLink=#ffffff aLink=#ffffff link=#ffffff bgColor=#ffffff><IMG 
+style="LEFT: 0px; POSITION: absolute; TOP: 0px" 
+src="thumbs/background.jpg"> 
+<DIV>
+<TABLE cellSpacing=0 cellPadding=0 width=800>
+  <TBODY>
+  <TR>
+    <TD vAlign=center align=middle width=200 height=180>
+      <DIV id=Bildbereich1><A id=a1 
+      href="http://sourceforge.net/projects/mediabrowser2" target="_blank"><IMG id=img1 
+      style="FILTER: blendTrans(Duration=2); CURSOR: hand" 
+      src="thumbs/dummy.gif" border=0></DIV></A></TD>
+    <TD vAlign=center align=middle width=200 height=180>
+      <DIV id=Bildbereich2><A id=a2 
+      href="http://sourceforge.net/projects/mediabrowser2" target="_blank"><IMG id=img2 
+      style="FILTER: blendTrans(Duration=2); CURSOR: hand" 
+      src="thumbs/dummy.gif" border=0></A></DIV></TD>
+    <TD vAlign=center align=middle width=200 height=180>
+      <DIV id=Bildbereich3><A id=a3 
+      href="http://sourceforge.net/projects/mediabrowser2" target="_blank"><IMG id=img3 
+      style="FILTER: blendTrans(Duration=2); CURSOR: hand" 
+      src="thumbs/dummy.gif" border=0></DIV></A></TD>
+    <TD vAlign=center align=middle width=200 height=180>
+      <DIV id=Bildbereich4><A id=a4 
+      href="http://sourceforge.net/projects/mediabrowser2" target="_blank"><IMG id=img4 
+      style="FILTER: blendTrans(Duration=2); CURSOR: hand" 
+      src="thumbs/dummy.gif" border=0></DIV></A></TD></TR>
+  <TR>
+    <TD vAlign=center align=middle width=200 height=180>
+      <DIV id=Bildbereich5><A id=a5 
+      href="http://sourceforge.net/projects/mediabrowser2" target="_blank"><IMG id=img5 
+      style="FILTER: blendTrans(Duration=2); CURSOR: hand" 
+      src="thumbs/dummy.gif" border=0></DIV></A></TD>
+    <TD vAlign=center align=middle width=200 height=180>
+      <DIV id=Bildbereich6><A id=a6 
+      href="http://sourceforge.net/projects/mediabrowser2" target="_blank"><IMG id=img6 
+      style="FILTER: blendTrans(Duration=2); CURSOR: hand" 
+      src="thumbs/dummy.gif" border=0></DIV></A></TD>
+    <TD vAlign=center align=middle width=200 height=180>
+      <DIV id=Bildbereich7><A id=a7 
+      href="http://sourceforge.net/projects/mediabrowser2" target="_blank"><IMG id=img7 
+      style="FILTER: blendTrans(Duration=2); CURSOR: hand" 
+      src="thumbs/dummy.gif" border=0></DIV></A></TD>
+    <TD vAlign=center align=middle width=200 height=180>
+      <DIV id=Bildbereich8><A id=a8 
+      href="http://sourceforge.net/projects/mediabrowser2" target="_blank"><IMG id=img8 
+      style="FILTER: blendTrans(Duration=2); CURSOR: hand" 
+      src="thumbs/dummy.gif" border=0></DIV></A></TD></TR>
+  <TR>
+    <TD vAlign=center align=middle width=200 height=180>
+      <DIV id=Bildbereich9><A id=a9 
+      href="http://sourceforge.net/projects/mediabrowser2" target="_blank"><IMG id=img9 
+      style="FILTER: blendTrans(Duration=2); CURSOR: hand" 
+      src="thumbs/dummy.gif" border=0></DIV></A></TD>
+    <TD vAlign=center align=middle width=200 height=180>
+      <DIV id=Bildbereich10><A id=a10 
+      href="http://sourceforge.net/projects/mediabrowser2" target="_blank"><IMG id=img10 
+      style="FILTER: blendTrans(Duration=2); CURSOR: hand" 
+      src="thumbs/dummy.gif" border=0></DIV></A></TD>
+    <TD vAlign=center align=middle width=200 height=180>
+      <DIV id=Bildbereich11><A id=a11 
+      href="http://sourceforge.net/projects/mediabrowser2" target="_blank"><IMG id=img11 
+      style="FILTER: blendTrans(Duration=2); CURSOR: hand" 
+      src="thumbs/dummy.gif" border=0></DIV></A></TD>
+    <TD vAlign=center align=middle width=200 height=180>
+      <DIV id=Bildbereich12><A id=a12 
+      href="http://sourceforge.net/projects/mediabrowser2" target="_blank"><IMG id=img12 
+      style="FILTER: blendTrans(Duration=2); CURSOR: hand" 
+      src="thumbs/dummy.gif" 
+  border=0></DIV></A></TD></TR></TBODY></TABLE></DIV>
+<DIV style="RIGHT: 10px; POSITION: absolute; TOP: 10px"><IMG 
+onmouseover="document.getElementsByTagName('iframe')[0].style.visibility = 'visible';" 
+style="CURSOR: hand" alt="Selection Menue" 
+src="thumbs/menue.gif" border=0> </DIV>
+<SCRIPT language=JavaScript src="thumbs/main.js" 
+type=text/javascript></SCRIPT>
+
+<SCRIPT language=JavaScript src="thumbs/slide.js" 
+type=text/javascript></SCRIPT>
+
+<SCRIPT language=JavaScript src="thumbs/slide_func.js" 
+type=text/javascript></SCRIPT>
+<IFRAME 
+style="BORDER-RIGHT: #ff0000 2px solid; BORDER-TOP: #ff0000 2px solid; RIGHT: 35px; VISIBILITY: hidden; BORDER-LEFT: #ff0000 2px solid; BORDER-BOTTOM: #ff0000 2px solid; POSITION: absolute; TOP: 35px" 
+name="Navigation Menue" src="thumbs/navigat.htm" 
+frameBorder=0 width=300 height=400>
+
+
+
+</body>
+</html></IFRAME></BODY></HTML>

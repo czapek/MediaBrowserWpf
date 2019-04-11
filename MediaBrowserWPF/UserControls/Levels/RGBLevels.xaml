@@ -1,0 +1,43 @@
+﻿<UserControl x:Class="MediaBrowserWPF.UserControls.Levels.RGBLevels"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:histogramm="clr-namespace:MediaBrowserWPF.UserControls.Levels"
+             mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300" Loaded="UserControl_Loaded"  >
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="280" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Image Grid.Row="0" Name="MainImage" />
+
+        <Grid Grid.Row="1" Margin="0,0,0,5">
+            <histogramm:HistogrammSlider x:Name="HistogrammSliderGlobal" LevelsValueChanged="HistogrammSliderGlobal_LevelsValueChanged" Margin="3,3,3,3"></histogramm:HistogrammSlider>
+        </Grid>
+
+        <Expander Grid.Row="2" Header="Farbkanäle" Name="RGBExpander" Expanded="Expander_Expanded" Collapsed="Expander_Collapsed">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Grid Grid.Row="0" Margin="0,5,0,5" Background="Red">
+                    <histogramm:HistogrammSlider x:Name="HistogrammSliderRed" LevelsValueChanged="HistogrammSliderRed_LevelsValueChanged" Margin="3,3,3,3"></histogramm:HistogrammSlider>
+                </Grid>
+
+                <Grid Grid.Row="1" Margin="0,0,0,5" Background="Green">
+                    <histogramm:HistogrammSlider x:Name="HistogrammSliderGreen" LevelsValueChanged="HistogrammSliderGreen_LevelsValueChanged" Margin="3,3,3,3"></histogramm:HistogrammSlider>
+                </Grid>
+                
+                <Grid Grid.Row="2" Background="Blue">
+                    <histogramm:HistogrammSlider x:Name="HistogrammSliderBlue" LevelsValueChanged="HistogrammSliderBlue_LevelsValueChanged" Margin="3,3,3,3"></histogramm:HistogrammSlider>
+                </Grid>
+            </Grid>
+        </Expander>
+    </Grid>
+</UserControl>

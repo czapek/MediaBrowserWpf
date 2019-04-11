@@ -1,0 +1,208 @@
+<html>
+<head>
+<style type="text/css">
+body, input {
+	font-weight: normal;
+	font-size: 12px;
+	font-family: Arial;
+	 }
+	 
+ .button
+{
+	border: solid 1px;
+	font-size: 12px;
+	width: 60px;
+	font-weight: bold;
+	text-transform: none;
+	font-family: Arial;
+	background-color: buttonface;
+}
+
+ .textBox
+{
+	border: solid 1px;
+	font-size: 12px;
+	width: 60px;
+	font-weight: bold;
+	font-family: Arial;
+	text-align:right;
+}
+
+</style>
+<title>Animation</title>
+</head>
+
+<body>
+<br>
+<br>
+
+<!--INSERT MEDIABROWSER CODE HERE-->
+
+var imageIndex = 0;
+var timeoutID = 0;
+var playMode = 1;
+var swap = 1;
+
+
+function animImageInc()
+{
+	if (imageIndex < numOfImages){
+		imageIndex++;
+	}else{
+		if( swap == 1 ){
+			imageIndex--;
+			playMode = 0;
+		}else{
+			imageIndex = 1;
+		}
+	}
+}
+
+function animImageDec()
+{
+	if (imageIndex > 1){
+		imageIndex--;
+	}else{
+		if( swap == 1 ){
+			imageIndex++;
+			playMode = 1;
+		}else{
+			imageIndex = numOfImages;
+		}
+	}
+}
+
+function setCurrImage()
+{
+	document.MainImage.src = imgarray[imageIndex].src;
+	
+	var Textknoten = document.createTextNode(imageIndex);
+  document.getElementById("FrameCount").replaceChild(Textknoten, document.getElementById("FrameCount").firstChild);
+}
+
+function updateAnim()
+{
+	var currTimeoutValue;
+	
+	currTimeoutValue = timeoutValue;
+
+	if (playMode == 1)
+	{
+		animImageInc();
+		if (imageIndex == numOfImages) 
+			currTimeoutValue += animDelay;
+	}
+	else
+	{
+		animImageDec();
+		if (imageIndex == 1) 
+			currTimeoutValue += animDelay;
+	}
+	setCurrImage();
+	timeoutID = setTimeout("updateAnim()", currTimeoutValue);
+}
+
+function clearLastUpdate()
+{
+	clearTimeout(timeoutID);
+	timeoutID = 0;
+}
+
+function startPlay()
+{
+	clearLastUpdate();
+	playMode = 1;
+	updateAnim();	
+}
+
+function startPlayReverse()
+{
+	clearLastUpdate();
+	playMode = 2;
+	updateAnim();	
+}
+
+function sizeTo(layerName, iHeight, iWidth) {   
+   
+   var imagg = document.images["MainImage"];
+   	
+  imagg.setAttribute("width",""+iWidth+"");
+	imagg.setAttribute("height",""+iHeight+"");
+
+}
+
+</script>
+
+<form name="PlayForm">
+<div align="center">
+
+<table>
+	<tr>
+		<td>
+		<input class="button" type="button" onclick="startPlay()" value=">Play>"></td>
+		<td>
+		<input class="button" type="button" onclick="startPlayReverse()" value="<Play<"></td>
+		<td>
+		<input class="button" type="button" onclick="clearLastUpdate()" value="Pause"></td>
+		<td>
+		<input class="button" type="button" onclick="clearLastUpdate();animImageInc();setCurrImage()" value=">Step>"></td>
+		<td>
+		<input class="button" type="button" onclick="clearLastUpdate();animImageDec();setCurrImage()" value="<Step<"></td>
+	</tr>
+	<tr>
+		<td>
+		<input class="button" type="button" onclick="timeoutValue = 4*timeoutValueFix" value="0.25x"></td>
+		<td>
+		<input class="button" type="button" onclick="timeoutValue = 2*timeoutValueFix" value="0.5x"></td>
+		<td>
+		<input class="button" type="button" onclick="timeoutValue = timeoutValueFix" value="1.0x"></td>
+		<td>
+		<input class="button" type="button" onclick="timeoutValue = 0.5*timeoutValueFix" value="2.0x"></td>
+		<td>
+		<input class="button" type="button" onclick="timeoutValue = 0.25*timeoutValueFix" value="4.0x"></td>
+	</tr>
+	
+	<tr>
+		<td>
+		<input class="button" type="button" onclick="sizeTo('zoom', imgHeight * .5, imgWidth * .5)" value="50%"></td>
+		<td>
+		<input class="button" type="button" onclick="sizeTo('zoom', imgHeight, imgWidth)" value="100%"></td>
+		<td>
+		<input class="button" type="button" onclick="sizeTo('zoom', imgHeight * 1.5,imgWidth * 1.5)" value="150%"></td>
+		<td>
+		<input class="button" type="button" onclick="sizeTo('zoom', imgHeight * 2,imgWidth * 2)" value="200%"></td>
+		<td>
+		<input class="button" type="button" onclick="sizeTo('zoom', imgHeight * 3,imgWidth * 3)" value="300%"></td>
+	</tr>
+	
+	<tr>
+		<td>
+		<input class="button" type="button" onclick="swap = 1" value="Swap"></td>
+		<td>
+		<input class="button" type="button" onclick="swap = 0" value="Repeat"></td>
+		<td id="FrameCount" align="center">
+		&nbsp;</td>
+		<td>
+		<input class="button" type="button" onclick="timeoutValue = parseInt(document.PlayForm.IntervalValue.value)" value="Interval"></td>
+		<td>
+		<input class="textBox" type="text" name="IntervalValue"></td>
+	</tr>
+	
+</table>
+
+
+   
+</div>
+
+<script language="javascript">
+	
+	document.PlayForm.IntervalValue.value = timeoutValue;
+	updateAnim();
+	
+</script>
+
+</form>
+
+
+</body>
+</html>

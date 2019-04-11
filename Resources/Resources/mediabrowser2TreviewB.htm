@@ -1,0 +1,234 @@
+document.write(d);
+		//-->
+		</script>
+		</div>
+		</td><td class="imageCell">
+		<div id="images">		            
+			<div>
+			</td></tr></table>
+
+<script type="text/javascript">
+	var qshow = getQueryVariable('show');
+	var qelement = getQueryVariable('element');
+	
+	if( qshow != null ){                	
+		d.closeAll();  
+		d.openTo( qshow ,true);
+		ajaxReplace('cat_' + qshow + '.tbl');                  
+	}
+	
+	function DHTMLSound(surl) {
+		document.getElementById("dummyspan").innerHTML=
+		"<embed src='"+surl+"' hidden=true autostart=true loop=false>";
+	}
+
+	var lastObject;
+	var lastStyle;
+	var scrolY = 0;
+	function MarkCell(cellId) {
+		
+		if(lastObject != null){
+			lastObject.style.borderColor = lastStyle;
+		}	                
+		
+		lastObject = document.getElementById(cellId).getElementsByTagName("img")[0];
+		
+		if(lastObject != null){  
+				lastStyle = lastObject.style.borderColor;                 
+			lastObject.style.borderColor ="red";
+		}		
+
+		scrolY = absTop(lastObject);
+	}
+	
+
+  function absTop(el) {
+     return (el.offsetParent)? 
+     el.offsetTop+absTop(el.offsetParent) : el.offsetTop;
+  }
+
+  function getQueryVariable(variable)
+  {
+	var query = window.location.search.substring(1);
+	var vars = query.split("&");
+	for (var i=0;i<vars.length;i++)
+	{
+	  var Key_And_Value = vars[i].split("=");
+	  if (Key_And_Value[0] == variable)
+	  {
+		return Key_And_Value[1];
+	  }
+	}
+	
+	return null;
+  }
+
+  function isVideoPath(path)
+  {
+	  if ( path.toLowerCase().indexOf(".avi") != -1 ||
+	  path.toLowerCase().indexOf(".mov") != -1 ||
+	  path.toLowerCase().indexOf(".wmv") != -1 ||
+			path.toLowerCase().indexOf(".mpg") != -1 
+		 )
+		 {	
+			return true
+		 }
+		 else
+		 {
+			return false;
+		 }
+  }
+  
+  function showMediaItem( mediaId, mediaPos, mainFolder, mediaName, previewFolder )
+  {
+	indexSlideshow = mediaPos;	
+	MarkCell(mediaId);
+	
+	var slideDiv = document.getElementById("slideShowDiv");
+	var slideImg = document.getElementById("slideshowImage");
+	slideDiv.style.display = "block";	
+
+	var inputFields = document.getElementsByName("imageLinkHref");
+	var inputField = inputFields[indexSlideshow];	
+	var imagePath = "";
+	
+	window.scrollTo(0, 0);
+	
+	if(previewFolder == ""){
+		imagePath = mainFolder + "/" + mediaName;
+	}else{	
+		imagePath = mainFolder + "/" + previewFolder + "/" + mediaName;
+	}	
+	
+	if ( !isVideoPath(mediaName) )
+	{
+		slideshowImage.style.display = "block";	
+		document.getElementById("VideoPlayer").style.display = "none";	
+		document.getElementById("VideoPlayer").innerHTML  = "";
+		slideshowImage.src = imagePath;							
+	}
+	else
+	{
+		slideshowImage.style.display = "none";	
+		document.getElementById("VideoPlayer").style.display = "block";	
+		document.getElementById("VideoPlayer").innerHTML  = "<embed type=\"application/x-mplayer2\" style=\"border-style:solid; border-width:3px;\" NAME=\"VideoPlayer\" src=\"" + imagePath + "\" />";	
+	}	
+	
+	document.getElementById("slidShowCount").firstChild.nodeValue = ((indexSlideshow + 1) + " / " + inputFields.length);
+	document.getElementById("slidShowName").firstChild.nodeValue = mediaName;		
+	document.getElementById("slidShowName").href = mainFolder + "/" + mediaName;	
+  }
+  
+  var timerSlideshow;
+  function startSlideshow()
+  {	
+	timerSlideshow = setTimeout("startSlideshow()", 5000);
+	stepSlideShow(1);
+  }
+  
+  function stepSlideShow( indexVar )
+  {
+	indexSlideshow += indexVar;	
+	
+	var inputFields = document.getElementsByName("imageLinkHref");
+	
+	if( inputFields.length <= 0){
+		stopSlideShow();
+		return;
+	}
+	
+	if(indexSlideshow >= inputFields.length)
+		indexSlideshow = 0;
+		
+	if(indexSlideshow < 0)
+		indexSlideshow = inputFields.length - 1;
+		
+	var inputField = inputFields[indexSlideshow];
+	document.location = inputField.href;
+  }
+  
+  function stopSlideShow()
+  { 
+	if(timerSlideshow != null)
+		clearTimeout(timerSlideshow);
+	document.getElementById("VideoPlayer").innerHTML  = "";
+	document.getElementById("slideShowDiv").style.display = "none";
+	document.getElementById("slideshowImage").src = "thumbs/empty.gif";
+	
+	window.scrollTo(0, scrolY);
+  } 
+
+ </script>
+ <span id="dummyspan"></span>
+
+<div id="slideShowDiv" style="border-style:solid; border-width:10px; border-color:#A0A0A0; display: none; position: absolute; top: 10px; z-index:1001; left: 10px; width:100%; background-color:White;">
+		
+<table  style="width:100%; margin-bottom: 20px;">
+<tr>
+<td align="center" >
+	<table>
+	<tr>
+	<td  style="width:50%; text-align: left;white-space:nowrap;">			
+			<a class="slideMenu" title="Download Original Media Item" style="background-color:#FFFFFF;" id="slidShowName" target="_blank">&npsp;</a>			
+	</td>
+	<td>
+	<table width="450px">
+	<tr>	
+	<td>	
+		<a class="button" href="#" onclick="stepSlideShow(-20);this.blur(); return false;"><span>-20</span></a>
+	</td>
+	<td>	
+		<a class="button" href="#" onclick="stepSlideShow(-5);this.blur(); return false;"><span>-5</span></a>
+	</td>
+	<td>	
+		<a class="button" href="#" onclick="stepSlideShow(-1);this.blur(); return false;"><span>-1</span></a>
+	</td>
+	<td>	
+		<a class="button" href="#" onclick="stopSlideShow();this.blur(); return false;"><span>Close</span></a>
+	</td>
+	<td>	
+		<a class="button" href="#" onclick="stepSlideShow(1);this.blur(); return false;"><span>+1</span></a>
+	</td>
+	<td>	
+		<a class="button" href="#" onclick="stepSlideShow(5);this.blur(); return false;"><span>+5</span></a>
+	</td>
+	<td>	
+		<a class="button" href="#" onclick="stepSlideShow(20);this.blur(); return false;"><span>+20</span></a>
+	</td>
+	</tr>
+	</table>
+	</td>
+	<td class="slideMenu" style="background-color:#FFFFFF; width:50%; text-align: right;" id="slidShowCount">			
+		&npsp;				
+	</td>
+	<tr>
+</table>
+<td>
+</tr>
+<tr><td align="center">
+<div id="VideoPlayer"></div>
+
+<img id ="slideshowImage" style="cursor:pointer;border-style:solid; border-width:3px;" title="Click to Close" onclick="stopSlideShow();" src="thumbs/empty.gif"></img>
+</td><tr>
+</table>
+</div>
+<SCRIPT LANGUAGE='JavaScript' TYPE='TEXT/JAVASCRIPT'>
+<!--
+if ((navigator.appName=="Microsoft Internet Explorer") || (navigator.appName=="Netscape"))
+{
+  if (navigator.appName=="Microsoft Internet Explorer"){
+   //IE
+    document.getElementById("slideShowDiv").style.width="100%";
+   }
+  else{
+   //firefox
+   document.getElementById("slideShowDiv").style.width="97%";
+   }
+  }
+else{
+   //other
+   }
+//-->
+</Script>
+</body>
+</html>

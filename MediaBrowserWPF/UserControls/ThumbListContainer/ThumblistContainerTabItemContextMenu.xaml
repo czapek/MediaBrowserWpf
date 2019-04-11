@@ -1,0 +1,20 @@
+﻿<ContextMenu x:Class="MediaBrowserWPF.UserControls.ThumblistContainerTabItemContextMenu"
+                xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300" Opened="ContextMenu_Opened">
+    
+    <MenuItem Name="MenuItemCloseThis" Header="Diese Registerkarte schließen" Click="MenuItem_CloseThis"/>
+    <MenuItem Name="MenuItemCloseAll" Header="Alle anderen Registerkarte schließen" Click="MenuItem_CloseAll"/>
+    <Separator/>
+    <MenuItem Name="MenuItemView" Header="Ansicht wechseln" InputGestureText="F8" Click="MenuItem_ChangeView"/>
+    <Separator/>
+    <MenuItem Name="MenuItemOpenRequest" Header="Die Anfrage öffnen" Click="MenuItemOpenRequest_Click"/>
+    <MenuItem Name="MenuItemSaveRequest" Header="Die Anfrage speichern" Click="MenuItemSaveRequest_Click" />
+    <MenuItem Name="MenuItemRefreshRequest" Header="Die Anfrage aktualisieren" Click="MenuItemRefreshRequest_Click" InputGestureText="F5" />
+    <MenuItem Name="MenuItemRefreshEditSql" Header="Angfrage-Sql editieren" Click="MenuItemRefreshEditSql_Click" />
+    <MenuItem Name="MenuItemRescanRecursive" Header="Neue Medien rekursiv suchen" Click="MenuItemRescanRecursive_Click" />
+    <MenuItem Name="MenuItemRescan" Header="Neue Medien suchen" Click="MenuItemRescan_Click" InputGestureText="Strg+F5" />
+</ContextMenu>

@@ -1,0 +1,149 @@
+﻿<UserControl x:Class="MediaBrowserWPF.UserControls.SearchContainer"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:mbLib="clr-namespace:MediaBrowser4.Objects;assembly=MediaBrowser4Lib"
+             xmlns:mbUc="clr-namespace:MediaBrowserWPF.UserControls" 
+             xmlns:dragonz="clr-namespace:dragonz.actb.control;assembly=dragonz.actb" 
+             xmlns:toolkit="clr-namespace:Microsoft.Windows.Controls;assembly=WPFToolkit.Extended" 
+             xmlns:focus="clr-namespace:MediaBrowserWPF.Utilities.FocusExtension"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300"
+            PreviewKeyDown="UserControl_PreviewKeyDown">
+    <DockPanel LastChildFill="True" PreviewGotKeyboardFocus="DockPanel_PreviewGotKeyboardFocus">
+        <StackPanel DockPanel.Dock="Top" Margin="0,10,0,0">
+            <Expander>
+                <Expander.Header>
+                    <Grid focus:KeyboardFocus.On="{Binding ElementName=SearchText1}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition Width="160"/>
+                            <ColumnDefinition Width="auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Column="0">Suchtext 1</Label>
+                        <TextBox Grid.Column="1" Name="SearchText1" Margin="5,0,10,0" VerticalAlignment="Center" Text="{Binding Path=SearchText1}" />
+                        <CheckBox Grid.Column="2" Name="SearchText1Not" IsChecked="{Binding Path=SearchText1Not}" Content="Nicht" ToolTip="Der Suchtext darf in den Ergebnissen nicht vorhanden sein." VerticalAlignment="Center"/>
+                    </Grid>
+                </Expander.Header>
+                <StackPanel Margin="10,0,0,10">
+                    <CheckBox Name="SearchText1Description" IsChecked="{Binding Path=SearchText1Description}" Margin="3" Content="Beschreibung" ToolTip="Der Suchtext wird in der Beschreibung gesucht." />
+                    <CheckBox Name="SearchText1Category" IsChecked="{Binding Path=SearchText1Category}" Margin="3" Content="Kategorie" ToolTip="Der Suchtext wird in den Kategorien gesucht." />
+                    <CheckBox Name="SearchText1Filename" IsChecked="{Binding Path=SearchText1Filename}" Margin="3" Content="Dateiname" ToolTip="Der Suchtext wird im Dateinamen gesucht." />
+                    <CheckBox Name="SearchText1Md5" IsChecked="{Binding Path=SearchText1Md5}" Margin="3" Content="Prüfsumme" ToolTip="Der Suchtext wird in der Prüfsumme gesucht." />
+                    <CheckBox Name="SearchText1Folder" IsChecked="{Binding Path=SearchText1Folder}" Margin="3" Content="Dateipfad" ToolTip="Der Suchtext wird im Dateipfad gesucht." />
+                </StackPanel>
+            </Expander>
+
+            <Expander>
+                <Expander.Header>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition Width="160"/>
+                            <ColumnDefinition Width="auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Column="0">Suchtext 2</Label>
+                        <TextBox Grid.Column="1" Name="SearchText2" Margin="5,0,10,0" VerticalAlignment="Center" Text="{Binding Path=SearchText2}" />
+                        <CheckBox Grid.Column="2" Name="SearchText2Not" IsChecked="{Binding Path=SearchText2Not}" Content="Nicht" ToolTip="Der Suchtext darf in den Ergebnissen nicht vorhanden sein." VerticalAlignment="Center"/>
+                    </Grid>
+                </Expander.Header>
+                <StackPanel Margin="10,0,0,0">
+                    <CheckBox Name="SearchText2Description" IsChecked="{Binding Path=SearchText2Description}" Margin="3" Content="Beschreibung" ToolTip="Der Suchtext wird in der Beschreibung gesucht." />
+                    <CheckBox Name="SearchText2Category" IsChecked="{Binding Path=SearchText2Category}" Margin="3" Content="Kategorie" ToolTip="Der Suchtext wird in den Kategorien gesucht." />
+                    <CheckBox Name="SearchText2Filename" IsChecked="{Binding Path=SearchText2Filename}" Margin="3" Content="Dateiname" ToolTip="Der Suchtext wird im Dateinamen gesucht." />
+                    <CheckBox Name="SearchText2Md5" IsChecked="{Binding Path=SearchText2Md5}" Margin="3" Content="Prüfsumme" ToolTip="Der Suchtext wird in der Prüfsumme gesucht." />
+                    <CheckBox Name="SearchText2Folder" IsChecked="{Binding Path=SearchText2Folder}" Margin="3" Content="Dateipfad" ToolTip="Der Suchtext wird im Dateipfad gesucht." />
+                </StackPanel>
+            </Expander>
+
+            <WrapPanel Margin="3,10">
+                <Label>Zeige Medien:</Label>
+                <CheckBox Name="MediaTypeDirectShow" VerticalAlignment="Center" Margin="3" IsChecked="{Binding Path=MediaTypeDirectShow}" Content="Videos" ToolTip="Videos sind im Suchergebnis vorhanden." />
+                <CheckBox Name="MediaTypeRgb" VerticalAlignment="Center" Margin="3" IsChecked="{Binding Path=MediaTypeRgb}" Content="Bilder" ToolTip="Bilder sind im Suchergebnis vorhanden." />
+            </WrapPanel>
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto" />
+                    <ColumnDefinition Width="160"/>
+                </Grid.ColumnDefinitions>
+
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+
+                <Label Grid.Column="0" Margin="3" Content="Seitenverhältnis" />
+                <ComboBox Grid.Column="1" Margin="3" SelectedValue="{Binding Path=Relation}">
+                    <mbLib:SearchTokenRelation RelationType="ALL"/>
+                    <mbLib:SearchTokenRelation RelationType="LANDSCAPE"/>
+                    <mbLib:SearchTokenRelation RelationType="LANDSCAPE21"/>
+                    <mbLib:SearchTokenRelation RelationType="LANDSCAPE43"/>
+                    <mbLib:SearchTokenRelation RelationType="PORTRAIT"/>
+                    <mbLib:SearchTokenRelation RelationType="PORTRAIT21"/>
+                    <mbLib:SearchTokenRelation RelationType="PORTRAIT43"/>
+                </ComboBox>
+
+                <CheckBox Grid.Column="0" Grid.Row="1" Margin="3" VerticalAlignment="Center" Name="DateFromEnabled" IsChecked="{Binding Path=DateFromEnabled}" Content="Datum von" ToolTip="Bilder ab einem bestimmten Datum suchen." />
+                <DatePicker Grid.Column="1" Grid.Row="1" Margin="3" VerticalAlignment="Center" Name="DateFrom" SelectedDate="{Binding Path=DateFrom}" IsEnabled="{Binding Path=DateFromEnabled}" ToolTip="Bilder ab einem bestimmten Datum suchen." />
+                <CheckBox Grid.Column="0" Grid.Row="2" Margin="3" VerticalAlignment="Center" Name="DateToEnabled" IsChecked="{Binding Path=DateToEnabled}" Content="Datum bis" ToolTip="Bilder bis zu einem bestimmten Datum suchen." />
+                <DatePicker Grid.Column="1" Grid.Row="2" Margin="3" VerticalAlignment="Center" Name="DateTo" SelectedDate="{Binding Path=DateTo}" IsEnabled="{Binding Path=DateToEnabled}" ToolTip="Bilder bis zu einem bestimmten Datum suchen." />
+
+                <Label Grid.Column="0" Grid.Row="3" Margin="3" >Info: Schlüssel</Label>
+                <dragonz:AutoCompleteComboBoxString Grid.Column="1" Grid.Row="3" VerticalAlignment="Center" Margin="3" x:Name="MetaDataKeyAutoCompleter" Text="{Binding Path=MetaDataKey}" />
+                <Label Grid.Column="0" Grid.Row="4" Margin="3">Info: Wert</Label>
+                <TextBox Grid.Column="1" Grid.Row="4" Margin="3" VerticalAlignment="Center" Name="MetaDataValue" Text="{Binding Path=MetaDataValue}" />
+            </Grid>
+
+            <Grid Margin="0,10,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto" />
+                    <ColumnDefinition Width="70" />
+                    <ColumnDefinition Width="auto" />
+                    <ColumnDefinition Width="70" />
+                </Grid.ColumnDefinitions>
+
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+
+                <Label Grid.Column="0" Grid.Row="0" Margin="3">Datei-Größe (KB)</Label>
+                <toolkit:IntegerUpDown Grid.Column="1" Grid.Row="0" Name="LengthFrom" Minimum="0" Increment="1024" Value="{Binding Path=LengthFrom}" VerticalAlignment="Center"></toolkit:IntegerUpDown>
+                <Label Grid.Column="2" Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="3,0" Content="&lt;-&gt;"/>
+                <toolkit:IntegerUpDown Grid.Column="3" Grid.Row="0" Name="LengthTo" Minimum="0" Increment="1024" Value="{Binding Path=LengthTo}" VerticalAlignment="Center"></toolkit:IntegerUpDown>
+
+                <Label Grid.Column="0" Grid.Row="1" Margin="3">Dauer (s)</Label>
+                <toolkit:IntegerUpDown Grid.Column="1" Grid.Row="1" Name="DurationFrom" Minimum="0" Increment="60" Value="{Binding Path=DurationFrom}" VerticalAlignment="Center"></toolkit:IntegerUpDown>
+                <Label Grid.Column="2" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="3,0" Content="&lt;-&gt;"/>
+                <toolkit:IntegerUpDown Grid.Column="3" Grid.Row="1" Name="DurationTo" Minimum="0" Increment="60" Value="{Binding Path=DurationTo}" VerticalAlignment="Center"></toolkit:IntegerUpDown>
+
+                <Label Grid.Column="0" Grid.Row="2" Margin="3">Abmessung (pix)</Label>
+                <toolkit:IntegerUpDown Grid.Column="1" Grid.Row="2" Name="DimensionFrom" Minimum="0" Increment="100" Value="{Binding Path=DimensionFrom}" VerticalAlignment="Center"></toolkit:IntegerUpDown>
+                <Label Grid.Column="2" Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="3,0" Content="&lt;-&gt;"/>
+                <toolkit:IntegerUpDown Grid.Column="3" Grid.Row="2" Name="DimensionTo" Minimum="0" Increment="100" Value="{Binding Path=DimensionTo}" VerticalAlignment="Center"></toolkit:IntegerUpDown>
+
+                <Label Grid.Column="0" Grid.Row="3" Margin="3">Priorität</Label>
+                <toolkit:IntegerUpDown Grid.Column="1" Grid.Row="3" Name="PriorityFrom" Maximum="9" Minimum="1" Value="{Binding Path=PriorityFrom}" VerticalAlignment="Center"></toolkit:IntegerUpDown>
+                <Label Grid.Column="2" Grid.Row="3" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="3,0" Content="&lt;-&gt;"/>
+                <toolkit:IntegerUpDown Grid.Column="3" Grid.Row="3" Name="PriorityTo" Maximum="9" Minimum="1" Value="{Binding Path=PriorityTo}" VerticalAlignment="Center"></toolkit:IntegerUpDown>
+            </Grid>
+
+            <WrapPanel HorizontalAlignment="Right" Margin="0,40,0,0">
+                <Button Name="ButtonStart" Margin="3" Click="ButtonStart_Click" Content="Suche starten" />
+                <Button Name="ButtonReset" Margin="3" Click="ButtonReset_Click" Content="Zurücksetzen" />
+            </WrapPanel>
+        </StackPanel>
+
+        <WrapPanel DockPanel.Dock="Bottom" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+            <CheckBox Name="CheckBoxNewTab" Margin="3" VerticalAlignment="Center" IsChecked="True" Content="Neuer Reiter" ToolTip="Öffnet die Suche in einem eigenen Reiter" />
+            <CheckBox Name="CheckBoxGlobalUse" Margin="3" VerticalAlignment="Center" Checked="CheckBoxGlobalUse_Checked" IsChecked="False" Content="Verwende Global" ToolTip="Verwendet diese Einschränkung für alle Anfragen." Unchecked="CheckBoxGlobalUse_Unchecked" />
+        </WrapPanel>
+    </DockPanel>
+</UserControl>

@@ -1,0 +1,93 @@
+﻿<Window x:Class="MediaBrowserWPF.Dialogs.CopySdCardDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Kopieren von einer Speicherkarte" WindowStyle="ToolWindow" MinHeight="300" MinWidth="550" Height="500" Width="450">
+
+    <Window.Resources>
+        <DataTemplate x:Key="FirstCell">
+            <StackPanel Orientation="Horizontal">
+                <CheckBox IsChecked="{Binding Path=IsCopy}"/>
+            </StackPanel>
+        </DataTemplate>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="120" />
+            <RowDefinition Height="60" />
+        </Grid.RowDefinitions>
+        <TabControl Grid.Row="0" Name="TabControlControls">
+            <TabItem Header="Dateien Kopieren" Name="CategoryCopy">
+                <ListView ItemsSource="{Binding}" Name="CopyGrid" SelectionChanged="CopyGrid_SelectionChanged">
+
+                    <ListView.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="Markierung hinzufügen" Click="MenuItem_Click" />
+                            <MenuItem Header="Markierung entfernen" Click="MenuItem_Click_1" />
+                        </ContextMenu>
+                    </ListView.ContextMenu>
+
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn x:Name= "Col0" CellTemplate="{StaticResource FirstCell}" Width="35"/>
+                            <GridViewColumn x:Name= "Col1" Header="Quelle" DisplayMemberBinding="{Binding Path=From}" />
+                            <GridViewColumn x:Name= "Col2" Header="Ziel" DisplayMemberBinding="{Binding Path=To}" />
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+            </TabItem>
+            <TabItem Header="Übrige Dateien" Name="CategoryNoCopy">
+                <ListView ItemsSource="{Binding}" Name="NoCopyGrid">
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn x:Name= "NoCopyCol1" Header="Sonstige Dateien" />
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+            </TabItem>
+        </TabControl>
+        <Grid Grid.Row="1" Margin="5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition  />
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0">
+                <WrapPanel Margin="0,0,0,5">
+                    <Label Padding="0,0,10,0" VerticalAlignment="Center">Quelle wählen</Label>
+                    <ComboBox Width="180" Name="MediaSource" SelectedValuePath="Value" DisplayMemberPath="Name" SelectionChanged="MediaSource_SelectionChanged"></ComboBox>
+                </WrapPanel>
+                <CheckBox Name="checkBoxDelete" IsChecked="False">Nach dem Import von der Karte löschen</CheckBox>
+                <TextBlock Name="LabelInfoCopy" Margin="10,0,0,2" Visibility="Collapsed" TextWrapping="WrapWithOverflow"></TextBlock>
+                <CheckBox Name="checkDeleteOther" IsChecked="False">Übrige Dateien und leere Ordner löschen</CheckBox>
+                <CheckBox Name="checkBoxRename" IsChecked="True">Sofort umbenennen</CheckBox>
+                <Label Name="LabelExifDate" Margin="0,40,0,0">Erstellt am ...</Label>
+            </StackPanel>
+            <Image HorizontalAlignment="Right" Margin="0,0,15,0" Grid.Column="1" Name="ThumbnailImage"></Image>
+        </Grid>
+        <Grid Grid.Row="2" Margin="5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="auto" />
+            </Grid.ColumnDefinitions>
+            <WrapPanel  Margin="0,12,0,0"  Grid.Column="0" >
+                <Label>Zielpfad</Label>
+                <Grid Grid.Column="1" Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBox Margin="3" Width="200" VerticalAlignment="Center" IsEnabled="False" x:Name="FolderAutoCompleter" />
+                    <Button Width="22" Height="22" Grid.Column="2" Grid.Row="0" Click="ButtonFolderDialog_Click">...</Button>
+                </Grid>
+            </WrapPanel>
+            <StackPanel Orientation="Horizontal" Grid.Column="1" Height="45" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="190">
+                <Button Content="Kopieren" 
+                Height="25" Margin="20,5,0,5" Width="75" Name="btnOK" TabIndex="1600" IsDefault="True" Click="btnOK_Click"                        
+                VerticalContentAlignment="Center" HorizontalContentAlignment="Center" />
+                <Button Content="Abbrechen" 
+                Height="25" Margin="10,5,10,5" Width="75" Name="btnCancel" TabIndex="1700" IsCancel="True" 
+                VerticalContentAlignment="Center" HorizontalContentAlignment="Center" />
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Window>

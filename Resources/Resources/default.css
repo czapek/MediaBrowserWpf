@@ -1,0 +1,284 @@
+
+
+.clear { /* generic container (i.e. div) for floating buttons */
+    overflow: hidden;
+    width: 100%;
+}
+
+a.button {
+    background: transparent url('bg_button_a.gif') no-repeat scroll top right;
+    color: #444;
+    display: block;
+    float: left;
+    font: normal 12px arial, sans-serif;
+    height: 24px;
+    margin-right: 6px;
+    padding-right: 18px; /* sliding doors padding */
+    text-decoration: none;
+	cursor: hand;
+}
+
+a.button span {
+    background: transparent url('bg_button_span.gif') no-repeat;
+    display: block;
+    line-height: 14px;
+    padding: 5px 0 5px 18px;
+	width: 40px;
+	text-align: center;
+	cursor: hand;
+}
+
+a.button:active {
+    background-position: bottom right;
+    color: #000;
+    outline: none; /* hide dotted outline in Firefox */
+	cursor: hand;
+}
+
+a.button:active span {
+    background-position: bottom left;
+    padding: 6px 0 4px 18px; /* push text down 1px */
+	cursor: hand;
+}
+
+.dtree {
+	font-family: Verdana;
+	font-size: 11px;
+	color: #666;
+	white-space: nowrap;
+}
+
+p.dtreeOpenClose {
+	font-family: Verdana;
+	font-size: 11px;
+	color: #666;
+	white-space: nowrap;
+	text-align: center;	
+}
+
+.dtree div {
+	vertical-align: top;
+}
+
+
+td.treeCell {
+	vertical-align: top;
+	padding-right: 10px;
+	padding-bottom: 10px;
+	padding-left: 5px;
+	background-color: #ffffff;
+	border:5px solid #a0a0a0
+}
+
+td.imageCell {
+	vertical-align: top;
+	padding-left: 30px;
+}
+
+.dtree img {
+	border: 0px;
+	vertical-align: middle;
+}
+.dtree a {
+	color: #333;
+	text-decoration: none;
+}
+.dtree a.node, .dtree a.nodeSel {
+	white-space: nowrap;
+	padding: 1px 2px 1px 2px;
+}
+.dtree a.node:hover, .dtree a.nodeSel:hover {
+	color: #333;
+	text-decoration: underline;
+}
+.dtree a.nodeSel {
+	background-color: #c0d2ec;
+}
+.dtree .clip {
+	overflow: hidden;
+}
+
+body
+{
+	background-color: #EBEEF1;
+}
+
+p
+{
+	font-size: 14px;
+	font-family: Verdana;
+	color: #212750;	
+}
+
+a.slideMenu, td.slideMenu
+{
+	font-size: 18px;
+	font-style: bold;
+	font-family: Verdana;
+	color: #212750;	
+	text-align: center;
+	width: 100px;
+	background-color: #F0F0F0;	
+}
+
+
+
+p.peviewText
+{
+	font-size: 18px;
+	font-style: bold;
+	font-family: Verdana;
+	color: #212750;	
+}
+
+p.filelistItem
+{
+	font-size: 14px;
+	font-family: Verdana;
+	color: #212750;	
+	text-align: left;	
+}
+
+p.directLink
+{
+	font-size: 14px;
+	font-family: Verdana;
+	color: #212750;	
+	text-align: left;	
+	white-space:nowrap;
+}
+
+td.itemsTableHead
+{
+	font-size: 34px;
+	font-family: Verdana;
+	font-style: bold;
+	color: #212750;	
+	padding-bottom: 5px;
+}
+
+td.itemsTableDesc
+{
+	font-size: 14px;
+	font-family: Verdana;
+	color: #212750;	
+	padding-bottom: 10px;
+}
+
+p.job
+{
+	font-size: 12px;
+	font-family: Verdana;
+	color: #212750;	
+}
+
+p.link
+{
+	font-size: 14px;
+	font-family: Verdana;
+	color: #212750;	
+}
+
+a:link 
+{
+	color: #212750;
+}
+
+a:link
+{
+	color: #212750;
+}
+
+a:hover
+{
+	color: #ff0000;
+}
+
+a:active
+{
+	color: #212750;
+}
+
+a:focus
+{
+	color: #212750;
+}
+
+a:visited
+{
+	color: #212750;	
+}
+
+div.filelist
+{
+	text-align: center;	
+}
+
+table.masterTable
+{
+
+}
+
+td.masterLeft
+{
+	vertical-align: top;
+	white-space:nowrap;
+}
+
+td.masterRight
+{	
+ 	padding-left: 5%;
+ 	text-align: left;	
+}
+
+table.itemsTable
+{
+	text-align: center;	
+	width: 1%;
+}
+
+div.itemsDiv
+{
+	text-align: center;	
+}
+
+td.itemCell
+{
+	vertical-align: top;
+	text-align: center;
+	padding-right: 5px;
+	padding-left: 5px;
+	padding-bottom: 10px;
+}
+
+img.itemThumb
+{	
+	border: #212750 3px solid;
+}
+
+img.videoIcon
+{	
+	border-style:none;
+	position: absolute;
+	left:0px;
+}
+
+p.thumbDescription
+{
+
+}
+
+p.thumbTitle
+{
+	font-weight:bold;
+}
+
+a.thumbDescriptionLink
+{
+
+}
+
+img.peviewImage
+{	
+	border: #212750 3px solid;
+}

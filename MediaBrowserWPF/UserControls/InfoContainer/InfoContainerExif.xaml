@@ -1,0 +1,48 @@
+﻿<UserControl x:Class="MediaBrowserWPF.UserControls.InfoContainerExif"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+
+    <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="100" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Column="0" VerticalAlignment="Center">Filter:</TextBlock>
+            <TextBox Grid.Column="1" Name="TextBoxFilter" HorizontalAlignment="Stretch" Margin="5" TextChanged="TextBoxFilter_TextChanged"></TextBox>
+            <ComboBox Grid.Column="2" Name="ComboBoxGroups" HorizontalAlignment="Stretch" VerticalAlignment="Center" SelectionChanged="ComboBoxGroups_SelectionChanged"></ComboBox>
+        </Grid>
+
+        <ListView Grid.Row="1" Name="ListViewExif" HorizontalAlignment="Stretch" SelectionMode="Extended" VerticalAlignment="Stretch" SizeChanged="ListViewExif_SizeChanged">
+            <ListView.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Name="MenuItemCopyKey" Header="Schlüssel kopieren" Click="MenuItemCopyKey_Click" />
+                    <MenuItem Name="MenuItemCopyValue" Header="Wert kopieren" Click="MenuItemCopyValue_Click" />
+                    <MenuItem Name="MenuItemSearch" Header="Danach suchen" Click="MenuItemSearch_Click" />
+                </ContextMenu>
+            </ListView.ContextMenu>
+            <ListView.View>
+                <GridView x:Name="GridViewExif">
+                    <GridViewColumn Width="100" Header="Name" DisplayMemberBinding="{Binding Key}"/>
+                    <GridViewColumn Width="100" Header="Wert" DisplayMemberBinding="{Binding Name}"/>
+                </GridView>
+            </ListView.View>
+            <ListView.ItemContainerStyle>
+                <Style TargetType="{x:Type ListViewItem}">
+                    <Setter Property="ToolTip" Value="{Binding Path=ToolTip}" />
+                </Style>
+            </ListView.ItemContainerStyle>
+        </ListView>
+    </Grid>
+</UserControl>

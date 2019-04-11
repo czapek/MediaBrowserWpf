@@ -1,0 +1,45 @@
+﻿<UserControl x:Class="MediaBrowserWPF.UserControls.FolderContainer.FolderEditor"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:mb="clr-namespace:MediaBrowserWPF.UserControls" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300" KeyDown="UserControl_KeyDown">
+    <Grid>
+        <Grid VerticalAlignment="Top">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+
+            <Label Grid.Column="0" Grid.Row="0" Margin="3">Elternknoten</Label>
+            <Grid Grid.Column="1" Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="auto" />
+                </Grid.ColumnDefinitions>
+                <mb:AutoCompleteComboBoxFolder  Margin="3" VerticalAlignment="Center"  x:Name="FolderAutoCompleter" />
+                <Button Width="22" Height="22" Grid.Column="2" Grid.Row="0" Click="ButtonFolderDialog_Click">...</Button>
+            </Grid>
+
+            <Label Grid.Column="0" Grid.Row="1" Margin="3">Name</Label>
+            <TextBox Name="TextBoxName" Grid.Column="1" Grid.Row="1" Margin="3" VerticalAlignment="Center" Text="{Binding Path=Name, UpdateSourceTrigger=Explicit}"  />
+
+            <WrapPanel  Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"  HorizontalAlignment="Right" Margin="0,15,0,0">
+                <CheckBox Name="CheckBoxOnlyDb" VerticalAlignment="Center" Margin="0,0,10,0">Nur DB</CheckBox>
+                <CheckBox Name="CheckBoxCreateNew" Unchecked="CheckBoxCreateNew_Unchecked" VerticalAlignment="Center" Checked="CheckBoxCreateNew_Checked" Margin="0,0,10,0">Neu</CheckBox>
+                <Button Name="ButtonSave" Margin="3" Content="Speichern" Width="80" Click="ButtonSave_Click" />
+                <Button Name="ButtonDelete" Margin="3" Content="Löschen" Width="80" Click="ButtonDelete_Click" />
+            </WrapPanel>
+
+        </Grid>
+
+    </Grid>
+</UserControl>

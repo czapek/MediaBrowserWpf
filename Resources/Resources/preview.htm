@@ -1,0 +1,83 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Language" content="de">
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<link href="thumbs/default.css" type="text/css" rel="stylesheet">
+<title>Preview Media</title>
+</head>
+
+<body>
+<table width="100%">
+	<tr>
+		<td width="40%">	
+		<a id="oImage1" href="">
+			<p align="right" class="peviewText">
+	Original Bild</p></a>
+		</td>
+		<td width="20%">
+		&nbsp;</td>
+		<td width="40%">		
+		<a href="javascript:close();"><p align="left" class="peviewText">Schließen</p></a></td>
+	</tr>
+	<tr>
+		<td colspan="3" align="center">
+		<a href="javascript:close();">
+		<img id="image" class="peviewImage" src=""></a></td>
+	</tr>
+	<tr>
+		<td width="40%">
+		
+	<a href="javascript:close();"><p align="right"  class="peviewText">Schließen</p></a>
+		</td>
+
+		<td width="20%">
+		&nbsp;</td>
+
+		<td width="40%">
+		<a id="oImage2" href=""><p align="left" class="peviewText">
+	Original Bild</p></a>
+		</td>
+
+	</tr>
+</table>
+
+            <script type="text/javascript">
+                var path = getQueryVariable('path');
+                var mediaName = getQueryVariable('name');
+                
+                      
+                     
+                if( path != null ){     
+                		path = decodeURIComponent(path);           	
+                		if(path.length > 0)
+                		{
+                			path = path + '/';
+                		}
+                     document.getElementById("oImage1").href = path + mediaName;
+                     document.getElementById("image").src = path + 'preview/' + mediaName;
+                     document.getElementById("oImage2").href = path + mediaName;                     
+      
+                }
+                
+
+             function getQueryVariable(variable)
+              {
+                var query = window.location.search.substring(1);
+                var vars = query.split("&");
+                for (var i=0;i<vars.length;i++)
+                {
+                  var Key_And_Value = vars[i].split("=");
+                  if (Key_And_Value[0] == variable)
+                  {
+                    return Key_And_Value[1];
+                  }
+                }
+                
+                return null;
+              }
+
+             </script>
+</body>
+
+</html>

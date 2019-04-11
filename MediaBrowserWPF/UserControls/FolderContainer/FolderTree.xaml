@@ -1,0 +1,86 @@
+﻿<UserControl x:Class="MediaBrowserWPF.UserControls.FolderTree"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:mb="clr-namespace:MediaBrowserWPF.UserControls" 
+             xmlns:f="clr-namespace:MediaBrowserWPF.UserControls.FolderContainer"
+             xmlns:focus="clr-namespace:MediaBrowserWPF.Utilities.FocusExtension"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300" Width="Auto" SizeChanged="UserControl_SizeChanged">
+
+    <StackPanel>
+        <Expander Name="EditFolderExpander" Header="Ordner bearbeiten" IsExpanded="False" Collapsed="Expander_Expanded" Expanded="Expander_Expanded">
+            <f:FolderEditor x:Name="FolderEditor" RenameFolder="FolderEditor_RenameFolder" NewFolder="FolderEditor_NewFolder" 
+                          DeleteFolder="FolderEditor_DeleteFolder"  PreviewKeyDown="FolderEditor_PreviewKeyDown"></f:FolderEditor>
+        </Expander>
+
+        <Expander Name="FolderTreeExpander" Header="Ordner-Baum" IsExpanded="True" Collapsed="Expander_Expanded" Expanded="Expander_Expanded">
+            <TreeView HorizontalAlignment="Stretch" Name="treeViewMain" KeyDown="treeViewMain_KeyDown"  PreviewKeyDown="treeViewMain_PreviewKeyDown" SelectedItemChanged="treeViewMain_SelectedItemChanged" 
+                  AllowDrop="True"  Drop="treeViewMain_Drop" DragEnter="treeViewMain_DragEnter"
+                  PreviewMouseLeftButtonDown="treeViewMain_PreviewMouseLeftButtonDown" ItemContainerStyle="{StaticResource GlobalTreeViewItemStyle}"
+                      PreviewMouseMove="treeViewMain_MouseMove" VerticalAlignment="Stretch" >
+
+                <TreeView.Resources>
+                    <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}">Lavender</SolidColorBrush>
+                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}">LightSteelBlue</SolidColorBrush>
+                </TreeView.Resources>
+
+                <TreeView.ItemTemplate>
+                    <HierarchicalDataTemplate ItemsSource="{Binding Children}">
+                        <StackPanel Orientation="Horizontal" MouseLeftButtonDown="StackPanel_MouseLeftButtonDown" ToolTip="" ToolTipOpening="Button_ToolTipOpening">
+                            <TextBlock  FontSize="15"  Text="{Binding Name}" Foreground="{Binding FolderColor}" />
+                            <TextBlock Text="{Binding ItemCountRecursive, StringFormat={} ({0:n0})}" Foreground="Green" />
+                        </StackPanel>
+                    </HierarchicalDataTemplate>
+                </TreeView.ItemTemplate>
+                <TreeView.ContextMenu>
+                    <ContextMenu Opened="ContextMenu_Opened">
+                        <MenuItem Name="MenuItemRecentFolders" Header="Zuletzt geöffnet ..." />
+                        <MenuItem Name="OpenExplorer" Header="Öffne in Windows Explorer" InputGestureText="Umschalt+Enter" Click="OpenExplorer_Click" />
+                        <MenuItem Header="Medien hierhin verschieben" InputGestureText="Strg+V" Click="MoveMediaItems_Click" />
+                        <MenuItem Name="MenuItemImportMetadata" Header="Importiere Metadaten (*.xml)" Click="MenuItemImportMetadata_Click" />
+                        <MenuItem Header="Lösche ..." >
+                            <MenuItem Name="MenuItemDelete" Header="... diese Ebene inkl. Dateien" InputGestureText="Entf" Click="MenuItemDelete_Click" />
+                            <MenuItem Name="MenuItemDeletDb" Header="... diese Ebene, nur Datenbank"  InputGestureText="Strg+Entf" Click="MenuItemDeleteDb_Click" />
+                            <MenuItem Name="MenuItemDeleteDbRecursive" Header="... rekursiv, nur Datenbank"  Click="MenuItemDeleteRekursive_Click" />
+                        </MenuItem>
+                        <MenuItem Header="Alle schließen" InputGestureText="Q" Click="MenuItemCollapseAll_Click" />
+                    </ContextMenu>
+                </TreeView.ContextMenu>
+            </TreeView>
+        </Expander>
+
+        <Expander Name="FolderCollectionExpander" Header="Ordner zusammenstellen" IsExpanded="False" Collapsed="Expander_Expanded" Expanded="Expander_Expanded">
+            <Grid focus:KeyboardFocus.On="{Binding ElementName=FolderAutoCompleter}">
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto" />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+
+                <mb:AutoCompleteComboBoxFolder Grid.Row="0" KeyDown="FolderAutoCompleter_KeyDown"  x:Name="FolderAutoCompleter" MouseDoubleClick="FolderAutoCompleter_MouseDoubleClick" />
+
+                <ListBox  Name="FolderListBox" DragOver="FolderListBox_DragOver" Drop="FolderListBox_Drop"  
+                 AllowDrop="True" Grid.Row="1" MouseDoubleClick="FolderListBox_MouseDoubleClick" KeyDown="FolderListBox_KeyDown" HorizontalAlignment="Stretch" SelectionMode="Extended"
+                      VerticalAlignment="Stretch">
+
+                    <ListBox.ContextMenu>
+                        <ContextMenu Opened="ContextMenu_Selected_Folders_Opened">
+                            <MenuItem Name="MenuItemRecursive" Header="Rekursiv" IsCheckable="true" IsChecked="False" ToolTip="Öffnet den Ordner inklusive aller seiner Unterordner." 
+                                  Click="MenuItem_Recursive" InputGestureText="Strg + R" />
+                            <MenuItem Name="MenuItemSingle" Header="Einzeln" IsCheckable="true" IsChecked="True" ToolTip="Öffnet alle Medien in diesem Ordner." Click="MenuItem_Single" InputGestureText="Strg + S" />
+                            <Separator />
+                            <MenuItem Name="MenuItemShowInTree" Header="In Baum zeigen" ToolTip="Öffnet den gewählten Ordner im obigen Ordner-Baum." Click="MenuItemShowInTree_Click"/>
+                            <Separator />
+                            <MenuItem Name="MenuItemExpand" Header="Expandieren" ToolTip="Ersetzt den Ordner durch seine Unterordner." Click="MenuItemExpand_Click" />
+                            <MenuItem Name="MenuItemRemove" Header="Entferne Auswahl" ToolTip="Entfernt die ausgewählten Ordner aus der Liste." Click="MenuItem_Remove" InputGestureText="Entf" />
+                            <MenuItem Name="MenuItemRemoveAll" Header="Entferne Alle" ToolTip="Entfernt alle Ordner aus der Liste." Click="MenuItem_RemoveAll" InputGestureText="Strg + Entf" />
+                        </ContextMenu>
+                    </ListBox.ContextMenu>
+                </ListBox>
+            </Grid>
+        </Expander>
+
+    </StackPanel>
+</UserControl>

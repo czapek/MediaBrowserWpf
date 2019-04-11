@@ -1,0 +1,55 @@
+<script type="text/javascript">
+
+indexSlideshow = 0;
+function ajaxReplace(imageTable)
+  {
+  var xmlHttp;
+	indexSlideshow = 0;
+  try
+	{
+	// Firefox, Opera 8.0+, Safari
+	xmlHttp=new XMLHttpRequest();
+	}
+  catch (e)
+	{
+	// Internet Explorer
+	try
+	  {
+	  xmlHttp=new ActiveXObject("Msxml2.XMLHTTP");
+	  }
+	catch (e)
+	  {
+	  try
+		{
+		xmlHttp=new ActiveXObject("Microsoft.XMLHTTP");
+		}
+	  catch (e)
+		{
+		alert("Your browser does not support AJAX!");
+		return false;
+		}
+	  }
+	}
+	xmlHttp.onreadystatechange=function()
+	  {
+	  if(xmlHttp.readyState==4)
+		{                            
+			document.getElementById("images").innerHTML=xmlHttp.responseText;
+			if(qelement != null){
+				MarkCell(qelement);
+				document.location = '#' + qelement;
+				qelement=null;
+			}
+		}
+	  }
+	xmlHttp.open("GET",'thumbs/'+imageTable,true);
+	xmlHttp.send(null);
+	window.scroll(0, 0);
+  }
+</script>
+ <table><tr><td class="treeCell">
+<div class="dtree">
+ <p class="dtreeOpenClose"><a href="javascript: d.openAll();">open all</a> | <a href="javascript: d.closeAll();">close all</a> | <a href="javascript: indexSlideshow -= 1; startSlideshow();">Slideshow</a></p>
+<script type="text/javascript">
+<!--
+d = new dTree('d');

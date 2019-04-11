@@ -1,0 +1,87 @@
+﻿<Window x:Class="MediaBrowserWPF.Dialogs.RenameDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Loaded="Window_Loaded" ShowInTaskbar="False" ResizeMode="CanResizeWithGrip"
+        Title="Mehfach umbenennen" WindowStyle="ToolWindow" MinHeight="300" MinWidth="550" Height="400" Width="450">
+    <Window.Resources>
+        <DataTemplate x:Key="FirstCell">
+            <StackPanel Orientation="Horizontal">
+                <CheckBox Visibility="{Binding Path=ExtraFileVisibility}" IsChecked="{Binding Path=Rename}"/>
+            </StackPanel>
+        </DataTemplate>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="40" />
+            <RowDefinition Height="60" />
+        </Grid.RowDefinitions>
+        <TabControl Name="TabControlControls">
+            <TabItem Header="Dateien Kopieren" Name="CategoryCopy">
+                <ListView ItemsSource="{Binding}" Name="RenameGrid">
+                    <ListView.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="Markierung hinzufügen" Click="MenuItemRename_Click" />
+                            <MenuItem Header="Markierung entfernen" Click="MenuItemNotRename_Click" />
+                        </ContextMenu>
+                    </ListView.ContextMenu>
+
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn x:Name= "Col0" CellTemplate="{StaticResource FirstCell}" Width="25"/>
+                            <GridViewColumn x:Name= "Col1" Width="235" Header="Alter Name" DisplayMemberBinding="{Binding Path=OriginalName}" />
+                            <GridViewColumn x:Name= "Col2" Width="235" Header="Neuer Name" DisplayMemberBinding="{Binding Path=NewName}" />
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+            </TabItem>
+        </TabControl>
+
+        <Grid  Grid.Row="1" Margin="5">
+
+            <Grid >
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="60"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="auto" />
+                </Grid.ColumnDefinitions>
+
+                <Label Grid.Column="0">Vorlage</Label>
+                <ComboBox Grid.Column="1" IsEditable="True" Margin="3"  Name="txtTemplate" >
+                    <ComboBoxItem>%mediadate%{yyMMdd-HHmm-ss}</ComboBoxItem>
+                    <ComboBoxItem>%folder%{4:1}∕%increment%{0:3}</ComboBoxItem>
+                    <ComboBoxItem>%increment%{0:3} %metadata%{Exposure Time} ISO%metadata%{ISO Speed Ratings} %metadata%{F-Number} Brennweite %metadata%{Focal Length} %metadata%{Model}</ComboBoxItem>
+                    <ComboBox.ContextMenu>
+                        <ContextMenu Name="txtContextMenu">
+                        </ContextMenu>
+                    </ComboBox.ContextMenu>
+                </ComboBox>
+                <Button Width="75" Height="22" Grid.Column="2" Grid.Row="0" IsDefault="True" Click="Button_Click">Vorschau</Button>
+            </Grid>
+
+        </Grid>
+
+        <Grid Grid.Row="2" Margin="5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="auto" />
+            </Grid.ColumnDefinitions>
+
+            <StackPanel  Margin="4,0,0,0"  Grid.Column="0" >
+                <Grid Name="gridIllegal">
+                    <CheckBox Name="chkIllegal" IsChecked="False" Margin="0,2,0,0">Ungeeignete Zeichen Maskieren</CheckBox>
+                    <TextBox Name="txtIllegal" Width="40" Margin="99,0,0,8">_</TextBox>
+                </Grid>
+                <CheckBox IsChecked="True" Name="chkbxExtension">Dateierweiterung automatisch anhängen</CheckBox>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Grid.Column="1" Height="45" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="190">
+                <Button Content="Umbenennen" 
+                Height="25" Margin="0,5,0,5" Width="85" Name="btnOK" TabIndex="1600"                         
+                VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Click="btnOK_Click" />
+                <Button Content="Abbrechen" 
+                Height="25" Margin="10,5,10,5" Width="85" Name="btnCancel" TabIndex="1700" IsCancel="True" 
+                VerticalContentAlignment="Center" HorizontalContentAlignment="Center" />
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Window>

@@ -1,0 +1,243 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{E1AEDD72-719E-4B46-B193-3D1B1ED294B5}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>MediaBrowser4</RootNamespace>
+    <AssemblyName>MediaBrowser4Lib</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <UpgradeBackupLocation />
+    <PublishUrl>http://localhost/MediaBrowser4Lib/</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Web</InstallFrom>
+    <UpdateEnabled>true</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>true</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.0.0\lib\net45\EntityFramework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.0.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Data.SQLite, Version=1.0.103.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Data.SQLite.Core.1.0.103\lib\net46\System.Data.SQLite.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Data.SQLite.EF6, Version=1.0.103.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Data.SQLite.EF6.1.0.103\lib\net46\System.Data.SQLite.EF6.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Data.SQLite.Linq, Version=1.0.103.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Data.SQLite.Linq.1.0.103\lib\net46\System.Data.SQLite.Linq.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Device" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xaml" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ConsoleManager.cs" />
+    <Compile Include="DB\DBProvider.cs" />
+    <Compile Include="DB\InsertItems.cs" />
+    <Compile Include="DB\SQLite\CommandHelper.cs" />
+    <Compile Include="DB\ICommandHelper.cs" />
+    <Compile Include="DB\IConnectionManager.cs" />
+    <Compile Include="DB\ITransaction.cs" />
+    <Compile Include="DB\SQLite\DBAdministration.cs" />
+    <Compile Include="DB\SQLite\SearchTokenSql.cs" />
+    <Compile Include="DB\SQLite\SimpleConnection.cs" />
+    <Compile Include="DB\SQLite\SQLiteInsert.cs" />
+    <Compile Include="DB\SQLite\SQLiteProvider.cs" />
+    <Compile Include="DB\SQLite\Transaction.cs" />
+    <Compile Include="DB\SQLServer\CommandHelper.cs" />
+    <Compile Include="DB\SQLServer\SimpleConnection.cs" />
+    <Compile Include="DB\SQLServer\SQLServerProvider.cs" />
+    <Compile Include="DB\SQLServer\Transaction.cs" />
+    <Compile Include="DB\UpdateDb.cs" />
+    <Compile Include="Events.cs" />
+    <Compile Include="Exceptions.cs" />
+    <Compile Include="Objects\GeoPoint.cs" />
+    <Compile Include="Objects\GpsAdressComponent.cs" />
+    <Compile Include="Objects\GpsFile.cs" />
+    <Compile Include="Objects\MediaItemSqlRequest.cs" />
+    <Compile Include="Utilities\GeoAdress.cs" />
+    <Compile Include="Utilities\GPS\GpsLocation.cs" />
+    <Compile Include="Utilities\GPS\Gpx.cs" />
+    <Compile Include="Utilities\GPS\GpxProperties.cs" />
+    <Compile Include="Utilities\GPS\GpxReader.cs" />
+    <Compile Include="Utilities\GPS\GpxWriter.cs" />
+    <Compile Include="Utilities\GpxHelper.cs" />
+    <Compile Include="Utilities\KmlHelper.cs" />
+    <Compile Include="Utilities\Log.cs" />
+    <Compile Include="MediaBrowserContext.cs" />
+    <Compile Include="MediaItemCache.cs" />
+    <Compile Include="Objects\AspectRatio.cs" />
+    <Compile Include="Objects\Attachment.cs" />
+    <Compile Include="Objects\Category.cs" />
+    <Compile Include="Objects\CategoryCollection.cs" />
+    <Compile Include="Objects\CategoryTree.cs" />
+    <Compile Include="Objects\CopyItemProperties.cs" />
+    <Compile Include="Objects\Description.cs" />
+    <Compile Include="Objects\ExtraData.cs" />
+    <Compile Include="Objects\Folder.cs" />
+    <Compile Include="Objects\FolderCollection.cs" />
+    <Compile Include="Objects\FolderTree.cs" />
+    <Compile Include="Objects\ITreeNode.cs" />
+    <Compile Include="Objects\Layer.cs" />
+    <Compile Include="Objects\MediaItem.cs" />
+    <Compile Include="Objects\MediaItemArg.cs" />
+    <Compile Include="Objects\MediaItemCategoryRequest.cs" />
+    <Compile Include="Objects\MediaItemDublicatesRequest.cs" />
+    <Compile Include="Objects\MediaItemFilesRequest.cs" />
+    <Compile Include="Objects\MediaItemVideo.cs" />
+    <Compile Include="Objects\MediaItemFolderRequest.cs" />
+    <Compile Include="Objects\MediaItemObservableCollectionRequest.cs" />
+    <Compile Include="Objects\MediaItemRequest.cs" />
+    <Compile Include="Objects\MediaItemRequestType.cs" />
+    <Compile Include="Objects\MediaItemBitmap.cs" />
+    <Compile Include="Objects\MediaItemRequestSortType.cs" />
+    <Compile Include="Objects\MediaItemSearchRequest.cs" />
+    <Compile Include="Objects\MediaItemSortRequest.cs" />
+    <Compile Include="Objects\MediaItemVirtualRequest.cs" />
+    <Compile Include="Objects\MetaData.cs" />
+    <Compile Include="Objects\PreviewObject.cs" />
+    <Compile Include="Objects\Role.cs" />
+    <Compile Include="Objects\SearchToken.cs" />
+    <Compile Include="Objects\SearchTokenRelation.cs" />
+    <Compile Include="Objects\Variation.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SmartRename\Interfaces\IReplacement.cs" />
+    <Compile Include="SmartRename\Interfaces\ISmartRename.cs" />
+    <Compile Include="SmartRename\RenameFile.cs" />
+    <Compile Include="SmartRename\Replacements\Bases\ReplacementBase.cs" />
+    <Compile Include="SmartRename\Replacements\DateReplacement.cs" />
+    <Compile Include="SmartRename\Replacements\ExtensionReplacement.cs" />
+    <Compile Include="SmartRename\Replacements\FileReplacement.cs" />
+    <Compile Include="SmartRename\Replacements\FlattenReplacement.cs" />
+    <Compile Include="SmartRename\Replacements\FolderReplacement.cs" />
+    <Compile Include="SmartRename\Replacements\IncrementReplacement.cs" />
+    <Compile Include="SmartRename\Replacements\MediaDateReplacement.cs" />
+    <Compile Include="SmartRename\Replacements\MetadataReplacement.cs" />
+    <Compile Include="SmartRename\Replacements\StringReplacement.cs" />
+    <Compile Include="SmartRename\Replacements\TimeReplacement.cs" />
+    <Compile Include="SmartRename\Renamer.cs" />
+    <Compile Include="Utilities\Createffmpeg.cs" />
+    <Compile Include="Utilities\Crypto.cs" />
+    <Compile Include="Utilities\DateAndTime.cs" />
+    <Compile Include="Utilities\FileLock.cs" />
+    <Compile Include="Utilities\MediaItemInfo.cs" />
+    <Compile Include="Utilities\RecycleBin.cs" />
+    <Compile Include="Utilities\FilesAndFolders.cs" />
+    <Compile Include="Utilities\OpenAs.cs" />
+    <Compile Include="Utilities\ResultMedia.cs" />
+    <Compile Include="Utilities\ScreenSaver.cs" />
+    <Compile Include="Utilities\XmlMetadata.cs" />
+    <Compile Include="Utilities\XMLCategory.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MediaProcessing\MediaProcessing.csproj">
+      <Project>{46071d22-d4f3-4fbe-a446-be1f7001a0f4}</Project>
+      <Name>MediaProcessing</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>if $(ConfigurationName) == Release (
+xcopy /Q /Y "$(TargetDir)$(TargetName).dll" "%25userprofile%25\OneDrive\MediaBrowserWpf"
+xcopy /Q /Y "$(TargetDir)$(TargetName).pdb" "%25userprofile%25\OneDrive\MediaBrowserWpf"
+)</PostBuildEvent>
+  </PropertyGroup>
+  <Import Project="..\packages\System.Data.SQLite.Core.1.0.103\build\net46\System.Data.SQLite.Core.targets" Condition="Exists('..\packages\System.Data.SQLite.Core.1.0.103\build\net46\System.Data.SQLite.Core.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>Dieses Projekt verweist auf mindestens ein NuGet-Paket, das auf diesem Computer fehlt. Verwenden Sie die Wiederherstellung von NuGet-Paketen, um die fehlenden Dateien herunterzuladen. Weitere Informationen finden Sie unter "http://go.microsoft.com/fwlink/?LinkID=322105". Die fehlende Datei ist "{0}".</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\System.Data.SQLite.Core.1.0.103\build\net46\System.Data.SQLite.Core.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\System.Data.SQLite.Core.1.0.103\build\net46\System.Data.SQLite.Core.targets'))" />
+  </Target>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

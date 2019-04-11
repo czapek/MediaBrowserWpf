@@ -1,0 +1,34 @@
+﻿<Window x:Class="MediaBrowserWPF.Viewer.Multiplayer"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:view="clr-namespace:MediaBrowserWPF.Viewer"
+        Icon="/MediaBrowserWPF;component/Images/green-leaf-icon.ico" 
+        Title="Multiplayer" Height="300" Width="300" WindowStyle="None" MouseWheel="Window_MouseWheel" MouseMove="Window_MouseMove" MouseDown="Window_MouseDown" MouseUp="Window_MouseUp" Loaded="Window_Loaded" ResizeMode="NoResize"  Background="Black" PreviewKeyDown="Window_PreviewKeyDown">
+    <Grid Name="MainGrid">
+        <Grid.ContextMenu>
+            <ContextMenu Opened="ContextMenu_Opened" Closed="ContextMenu_Closed">
+                <MenuItem Name="MenuItemSViewer" Header="Interner Betrachter" InputGestureText="Enter" Click="MenuItemSViewer_Click" />
+                <Separator/>
+                <MenuItem Name="MenuItemAllForward" Header="Alle vorwärts" InputGestureText="Bild runter" Click="MenuItemAllForward_Click" />
+                <MenuItem Name="MenuItemAllBackward" Header="Alle zurück" InputGestureText="Bild hoch" Click="MenuItemAllBackward_Click" />
+                <MenuItem Name="MenuItemForward" Header="Aktives Element vorwärts" InputGestureText="Leertaste" Click="MenuItemForward_Click" />
+                <MenuItem Name="MenuItemBackward" Header="Aktives Element zurück" InputGestureText="Strg+Leertaste" Click="MenuItemBackward_Click" />
+                <Separator/>
+                <MenuItem Name="MenuItemResetTransform" Header="Verschieben/Skalieren rückgängig" ToolTip="Elemente können mit der Maus verschoben und skaliert werden"  InputGestureText="Zurück" Click="MenuItemResetTransform_Click" />
+                <Separator/>
+                <MenuItem Name="MenuItemSlideshow" Header="Diaschau" IsCheckable="True" ToolTip="Kann mit +/- beschleunigt und verlangsamt werden"  IsChecked="False" InputGestureText="F10" Click="MenuItemSlideshow_Click" />
+                <MenuItem Name="MenuItemSlideshowVideo" Header="Video Diaschau" ToolTip="Videos werden bei aktiver Diaschau immer zu Ende gespielt" IsCheckable="True" IsChecked="False" InputGestureText="F9" Click="MenuItemSlideshowVideo_Click" />
+                <Separator/>
+                <MenuItem Header="Schließen" InputGestureText="Esc" Click="MenuItemEsc_Click" />
+            </ContextMenu>
+        </Grid.ContextMenu>
+
+        <TextBlock Name="InfoTextCenter" Grid.ZIndex="3" Visibility="Collapsed" TextAlignment="Center" TextWrapping="Wrap" HorizontalAlignment="Center" Margin="0, 0, 10, 0" VerticalAlignment="Center" FontFamily="Eras ITC" Foreground="WhiteSmoke" FontSize="42" MouseMove="InfoTextCenter_MouseMove"></TextBlock>
+        <TextBlock Name="InfoTextCenterBlur" Grid.ZIndex="2" Visibility="Collapsed" TextAlignment="Center" TextWrapping="Wrap" HorizontalAlignment="Center" Margin="3, 3, 10, 0" VerticalAlignment="Center" FontFamily="Eras ITC" Foreground="Black" FontSize="42">
+            <TextBlock.Effect>
+                <BlurEffect Radius="15" KernelType="Gaussian">
+                </BlurEffect>
+            </TextBlock.Effect>
+        </TextBlock>
+    </Grid>
+</Window>

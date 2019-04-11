@@ -1,0 +1,76 @@
+﻿<UserControl x:Class="MediaBrowserWPF.UserControls.AttachmentsContainer"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:toolkit="clr-namespace:Microsoft.Windows.Controls;assembly=WPFToolkit.Extended" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition Height="5" />
+            <RowDefinition Height="3*" />
+        </Grid.RowDefinitions>
+
+        <ListBox Grid.Row="0" Name="ListBoxAttachments" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" MouseDoubleClick="ListBoxAttachments_MouseDoubleClick" SelectionMode="Extended">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel>
+                        <TextBlock Text="{Binding Path=GuiName}" ToolTip="{Binding Path=Description}" />
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+
+            <ListBox.ContextMenu>
+                <ContextMenu Opened="ContextMenu_Attachments_Opened">
+                    <MenuItem Name="MenuItemAttachmetsOpen" Header="Öffnen" Click="MenuItem_Click_Open" />
+                    <MenuItem Name="MenuItemAttachmetsOpenWith" Header="Öffnen mit" Click="MenuItem_Click_OpenWith" />
+                    <MenuItem Name="MenuItemAttachmetsCopy" Header="Kopieren nach" Click="MenuItem_Click_Copy" />
+                    <Separator/>
+                    <MenuItem Name="MenuItemAttach" Header="Datei mit Medien verknüpfen" ToolTip="Verknüpft alle gewählten Medien mit einer oder mehreren Dateien." Click="MenuItem_Attach_Click" />
+                    <MenuItem Name="MenuItemMoveAndAttach" Header="Datei verschieben und verknüpfen" ToolTip="Verschiebt eine oder mehrere Dateien in den Ordner eines der Medien und verknüpft alle gewählten Medien mit dieser." Click="MenuItem_Move_And_Attach_Click" />
+                    <MenuItem Name="MenuItemMoveAndRename" Header="Datei verschieben und umbenennen" ToolTip="Verschiebt eine oder mehrere Dateien in den Ordner des Mediums und gibt ihr denselben Namen wie das Medium." Click="MenuItem_Move_And_Rename_Click" />
+                    <Separator/>
+                    <MenuItem Name="MenuItemAttachmetsCopyAttach" Header="Verknüpfung übertragen" ToolTip="Überträgt die gewählte Verknüpfung auf alle anderen ausgewählten Medien" Click="MenuItemAttachmetsCopyAttach_Click" />
+                    <MenuItem Name="MenuItemAttachmetsDetach" Header="Verknüpfung lösen (löschen)" ToolTip="Trennt die Verknüpfung zu einer Datei und löscht diese, falls sie im selben Verzeichnis wie das Medium liegt und nicht weiter verknüpft ist." Click="MenuItem_Detach_Click" />
+                </ContextMenu>
+            </ListBox.ContextMenu>
+        </ListBox>
+
+        <GridSplitter ResizeDirection="Rows" IsTabStop="False" Grid.Row="1" Mouse.MouseEnter="GridSplitter_MouseEnter" Mouse.MouseLeave="GridSplitter_MouseLeave"
+                  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
+                  ResizeBehavior="PreviousAndNext" />
+
+        <Grid Grid.Row="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="35"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="35"/>
+                <RowDefinition Height="40"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0" Margin="3" VerticalAlignment="Bottom">Beschreibungen von allen ausgewählten Medien</TextBlock>
+            
+            <TextBox Name="TextBoxDescription" TextChanged="TextBoxDescription_TextChanged" Grid.Row="1" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Visible" FontSize="15" FontFamily="Times New Roman">
+                <TextBox.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Name="MenuItemDeleteDescription" Header="Beschreibung löschen" Click="MenuItem_Click_DeleteDescription" />
+                        <Separator/>
+                        <MenuItem Name="MenuItemDescribeAll" Header="Diese Beschreibung für alle Medien verwenden" Click="MenuItem_Click_DescribeAll" />
+                        <MenuItem Name="MenuItemDeleteAllDescription" Header="Alle Beschreibungen an allen Medien löschen" Click="MenuItem_Click_DeleteAllDescription" />
+                        <Separator/>
+                        <MenuItem Name="MenuItemOpenMediaItems" Header="Alle Medien mit dieser Beschreibung öffnen" Click="MenuItem_Click_OpenMediaItems" />
+                    </ContextMenu>
+                </TextBox.ContextMenu>
+            </TextBox>
+
+            <ComboBox Name="ComboBoxDescription" Margin="0 5 0 5" Height="25" Grid.Row="2" DisplayMemberPath="ShortString" SelectedValue="{Binding ShortString}" SelectionChanged="ComboBoxDescription_SelectionChanged" />
+
+            <WrapPanel HorizontalAlignment="Right" Grid.Row="3">
+                <Button Grid.Column="1"  Name="ButtonSaveDescription" Padding="3" Margin="5" Click="ButtonSaveDescription_Click">Beschreibung speichern</Button>
+            </WrapPanel>
+        </Grid>
+    </Grid>
+</UserControl>

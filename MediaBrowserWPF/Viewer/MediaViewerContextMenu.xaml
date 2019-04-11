@@ -1,0 +1,133 @@
+﻿<ContextMenu x:Class="MediaBrowserWPF.Viewer.MediaViewerContextMenu"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:c="clr-namespace:MediaBrowserWPF.UserControls.CategoryContainer"
+             xmlns:t="clr-namespace:MediaBrowserWPF.UserControls.ThumbListContainer"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300" Opened="ContextMenu_Opened">
+    <MenuItem Name="MenuItemViewerState" Header="Editiermodus">
+        <!--<MenuItem Name="MenuItemAvisynthVideo" Header="Video Avisynth">            
+            <MenuItem Name="MenuItemAvisynthSplit4Second1" Header="4x Splitscreen (1 Sekunde)" Click="MenuItemAvisynthSplit4Second1_Click" />
+            <MenuItem Name="MenuItemAvisynthSplit4Seconds10" Header="4x Splitscreen (10 Sekunden)" Click="MenuItemAvisynthSplit4Seconds10_Click" />
+            <MenuItem Name="MenuItemAvisynthSplit4Seconds30" Header="4x Splitscreen (30 Sekunden)" Click="MenuItemAvisynthSplit4Seconds30_Click" />
+            <MenuItem Name="MenuItemAvisynthSplit4Seconds120" Header="4x Splitscreen (120 Sekunden)" Click="MenuItemAvisynthSplit4Seconds120_Click" />
+            <MenuItem Name="MenuItemAvisynthPreview30" Header="30 SekundenVorschau" Click="MenuItemAvisynthPreview30_Click" />
+            <MenuItem  Name="MenuItemAvisynthSlow1" Header="Slow" Click="MenuItemAvisynthSlow1_Click" />
+            <Separator></Separator>
+            <MenuItem Name="MenuItemAvisynthReset" Header="Zurücksetzen" Click="MenuItemAvisynthReset_Click" />
+            <MenuItem Name="MenuItemAvisynthSave" Header="Speichern" Click="MenuItemAvisynthSave_Click" />
+            <MenuItem Name="MenuItemAvisynthLoad" Header="Öffnen" Click="MenuItemAvisynthLoad_Click" />
+        </MenuItem>-->
+        <MenuItem Name="MenuItemEditVideo" Header="Video">
+            <MenuItem Header="Springe an den Anfang" InputGestureText="Pos1"  Click="MenuItemJumpStartPosition_Click" />
+            <MenuItem Header="Springe nahe dem Ende" InputGestureText="Ende"  Click="MenuItemJumpStopPosition_Click" />
+            <MenuItem Header="Startposition festlegen" InputGestureText="Strg+Pos1"  Click="MenuItemSetStartPosition_Click" />
+            <MenuItem Header="Stoppposition festlegen" InputGestureText="Strg+Ende"  Click="MenuItemSetStoppPosition_Click" />
+            <MenuItem Header="Entferne Startposition" InputGestureText="Strg+Alt+Pos1"  Click="MenuItemRemoveStartPosition_Click" />
+            <MenuItem Header="Entferne Stopppostion" InputGestureText="Strg+Alt+Ende"  Click="MenuItemRemoveStopPosition_Click" />
+            <MenuItem Header="Stoppposition zu Startposition" InputGestureText="Strg+Tab"  Click="MenuItem_Stopp2Start_Click" />
+            <Separator></Separator>
+            <MenuItem Header="Multiplayer" InputGestureText="M"  Click="MenuItemMultiplayer_Click" />
+            <Separator></Separator>
+            <MenuItem Name="MenuItemSPause" Header="Unterbrechen" InputGestureText="Pause" IsCheckable="true" IsChecked="False" Click="MenuItemSPause_Click" />
+            <MenuItem Name="MenuItemNextFrame" Header="Minischritt" InputGestureText="Q und Str+Q" Click="MenuItemNextFrame_Click" />
+        </MenuItem>
+        <MenuItem Name="MenuItemOrientate" Header="Ausrichten" InputGestureText="A" ToolTip="Mausgeste nach oben" IsCheckable="true" IsChecked="False" Click="MenuItemOrientate_Click" />
+        <MenuItem Name="MenuItemAspectRatio" Header="Seitenverhältnis" InputGestureText="R" IsCheckable="true" IsChecked="False" Click="MenuItemAspectRatio_Click" />
+        <MenuItem Name="MenuItemClip" Header="Passepartout" IsCheckable="true" IsChecked="False" Click="MenuItemClip_Click" />
+        <MenuItem Name="MenuItemRotate" Header="Drehen" InputGestureText="D" ToolTip="Mausgeste nach links" IsCheckable="true" IsChecked="False" Click="MenuItemRotate_Click" />
+        <MenuItem Name="MenuItemCropRotate" Header="Neigen" InputGestureText="N" ToolTip="Mausgeste nach rechts" IsCheckable="true" IsChecked="False" Click="MenuItemCropRotate_Click" />
+        <MenuItem Name="MenuItemLevels" Header="Kontrast, Gamma und Farben" InputGestureText="G" IsCheckable="true" IsChecked="False" Click="MenuItemLevels_Click" />
+        <MenuItem Name="MenuItemZoom" Header="Größe und Position" IsCheckable="true" InputGestureText="H" IsChecked="False" Click="MenuItemZoom_Click" />
+        <MenuItem Name="MenuItemFlip" Header="Spiegeln" InputGestureText="F" IsCheckable="true" IsChecked="False" Click="MenuItemFlip_Click" />
+        <MenuItem Name="MenuItemCrop" Header="Zuschneiden" InputGestureText="Z" ToolTip="Mausgeste nach unten" IsCheckable="true" IsChecked="False" Click="MenuItemCrop_Click" />
+        <Separator></Separator>
+        <MenuItem Name="MenuItemAutoCrop" Header="Automatisch Zuschneiden" InputGestureText="F4" ToolTip="Stellt das Seitenverhältnis entsprechend der Optionen ein" Click="MenuItemAutoCrop_Click"  />
+        <MenuItem Name="MenuItemAutoCropOption" Header="Optionen">
+            <MenuItem Name="MenuItemAutoCropOptions11" Header="Seitenverhältnis 1:1 (1,0)" StaysOpenOnClick="True" IsCheckable="True"  IsChecked="False" Checked="MenuItemMenuItemAutoCropOptions_Checked" Unchecked="MenuItemMenuItemAutoCropOptions_Unchecked" />
+            <MenuItem Name="MenuItemAutoCropOptions43" Header="Seitenverhältnis 4:3 (1,3)" StaysOpenOnClick="True" IsCheckable="True" Checked="MenuItemMenuItemAutoCropOptions_Checked" Unchecked="MenuItemMenuItemAutoCropOptions_Unchecked" IsChecked="False" />
+            <MenuItem Name="MenuItemAutoCropOptions32" Header="Seitenverhältnis 3:2 (1,5)" StaysOpenOnClick="True" IsCheckable="True" Checked="MenuItemMenuItemAutoCropOptions_Checked" Unchecked="MenuItemMenuItemAutoCropOptions_Unchecked" IsChecked="False" />
+            <MenuItem Name="MenuItemAutoCropOptions169" Header="Seitenverhältnis 16:9 (1,77)" StaysOpenOnClick="True" IsCheckable="True" Checked="MenuItemMenuItemAutoCropOptions_Checked" Unchecked="MenuItemMenuItemAutoCropOptions_Unchecked" IsChecked="True" />
+        </MenuItem>
+        <Separator></Separator>
+        <MenuItem Name="MenuItemResetDefault" Header="Standtardwert für Auswahl" ToolTip="Mausgeste nach links und zurück" InputGestureText="Rücktaste" IsCheckable="False" Click="MenuItemResetDefault_Click" />
+        <MenuItem Name="MenuItemResetDefaultAll" Header="Standtardwert für Alle" InputGestureText="Strg+Rücktaste" IsCheckable="False" Click="MenuItemResetDefaultAll_Click" />
+    </MenuItem>
+    <MenuItem Name="MenuItemEffects" Header="Effekte">
+        <MenuItem Name="MenuItemSlideshow" Header="Diaschau" InputGestureText="F10" IsCheckable="true" IsChecked="False" Click="MenuItemSlideshow_Click" />
+        <MenuItem Name="MenuItemMagnifier" Header="Bildschirmlupe" InputGestureText="L" IsCheckable="true" IsChecked="False" Click="MenuItemMagnifier_Click" />
+        <MenuItem Name="MenuItemPanoramaAnimation" Header="Panorama" InputGestureText="F9" IsCheckable="False" Click="MenuItemPanoramaView_Click" />
+        <Separator></Separator>
+        <MenuItem Name="MenuItemJumpAnimation" Header="Sprung-Animation" InputGestureText="F8" IsCheckable="False" Click="MenuItemJumpView_Click" />
+        <MenuItem Name="MenuItemRotateAnimation" Header="Dreh-Animation" InputGestureText="F7" IsCheckable="False" Click="MenuItemRotateAnimation_Click" />
+        <MenuItem Name="MenuItemSkewAnimation" Header="Zerr-Animation" InputGestureText="F6" IsCheckable="False" Click="MenuItemSkewAnimation_Click" />
+        <Separator></Separator>
+        <MenuItem Name="MenuItemRandomVideoJump" Header="Zufallssprung (Video)" InputGestureText="Shift+Leertaste" Click="MenuItemRandomVideoJump_Click" />
+        <MenuItem Name="MenuItemRandomVideoJumpAuto" Header="Auto Zufallssprung (Video)" IsCheckable="true" IsChecked="False" Click="MenuItemRandomVideoJumpAuto_Click" />
+        <Separator Name="MenuItemRandomVideoSeparator"></Separator>
+        <MenuItem Name="MenuItemAnimateRandom" Header="Animation wechseln" StaysOpenOnClick="True" IsCheckable="true" IsChecked="False" />
+        <MenuItem Name="MenuItemAnimateSlideshow" Header="Animation Diaschau" IsCheckable="true" IsChecked="False" Click="MenuItemAnimateSlideshow_Click" />
+    </MenuItem>
+    <MenuItem Name="MenuItemSave" Header="Speichern" InputGestureText="Strg+S"  ToolTip="Mausgeste nach unten und rechts" Click="MenuItemSave_Click" />
+    <MenuItem Name="MenuItemReset" Header="Alle Änderungen verwerfen" ToolTip="Setzt alle Werte auf den zuletzt gespeicherten Stand zurück" Click="MenuItemReset_Click" />
+    <MenuItem Name="MenuItemAutoSave" Visibility="Collapsed" Header="Beim Wechsel speichern" IsCheckable="true" IsChecked="False" />
+
+    <Separator/>
+    <c:CategorizeMenuItem x:Name="CategorizeMenuItem" Header="Kategorisieren ..." ShowRemoveAll="True" ShowCategorizeByDate="True"></c:CategorizeMenuItem>
+   
+    <MenuItem Name="MenuItemVariations" Header="Varianten" SubmenuOpened="MenuItemVariations_SubmenuOpened">
+        <MenuItem Name="MenuItemVariationsAll" Header="Alle"/>
+        <Separator/>
+        <MenuItem Name="MenuItemVariationsShowNone" Header="Zeige nur Hauptvariante" ToolTip="Zeigt zu jedem Medium nur die als Hauptvariante markierte Variante" IsCheckable="true" IsChecked="False" Checked="MenuItemVariationsShow_Checked" />
+        <MenuItem Name="MenuItemVariationsShowName" Header="Zeige alle mit gleichem Namen" ToolTip="Zeigt nur die Varianten, welche den selben namen wie die Hauptvariante haben" IsCheckable="true" Checked="MenuItemVariationsShow_Checked" />
+        <MenuItem Name="MenuItemVariationsShowAll" Header="Zeige alle Varianten" IsCheckable="true" ToolTip="Zeigt alle varianten dieses Mediums" IsChecked="False" Checked="MenuItemVariationsShow_Checked" />
+        <Separator/>
+        <MenuItem Name="MenuItemVariationsNew" Header="Neu mit Hauptvarianten-Namen" InputGestureText="Strg+Umschalt+N" Click="MenuItemVariationsNew_Click" />
+        <MenuItem Name="MenuItemVariationsRename" Header="Umbenennen" InputGestureText="Strg+Umschalt+F2" Click="MenuItemVariationsRename_Click" />
+        <MenuItem Name="MenuItemVariationsNewName" Header="Neu mit neuem Namen" ToolTip="Es werden in Folge automatisch alle Varianten angezeigt" Click="MenuItemVariationsNewName_Click" />
+        <MenuItem Name="MenuItemVariationsVideoTimestamp" Header="Marke setzen" Click="MenuItemVariationsVideoTimestamp_Click" />
+        <Separator/>
+        <MenuItem Name="MenuItemVariationsSetDefault" Header="Zur Hauptvariante machen" Click="MenuItemVariationsSetDefault_Click" />
+        <MenuItem Name="MenuItemVariationsDelete" Header="Löschen" InputGestureText="Strg+Umschalt+Entf" Click="MenuItemVariationsDelete_Click" />
+    </MenuItem>
+
+    <Separator/>
+    <MenuItem Header="Anwendung Anpassen" SubmenuOpened="MenuItemConfigureApplication_SubmenuOpened">
+        <MenuItem Name="MenuItemSelectVideoPlayer" Header="Player wählen">
+            <MenuItem Name="SelectPlayerWpfMediaElement"  Header="WPF MediaElement" IsCheckable="true" IsChecked="False" Click="SelectPlayerWpfMediaElement_Click" />
+            <MenuItem Name="SelectPlayerWpfMediaKit"  Header="WPFMediaKit" IsCheckable="true" IsChecked="False" Click="SelectPlayerWpfMediaKit_Click" />
+            <MenuItem Name="SelectPlayerMultiplayer"  Header="Multiplayer" IsCheckable="true" IsChecked="False" Click="SelectPlayerMultiplayer_Click" />
+            <MenuItem Name="SelectPlayerVideoLan" Header="VideolLan DotNet" IsCheckable="true" IsChecked="True" Visibility="Collapsed" Click="SelectPlayerVideoLan_Click" />
+            <MenuItem Name="SelectPlayernVlc" Header="nVlc" IsCheckable="true" IsChecked="True" Visibility="Collapsed" Click="SelectPlayernVlc_Click" />
+        </MenuItem>
+
+        <MenuItem Name="MenuItemVideoAudioTrack" Header="Video Tonspur" />
+        <MenuItem Name="MenuItemVideoSubtitleTrack" Header="Video Untertitel" />
+
+        <MenuItem Name="MenuItemSelectBitmapScalingMode" Header="Qualität wählen">
+            <MenuItem Name="BitmapScalingModeHighQuality" Header="HighQuality" IsCheckable="true" IsChecked="True" Click="BitmapScalingModeHighQuality_Click" />
+            <MenuItem Name="BitmapScalingModeLowQuality" Header="LowQuality" IsCheckable="true" IsChecked="True" Click="BitmapScalingModeLowQuality_Click" />
+            <MenuItem Name="BitmapScalingModeNearestNeighbor" Header="NearestNeighbor" IsCheckable="true" IsChecked="True" Click="BitmapScalingModeNearestNeighbor_Click" />
+            <MenuItem Name="BitmapScalingModeUnspecified" Header="Unspecified" IsCheckable="true" IsChecked="True" Click="BitmapScalingModeUnspecified_Click" />
+        </MenuItem>
+
+        <!--<MenuItem Name="MenuItemResizeGripTweak" Header="ResizeGrip-Tweak" IsCheckable="True" IsChecked="False" ToolTip="Kann Ränder im Vollbild-Modus verhindern, bringt aber andere Nachteile mit sich (z.B. keine Lupe)" />-->
+    </MenuItem>
+    <t:CopyMenuItem x:Name="CopyMenuItem" Header="Kopiere ..."></t:CopyMenuItem>
+    <MenuItem Name="MenuItemBookmarked" Header="Lesezeichen gesetzt" InputGestureText="Strg+B"  Click="MenuItemBookmark_Click" />
+    <MenuItem Name="MenuItemMarkDeleted" Header="Als gelöscht markiert" InputGestureText="Entf"  Click="MenuItemMarkDeleted_Click" />
+    <MenuItem Name="MenuItemShowDeleted" Header="Gelöscht markierte verbergen" IsCheckable="true" IsChecked="True" Click="MenuItemShowDeleted_Click" />
+    <MenuItem Name="MenuItemShowNavigationBar" InputGestureText="U" Header="Navigationsleiste" IsCheckable="true" IsChecked="False" Click="MenuItemShowNavigationBar_Click" />
+    <MenuItem Name="MenuItemFullscreen" Header="Vollbild" InputGestureText="F11" IsCheckable="true" IsChecked="True" Click="MenuItemFullscreen_Click" />
+    <MenuItem Name="MenuItemInfo" Header="Info" InputGestureText="I" IsCheckable="true" IsChecked="False" Click="MenuItemInfo_Click"></MenuItem>
+
+    <Separator/> 
+
+    <MenuItem Name="MenuItemSaveScreenshot" Header="Bildschirmfoto in Zwischenablage" Click="MenuItemScreenshotToClipBoard_Click" />
+    <MenuItem Name="MenuItemScreenshotToClipBoard" Header="Bildschirmfoto Auf Desktop" Click="MenuItemSaveScreenshot_Click" />
+    <MenuItem Name="MenuItemClose" Header="Schließen" InputGestureText="Esc" Click="MenuItemClose_Click" />
+
+
+</ContextMenu>

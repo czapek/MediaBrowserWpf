@@ -1,0 +1,32 @@
+﻿<MenuItem x:Class="MediaBrowserWPF.UserControls.ThumbListContainer.CopyMenuItem"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" SubmenuOpened="MenuItem_SubmenuOpened">
+
+    <MenuItem Name="MenuItemCopyProperties" Header="... gewählte Eigenschaften" InputGestureText="Strg+Umschalt+K" Click="MenuItemCopyProperties_Click" />
+    <MenuItem Name="MenuItemPasteProperties" Header="Einfügen der Eigenschaft(en)" InputGestureText="Strg+K" Click="MenuItemPasteProperties_Click"/>
+    <MenuItem Header="Wähle Eigenschaft ...">
+        <MenuItem Name="MenuItemCategories" Header="... Kategorien" StaysOpenOnClick="True" IsCheckable="True" IsChecked="True" Click="MenuItemCategories_Click" />
+        <MenuItem Name="MenuItemTrim" Header="... Videoschnitt" StaysOpenOnClick="True" IsCheckable="True" IsChecked="False" Click="MenuItemCategories_Click" />
+        <MenuItem Name="MenuItemOrientate" Header="... Ausrichten" StaysOpenOnClick="True" IsCheckable="true" IsChecked="False" Click="MenuItemCategories_Click" />
+        <MenuItem Name="MenuItemCrop" Header="... Zuschnitt" StaysOpenOnClick="True" IsCheckable="True" IsChecked="False" Click="MenuItemCategories_Click"/>
+        <MenuItem Name="MenuItemClip" Header="... Passepartout" StaysOpenOnClick="True" IsCheckable="true" IsChecked="False" Click="MenuItemCategories_Click" />
+        <MenuItem Name="MenuItemRotate" Header="... Drehen" StaysOpenOnClick="True" IsCheckable="true" IsChecked="False" Click="MenuItemCategories_Click" />
+        <MenuItem Name="MenuItemLevels" Header="... Kontrast, Gamma und Farben"  StaysOpenOnClick="True" IsCheckable="true" IsChecked="False" Click="MenuItemCategories_Click" />
+        <MenuItem Name="MenuItemZoom" Header="... Größe und Position" StaysOpenOnClick="True" IsCheckable="true" IsChecked="False" Click="MenuItemCategories_Click" />
+        <MenuItem Name="MenuItemFlip" Header="... Spiegeln" StaysOpenOnClick="True" IsCheckable="true" IsChecked="False"  Click="MenuItemCategories_Click" />
+    </MenuItem>
+    <Separator></Separator>
+    <MenuItem Name="MenuItemCopyPathToClipboard" Header="... Dateipfad in Zwischenablage" Click="MenuItemCopyPathToClipboard_Click" />
+    <MenuItem Name="MenuItemCopyNameToClipboard" Header="... Dateiname in Zwischenablage" Click="MenuItemCopyNameToClipboard_Click" />
+    <MenuItem Name="MenuItemCopyIdToClipboard" Header="... Datenbank-Ids in Zwischenablage" Click="MenuItemCopyIdsToClipboard_Click" />
+    <MenuItem Name="MenuItemCopyFileToClipboard" Header="... Datei in Zwischenablage" InputGestureText="Strg+C" Click="MenuItemCopyFileToClipboard_Click" />
+    <MenuItem Name="MenuItemCopyToDesktop" Header="... auf den Desktop" Click="MenuItemCopyToDesktop_Click" />
+
+</MenuItem>
+
+
+    
+    
