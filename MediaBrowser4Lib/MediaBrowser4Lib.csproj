@@ -222,8 +222,8 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>if $(ConfigurationName) == Release (
-xcopy /Q /Y "$(TargetDir)$(TargetName).dll" "%25userprofile%25\OneDrive\MediaBrowserWpf"
-xcopy /Q /Y "$(TargetDir)$(TargetName).pdb" "%25userprofile%25\OneDrive\MediaBrowserWpf"
+xcopy /Q /Y "$(TargetDir)$(TargetName).dll" "%25userprofile%25\SynologyDrive\Programme\MediaBrowserWpf"
+xcopy /Q /Y "$(TargetDir)$(TargetName).pdb" "%25userprofile%25\SynologyDrive\Programme\MediaBrowserWpf"
 )</PostBuildEvent>
   </PropertyGroup>
   <Import Project="..\packages\System.Data.SQLite.Core.1.0.103\build\net46\System.Data.SQLite.Core.targets" Condition="Exists('..\packages\System.Data.SQLite.Core.1.0.103\build\net46\System.Data.SQLite.Core.targets')" />
