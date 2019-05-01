@@ -236,7 +236,7 @@ namespace MediaBrowserWPF.UserControls
                     sortRequest.SortTypeList.Add(Tuple.Create(MediaItemRequestSortType.VIEWED, MediaItemRequestSortDirection.DESCENDING));
                     break;
 
-                case RequestContainerSortType.SHUFFLE:
+                case RequestContainerSortType.SHUFFLE:    
                     sortRequest.ShuffleType = MediaItemRequestShuffleType.SHUFFLE;
                     break;
             }

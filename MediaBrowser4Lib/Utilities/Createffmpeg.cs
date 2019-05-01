@@ -5,6 +5,7 @@ using System.Text;
 using System.ComponentModel;
 using MediaBrowser4.Objects;
 using System.Globalization;
+using System.IO;
 
 namespace MediaBrowser4.Utilities
 {
@@ -516,14 +517,19 @@ namespace MediaBrowser4.Utilities
 
         public static string FindApplication(string dirStartsWith, string contains)
         {
+            string app = System.IO.Path.Combine(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, dirStartsWith), contains);
+
+            if (File.Exists(app))
+                return app;
+
             foreach (string look in System.IO.Directory.GetDirectories(
                 System.Environment.GetFolderPath(System.Environment.SpecialFolder.ProgramFilesX86), dirStartsWith + "*"))
-            {
-                if (System.IO.File.Exists(look + "\\" + contains))
-                    return look + "\\" + contains;
-                else if (System.IO.File.Exists(look + "\\bin\\" + contains))
-                    return look + "\\bin\\" + contains;
-            }
+                {
+                    if (System.IO.File.Exists(look + "\\" + contains))
+                        return look + "\\" + contains;
+                    else if (System.IO.File.Exists(look + "\\bin\\" + contains))
+                        return look + "\\bin\\" + contains;
+                }
             return null;
         }
 
