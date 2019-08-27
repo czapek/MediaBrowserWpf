@@ -123,6 +123,21 @@ namespace MediaBrowser4.Objects
             return mList;
         }
 
+
+        public string FocalLength35All
+        {
+            get
+            {
+                MetaData m = this.Find("Focal Length in 35mm Film", "MDEX", "Exif Makernote");
+                if (!m.Null)
+                    return m.Value + " (KB)";
+                else
+                    return FocalLength;
+
+              
+            }
+        }
+
         string model;
         public string Model
         {
@@ -254,7 +269,7 @@ namespace MediaBrowser4.Objects
                         {
                             iso = "ISO " + iso;
                         }
-                    }    
+                    }
                 }
 
                 return iso;
@@ -358,7 +373,7 @@ namespace MediaBrowser4.Objects
             {
                 if (frameRate == null)
                 {
-                MetaData m = this.FindSoft("Frame rate", "MediaInfoLib Video");
+                    MetaData m = this.FindSoft("Frame rate", "MediaInfoLib Video");
 
                     if (!m.Null)
                     {

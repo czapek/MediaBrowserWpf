@@ -1362,8 +1362,8 @@ namespace MediaBrowserWPF.Viewer
                 if (this.VisibleMediaItem.MetaData.Iso != null)
                     sb.Append(this.VisibleMediaItem.MetaData.Iso + " ");
 
-                if (this.VisibleMediaItem.MetaData.FocalLength != null)
-                    sb.Append(this.VisibleMediaItem.MetaData.FocalLength);
+                if (this.VisibleMediaItem.MetaData.FocalLength35All != null)
+                    sb.Append(this.VisibleMediaItem.MetaData.FocalLength35All);
 
                 if (sb.Length > 0)
                     infoList.Add(sb.ToString());
