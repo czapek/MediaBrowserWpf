@@ -1359,9 +1359,7 @@ namespace MediaBrowserWPF.UserControls
                 GeoPoint gps = MediaBrowserContext.GetGpsNearest(this.thumblistContainer.SelectedMediaItem.MediaDate);
 
                 if (gps != null)
-                {
-                    string adress = System.Web.HttpUtility.UrlEncode(GeoAdress.GetAdressXml(gps).StreetAddressFormatted);
-                    // string url = $"https://www.google.com/maps/place/{adress}/@{gps.Latitude},{gps.Longitude},15z&language=de".Replace(",", ".").Replace(" ", ",");
+                {      
                     string url = $"https://www.google.com/maps/place/{gps.Latitude}+{gps.Longitude}/@{gps.Latitude},{gps.Longitude},15z&language=de".Replace(",", ".").Replace(" ", ",");
                     System.Diagnostics.Process.Start(url);
                 }
@@ -1380,7 +1378,7 @@ namespace MediaBrowserWPF.UserControls
 
         private void MenuItemOpenGeoAdress_Click(object sender, RoutedEventArgs e)
         {
-            this.thumblistContainer.ShowGeoAdress(false);
+            this.thumblistContainer.ShowGeoAdress();
         }
 
         private void MenuItemExportGpxMedia_Click(object sender, RoutedEventArgs e)
@@ -1422,16 +1420,16 @@ namespace MediaBrowserWPF.UserControls
 
                 if (gps != null)
                 {
-                    GeoAdress geoAdress = GeoAdress.GetAdressXml(gps);
+                    //GeoAdress geoAdress = GeoAdress.GetAdressXml(gps);
 
-                    if (geoAdress != null && geoAdress.PoliticalFormatted != null)
-                    {
-                        DateTime date = this.thumblistContainer.SelectedMediaItem.MediaDate;
-                        string name = HttpUtility.UrlEncode(geoAdress.PoliticalFormatted);
-                        string url = $"https://www.wunderground.com/history/index.html?error=AMBIGUOUS&query={name}&day={date.Day}&month={date.Month}&year={date.Year}";
+                    //if (geoAdress != null && geoAdress.PoliticalFormatted != null)
+                    //{
+                    //    DateTime date = this.thumblistContainer.SelectedMediaItem.MediaDate;
+                    //    string name = HttpUtility.UrlEncode(geoAdress.PoliticalFormatted);
+                    //    string url = $"https://www.wunderground.com/history/index.html?error=AMBIGUOUS&query={name}&day={date.Day}&month={date.Month}&year={date.Year}";
 
-                        System.Diagnostics.Process.Start(url);
-                    }
+                    //    System.Diagnostics.Process.Start(url);
+                    //}
                 }
             }
         }

@@ -116,7 +116,6 @@
     <Compile Include="Objects\GpsAdressComponent.cs" />
     <Compile Include="Objects\GpsFile.cs" />
     <Compile Include="Objects\MediaItemSqlRequest.cs" />
-    <Compile Include="Utilities\GeoAdress.cs" />
     <Compile Include="Utilities\GPS\GpsLocation.cs" />
     <Compile Include="Utilities\GPS\Gpx.cs" />
     <Compile Include="Utilities\GPS\GpxProperties.cs" />

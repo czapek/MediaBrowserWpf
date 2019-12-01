@@ -22,6 +22,8 @@ using System.Windows.Media.Imaging;
 using System.Net.Cache;
 using MediaBrowser4.Utilities;
 using System.Device.Location;
+using Nominatim.API.Geocoders;
+using Nominatim.API.Models;
 
 namespace MediaBrowserWPF.UserControls
 {
@@ -1068,11 +1070,7 @@ namespace MediaBrowserWPF.UserControls
                     break;
 
                 case Key.A:
-                    if ((Keyboard.Modifiers & (ModifierKeys.Control | ModifierKeys.Shift)) == (ModifierKeys.Control | ModifierKeys.Shift))
-                    {
-                        ShowGeoAdress(true);
-                    }
-                    else if (Keyboard.Modifiers == ModifierKeys.Control)
+                    if (Keyboard.Modifiers == ModifierKeys.Control)
                     {
                         for (int i = this.MediaItemContainer.Items.Count; i < this.mediaItemList.Count; i++)
                             this.selectedMediaItemList.Add(this.mediaItemList[i]);
@@ -1081,7 +1079,7 @@ namespace MediaBrowserWPF.UserControls
                     }
                     else if (Keyboard.Modifiers == ModifierKeys.Shift)
                     {
-                        ShowGeoAdress(false);
+                        ShowGeoAdress();
                     }
                     break;
 
@@ -1119,40 +1117,31 @@ namespace MediaBrowserWPF.UserControls
             }
         }
 
-        public void ShowGeoAdress(bool messageBox)
+        public void ShowGeoAdress()
         {
             if (this.SelectedMediaItem != null)
             {
                 GeoPoint gps = MediaBrowserContext.GetGpsNearest(this.SelectedMediaItem.MediaDate);
 
-                CivicAddressResolver cs = new CivicAddressResolver();
-                CivicAddress ca = cs.ResolveAddress(gps);
-
                 if (gps != null)
                 {
-                    GeoAdress adress = GeoAdress.GetAdressXml(gps);
-                    if (adress.StreetAddressFormatted != null)
-                    {
-                        Clipboard.SetText(adress.StreetAddressFormatted);
-                        if (messageBox)
-                        {
-                            MessageBox.Show(adress.StreetAddressFormatted);
-                        }
-                        else
-                        {
-                            string url = null;
-                            if (!adress.StreetAddressFormatted.ToLower().Contains("unnamed"))
-                            {
-                                string adressEnc = System.Web.HttpUtility.UrlEncode(adress.StreetAddressFormatted);
-                                url = $"https://www.google.com/maps/place/{adressEnc}/@{gps.Latitude},{gps.Longitude},15z&language=de".Replace(",", ".").Replace(" ", ",");
-                            }
-                            else
-                            {
-                                url = $"http://maps.google.com/maps?&z=10&q={gps.Latitude}+{gps.Longitude}&ll={gps.Longitude}+{gps.Longitude}".Replace(",", ".").Replace(" ", ",");
-                            }
+                    var y = new ReverseGeocoder();
 
-                            System.Diagnostics.Process.Start(url);
-                        }
+                    var result = y.ReverseGeocode(new ReverseGeocodeRequest
+                    {
+                        Longitude = gps.Longitude,
+                        Latitude = gps.Latitude,
+
+                        BreakdownAddressElements = true,
+                        ShowExtraTags = true,
+                        ShowAlternativeNames = true,
+                        ShowGeoJSON = true
+                    });
+
+                    result.Wait();
+                    if (result != null)
+                    {
+                        MessageBox.Show(result.Result.DisplayName);
                     }
                 }
             }

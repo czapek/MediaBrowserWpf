@@ -790,14 +790,14 @@ namespace MediaBrowserWPF
                     }
                     break;
 
-                    //case Key.F:
-                    //    if (Keyboard.Modifiers == ModifierKeys.Control)
-                    //    {
-                    //        this.TabControlControls.SelectedItem = this.SearchTab;
-                    //        this.UpdateLayout();
-                    //        e.Handled = true;
-                    //    }
-                    //    break;
+                case Key.F:
+                    if (Keyboard.Modifiers == ModifierKeys.Control)
+                    {
+                        SampleApp.MainWindow sc = new SampleApp.MainWindow();
+                        sc.ShowDialog();
+                   
+                    }
+                    break;
 
             }
         }
