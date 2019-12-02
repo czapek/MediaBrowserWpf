@@ -173,7 +173,7 @@ namespace MapControl
                         this.Tile = (int)(location / TileGenerator.TileSize);
                         this.Offset = (this.Tile * TileGenerator.TileSize) - location;
                     }
-                }
+                }             
             }
 
             // Used for animating the Translate.

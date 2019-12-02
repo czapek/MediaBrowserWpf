@@ -2,7 +2,7 @@
 using System.Windows.Controls;
 using MapControl;
 
-namespace SampleApp
+namespace MapControl
 {
     /// <summary>Displays panning and zoom controls.</summary>
     public sealed partial class NavigationControls : UserControl

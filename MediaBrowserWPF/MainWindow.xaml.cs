@@ -790,10 +790,10 @@ namespace MediaBrowserWPF
                     }
                     break;
 
-                case Key.F:
-                    if (Keyboard.Modifiers == ModifierKeys.Control)
+                case Key.G:
+                    if (Keyboard.Modifiers == ModifierKeys.Shift)
                     {
-                        SampleApp.MainWindow sc = new SampleApp.MainWindow();
+                        MapControl.MapSearchWindow sc = new MapControl.MapSearchWindow();
                         sc.ShowDialog();
                    
                     }

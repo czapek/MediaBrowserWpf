@@ -110,7 +110,6 @@ namespace MediaBrowser4.DB.SQLite
             return resulList;
         }
 
-
         private List<MediaBrowser4.Objects.MediaItem> GetMediaItemsFromMissingCategories(MediaItemCategoryRequest request)
         {
             string sqlCategory = "";
@@ -321,7 +320,7 @@ INNER JOIN CATEGORIZE ON CATEGORIZE.VARIATIONS_FK=VARIATIONS.ID"
 
                         if (point.Altitude == 0 && point.Predecessor != null)
                         {
-                           point.Altitude = point.Predecessor.Altitude;
+                            point.Altitude = point.Predecessor.Altitude;
                         }
 
                         //if (pointLast != null && (point.LocalTime - pointLast.LocalTime).TotalMinutes > 2)
@@ -2676,6 +2675,48 @@ LIMIT 10"
                 }
             }
             return catIDs;
+        }
+
+        public override List<MediaBrowser4.Objects.Category> GetCategoriesGeoData(double longitute, double width, double latitude, double height)
+        {
+            List<Category> categories = new List<Category>();
+
+            using (MediaBrowser4.DB.ICommandHelper com = this.MBCommand)
+            {
+                string lo1 = (longitute - width).ToString().Replace(',','.');
+                string lo2 = (longitute + width).ToString().Replace(',', '.');
+                string la1 = (latitude - height).ToString().Replace(',', '.');
+                string la2 = (latitude + height).ToString().Replace(',', '.');
+
+                if((longitute - width) > (longitute + width))
+                {
+                    lo2 = (longitute - width).ToString().Replace(',', '.');
+                    lo1 = (longitute + width).ToString().Replace(',', '.');
+                }
+
+
+                if ((latitude - height) > (latitude + height))
+                {
+                    la2 = (latitude - height).ToString().Replace(',', '.');
+                    la1 = (latitude + height).ToString().Replace(',', '.');
+                }
+
+
+                using (DbDataReader reader = com.ExecuteReader(
+                    "select DISTINCT c.ID from CATEGORY c INNER JOIN CATEGORIZE z ON z.CATEGORY_FK=C.ID where c.ISDATE = 1 and c.FULLPATH like 'Tagebuch%' and date(c.DATE) in (select distinct date(LOCALTIME) as GPS_DATE from DATALOGGER_GPS where (LONGITUDE BETWEEN " + lo1 + " and " + lo2 + " ) and (LATITUDE BETWEEN " + la1 + " and " + la2 + ")) order by c.DATE"))
+                {
+                    while (reader.Read())
+                    {
+                        Category cat = MediaBrowserContext.CategoryTreeSingelton.GetcategoryById((int)(long)reader["ID"]);
+                        if (cat != null && !cat.FullPath.StartsWith(MediaBrowserContext.CategoryHistoryName))
+                        {
+                            categories.Add(cat);
+                        }
+                    }
+                }
+            }
+
+            return categories;
         }
 
         public override Dictionary<MediaBrowser4.Objects.Category, int> GetCategoriesFromMediaItems(List<MediaItem> mItemList)

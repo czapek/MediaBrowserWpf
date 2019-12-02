@@ -256,8 +256,8 @@
       <DependentUpon>RGBLevels.xaml</DependentUpon>
     </Compile>
     <Compile Include="UserControls\MapControl\BitmapStore.cs" />
-    <Compile Include="UserControls\MapControl\MainWindow.xaml.cs">
-      <DependentUpon>MainWindow.xaml</DependentUpon>
+    <Compile Include="UserControls\MapControl\MapSearchWindow.xaml.cs">
+      <DependentUpon>MapSearchWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="UserControls\MapControl\MapCanvas.cs" />
     <Compile Include="UserControls\MapControl\MapCanvas.MapOffset.cs" />
@@ -470,7 +470,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UserControls\MapControl\MainWindow.xaml">
+    <Page Include="UserControls\MapControl\MapSearchWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

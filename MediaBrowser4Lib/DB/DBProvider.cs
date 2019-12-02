@@ -77,6 +77,7 @@ namespace MediaBrowser4.DB
         public abstract Dictionary<string, DateTime> LastAddedFolders();
         public abstract List<Layer> GetLayers(Variation variation);
         public abstract byte[] GetThumbJpegData(int variationId);
+        public abstract List<MediaBrowser4.Objects.Category> GetCategoriesGeoData(double longitute, double width, double latitude, double height);
         public abstract Dictionary<MediaBrowser4.Objects.Category, int> GetCategoriesFromMediaItems(List<MediaItem> mItemList);
         public abstract List<MediaBrowser4.Objects.MediaItem> GetMediaItemsFromCategories(List<MediaBrowser4.Objects.Category> categoryList, bool isIntersection, bool isRecursive, string sortString, int limtRequest);
         public abstract List<MediaBrowser4.Objects.MediaItem> GetMediaItemsFromTrashfolder(string sortString, int limtRequest);

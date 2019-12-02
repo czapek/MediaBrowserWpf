@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Threading;
@@ -9,16 +10,19 @@ using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using MapControl;
+using MediaBrowser4;
+using MediaBrowser4.Objects;
+using MediaBrowserWPF;
 
-namespace SampleApp
+namespace MapControl
 {
     /// <summary>This is the main window for the sample application.</summary>
-    public sealed partial class MainWindow : Window
+    public sealed partial class MapSearchWindow : Window
     {
         private int _maxDownload = -1;
 
         /// <summary>Initializes a new instance of the MainWindow class.</summary>
-        public MainWindow()
+        public MapSearchWindow()
         {
             // Very important we set the CacheFolder before doing anything so the MapCanvas knows where
             // to save the downloaded files to.
@@ -135,6 +139,22 @@ namespace SampleApp
             this.zoomGrid.RenderTransform = new ScaleTransform(); // Clear the old transform
             this.zoomGrid.Visibility = Visibility.Visible;
             ((Storyboard)this.zoomGrid.FindResource(name)).Begin();
+        }    
+
+        private void selectDaysBtn_Click(object sender, RoutedEventArgs e)
+        {
+            SearchResult searchResult = this.searchMarker.DataContext as SearchResult;
+            if (searchResult != null)
+            {
+                List<Category> categories = MediaBrowserContext.GetCategoriesGeoData(searchResult.Longitude, searchResult.Size.Width, searchResult.Latitude, searchResult.Size.Height);
+                MainWindow.MainWindowStatic.CategoryTree.SetCategories(categories);
+                this.Close();
+            }
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

@@ -4,7 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using MapControl;
 
-namespace SampleApp
+namespace MapControl
 {
     /// <summary>Provides data for the Navigate event.</summary>
     public sealed class NavigateEventArgs : EventArgs
@@ -131,5 +131,10 @@ namespace SampleApp
                 callback(this, new NavigateEventArgs(result));
             }
         }
+
+        private void UserControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            searchBox.Focus();
+        }        
     }
 }

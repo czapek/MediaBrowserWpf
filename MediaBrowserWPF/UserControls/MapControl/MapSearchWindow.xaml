@@ -1,7 +1,7 @@
-﻿<Window x:Class="SampleApp.MainWindow"
+﻿<Window x:Class="MapControl.MapSearchWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:local="clr-namespace:SampleApp"
+        xmlns:local="clr-namespace:MapControl"
         xmlns:map="clr-namespace:MapControl"
         Title="Map" Height="500" Width="500">
   <Grid Background="{x:Static SystemColors.ControlBrush}">
@@ -63,5 +63,12 @@
       <ProgressBar x:Name="progress" Width="100" Height="15" Visibility="Hidden" />
       <TextBlock x:Name="label" Visibility="Hidden" />
     </StatusBar>
-  </Grid>
+
+        <StackPanel Grid.Row="3"  Orientation="Vertical" HorizontalAlignment="Right">
+            <Button x:Name="selectDaysBtn" Grid.Column="1" Content="Tagebuch auswählen" Click="selectDaysBtn_Click"  Margin="4" Padding="5,0" />
+
+        </StackPanel>
+
+
+    </Grid>
 </Window>

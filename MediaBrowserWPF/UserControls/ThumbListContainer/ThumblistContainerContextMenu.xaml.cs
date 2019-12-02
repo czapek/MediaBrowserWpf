@@ -1287,7 +1287,7 @@ namespace MediaBrowserWPF.UserControls
             this.MenuItemOpenDublicate.Visibility = (this.thumblistContainer.SelectedMediaItems.Count == 1
                 && this.thumblistContainer.SelectedMediaItems[0].IsMd5Dublicate) ? Visibility.Visible : Visibility.Collapsed;
 
-            this.MenuItemGeo.Visibility = MediaBrowserContext.HasGeodata ? Visibility.Visible : Visibility.Collapsed;
+           // this.MenuItemGeo.Visibility = MediaBrowserContext.HasGeodata ? Visibility.Visible : Visibility.Collapsed;
 
         }
 

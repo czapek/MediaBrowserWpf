@@ -1046,6 +1046,14 @@ namespace MediaBrowser4
                 return new List<Category>();
         }
 
+        public static List<Category> GetCategoriesGeoData(double longitute, double width, double latitude, double height)
+        {
+            if (MainDBProvider != null)            
+                return mainDBProvider.GetCategoriesGeoData(longitute, width, latitude, height);            
+            else
+                return new List<Category>();
+        }
+
         public static Dictionary<MediaBrowser4.Objects.Category, int> GetCategoriesFromMediaItems(List<MediaItem> mItemList)
         {
             if (MainDBProvider != null)

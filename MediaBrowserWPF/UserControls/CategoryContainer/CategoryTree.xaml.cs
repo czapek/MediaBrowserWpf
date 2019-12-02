@@ -186,6 +186,12 @@ namespace MediaBrowserWPF.UserControls
 
         public void SetRequestFromList(List<Category> categoryList)
         {
+            SetCategories(categoryList);
+            this.GetMediaItems(MediaItemRequestType.UNION);
+        }
+
+        public void SetCategories(List<Category> categoryList)
+        {
             this.CategoryListBox.Items.Clear();
             foreach (Category cat in categoryList.OrderBy(x => x.IsDate).ThenBy(x => x.IsLocation).ThenBy(x => x.Date).ThenBy(x => x.FullPath))
             {
@@ -197,11 +203,13 @@ namespace MediaBrowserWPF.UserControls
                 }
             }
 
+            this.MenuItemUnion.IsChecked = false;
+            this.MenuItemIntersect.IsChecked = false;
+            this.MenuItemSingle.IsChecked = true;
+
             this.CategoryCollectionExpander.IsExpanded = true;
             this.EditCategoryExpander.IsExpanded = false;
             this.CategoryCollectionExpander.IsExpanded = true;
-
-            this.GetMediaItems(MediaItemRequestType.UNION);
         }
 
         public void Set(MediaItemCategoryRequest request)
@@ -368,8 +376,18 @@ namespace MediaBrowserWPF.UserControls
             MediaItemCategoryRequest categoryRequest = new MediaItemCategoryRequest();
             categoryRequest.RequestType = mediaItemRequestType;
 
-            foreach (Category category in CategoryListBox.Items)
-                categoryRequest.AddCategory(category);
+            if (this.MenuItemSingle.IsChecked)
+            {
+                if (CategoryListBox.SelectedItem != null)
+                    categoryRequest.AddCategory(CategoryListBox.SelectedItem as Category);
+                else
+                    categoryRequest.AddCategory(CategoryListBox.Items[0] as Category);
+            }
+            else
+            {
+                foreach (Category category in CategoryListBox.Items)
+                    categoryRequest.AddCategory(category);
+            }
 
             if (this.OnRequest != null && categoryRequest.IsValid)
             {

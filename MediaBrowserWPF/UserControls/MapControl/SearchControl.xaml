@@ -1,6 +1,6 @@
-﻿<UserControl x:Class="SampleApp.SearchControl"
+﻿<UserControl x:Class="MapControl.SearchControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Loaded="UserControl_Loaded">
   <Grid VerticalAlignment="Top" TextOptions.TextFormattingMode="Display">
     <Grid.ColumnDefinitions>
       <ColumnDefinition />
