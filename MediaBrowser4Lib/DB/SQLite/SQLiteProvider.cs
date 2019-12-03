@@ -102,6 +102,11 @@ namespace MediaBrowser4.DB.SQLite
             {
                 resulList = LoadMediaItems(request as MediaItemSqlRequest);
             }
+            else if (request is MediaItemRequestGeoData)
+            {
+                MediaItemRequestGeoData geoRequest = (MediaItemRequestGeoData)request;
+                resulList = GetMediaItemsGeoData(geoRequest.Longitute, geoRequest.Width, geoRequest.Latitude, geoRequest.Height, geoRequest.LimitRequest);
+            }
             else
             {
                 throw new Exception("Not Implemented: " + request);
@@ -2677,18 +2682,47 @@ LIMIT 10"
             return catIDs;
         }
 
+        public override List<MediaBrowser4.Objects.MediaItem> GetMediaItemsGeoData(double longitute, double width, double latitude, double height, int limitRequest)
+        {
+            List<MediaItem> mediaItems = new List<MediaItem>();
+
+            string lo1 = (longitute - width).ToString().Replace(',', '.');
+            string lo2 = (longitute + width).ToString().Replace(',', '.');
+            string la1 = (latitude - height).ToString().Replace(',', '.');
+            string la2 = (latitude + height).ToString().Replace(',', '.');
+
+            if ((longitute - width) > (longitute + width))
+            {
+                lo2 = (longitute - width).ToString().Replace(',', '.');
+                lo1 = (longitute + width).ToString().Replace(',', '.');
+            }
+
+
+            if ((latitude - height) > (latitude + height))
+            {
+                la2 = (latitude - height).ToString().Replace(',', '.');
+                la1 = (latitude + height).ToString().Replace(',', '.');
+            }
+
+            List<MediaItem> result = LoadMediaItems(
+                "FROM MEDIAFILES, FOLDERS WHERE FOLDERS.ID = MEDIAFILES.FOLDERS_FK AND HISTORYVERSION=0 AND (LONGITUDE BETWEEN " + lo1 + " and " + lo2 + " ) and (LATITUDE BETWEEN " + la1 + " and " + la2 + ")",
+                null, String.Empty, limitRequest, null);
+
+            return result;
+        }
+
         public override List<MediaBrowser4.Objects.Category> GetCategoriesGeoData(double longitute, double width, double latitude, double height)
         {
             List<Category> categories = new List<Category>();
 
             using (MediaBrowser4.DB.ICommandHelper com = this.MBCommand)
             {
-                string lo1 = (longitute - width).ToString().Replace(',','.');
+                string lo1 = (longitute - width).ToString().Replace(',', '.');
                 string lo2 = (longitute + width).ToString().Replace(',', '.');
                 string la1 = (latitude - height).ToString().Replace(',', '.');
                 string la2 = (latitude + height).ToString().Replace(',', '.');
 
-                if((longitute - width) > (longitute + width))
+                if ((longitute - width) > (longitute + width))
                 {
                     lo2 = (longitute - width).ToString().Replace(',', '.');
                     lo1 = (longitute + width).ToString().Replace(',', '.');
@@ -2820,6 +2854,8 @@ LIMIT 10"
             int colOrientation = reader.GetOrdinal("ORIENTATION");
             int colViewed = reader.GetOrdinal("VIEWED");
             int colRoleId = reader.GetOrdinal("ROLES_FK");
+            int colLongitude = reader.GetOrdinal("LONGITUDE");
+            int colLatitude = reader.GetOrdinal("LATITUDE");
 
             List<MediaItem> deleteList = null;
             Dictionary<int, MediaItem> newItems = new Dictionary<int, MediaItem>();
@@ -2864,6 +2900,8 @@ LIMIT 10"
                     mItem.SetOrientationByNumber(reader.GetInt32(colOrientation));
                     mItem.Viewed = reader.GetInt32(colViewed);
                     mItem.RoleId = reader.GetInt32(colRoleId);
+                    mItem.Longitude = reader[colLongitude] == DBNull.Value ? (double?)null : reader.GetDouble(colLongitude);
+                    mItem.Latitude = reader[colLatitude] == DBNull.Value ? (double?)null : reader.GetDouble(colLatitude);
                     mItem.IsThumbJpegDataOutdated = true;
 
                     if (CheckMissingBehavior(ref deleteList, mItem))
@@ -2924,7 +2962,7 @@ LIMIT 10"
         }
 
         string sqlDefaultHead = " MEDIAFILES.ID AS MF_ID, ORIENTATION, FOLDERS_FK, FILENAME, MEDIAFILES.SORTORDER, DESCRIPTION_FK, FRAMES, ROLES_FK, ISBOOKMARKED, PRIORITY, FOLDERNAME, MEDIADATE, "
-                                + "CREATIONDATE, EDITDATE, WIDTH, HEIGHT, DURATION, ISDUBLICATE, VIEWED, MEDIAFILES.TYPE, LENGTH, MD5VALUE, CURRENTVARIATION, ISDELETED, INSERTDATE ";
+                                + "CREATIONDATE, EDITDATE, WIDTH, HEIGHT, DURATION, ISDUBLICATE, VIEWED, MEDIAFILES.TYPE, LENGTH, MD5VALUE, CURRENTVARIATION, ISDELETED, INSERTDATE, LONGITUDE, LATITUDE ";
 
         private List<MediaBrowser4.Objects.MediaItem> LoadMediaItems(string sql, string sortString, int limtRequest)
         {
@@ -3088,6 +3126,20 @@ LIMIT 10"
                             MediaBrowserContext.DeletedSingleton.Remove(mItem);
                     }
 
+                }
+            }
+        }
+
+        public override void SetGeodata(List<MediaBrowser4.Objects.MediaItem> mediaItemList)
+        {
+            using (MediaBrowser4.DB.ITransaction trans = MediaBrowserContext.MainDBProvider.MBTransaction)
+            {
+                foreach (MediaBrowser4.Objects.MediaItem mItem in mediaItemList)
+                {
+                    trans.SetParameter("@LONGITUDE", mItem.Longitude, System.Data.DbType.Double);
+                    trans.SetParameter("@LATITUDE", mItem.Latitude, System.Data.DbType.Double);
+                    trans.SetParameter("@ID", mItem.Id, System.Data.DbType.Int32);
+                    trans.ExecuteNonQuery("UPDATE MEDIAFILES SET LONGITUDE=@LONGITUDE, LATITUDE=@LATITUDE WHERE ID=@ID ");
                 }
             }
         }

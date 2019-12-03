@@ -22,6 +22,7 @@ using System.Globalization;
 using System.Windows.Threading;
 using MediaBrowser4.Utilities;
 using MediaProcessing.FaceDetection;
+using MapControl;
 
 namespace MediaBrowserWPF
 {
@@ -103,6 +104,7 @@ namespace MediaBrowserWPF
             this.AttachmentsContainer.OnRequest += new EventHandler<MediaItemRequestMessageArgs>(OnMediaItemRequest);
             this.BookmarkedListContainer.OnRequest += new EventHandler<MediaItemRequestMessageArgs>(OnMediaItemRequest);
             this.DeletedListContainer.OnRequest += new EventHandler<MediaItemRequestMessageArgs>(OnMediaItemRequest);
+            MapSearchWindow.OnRequest += new EventHandler<MediaItemRequestMessageArgs>(OnMediaItemRequest);
             this.TabControlControls.SelectedIndex = InitalRequestTab;
 
             this.Title = "MediaBrowserWPF " + System.Reflection.Assembly.GetExecutingAssembly()

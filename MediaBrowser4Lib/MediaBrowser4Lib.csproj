@@ -115,6 +115,7 @@
     <Compile Include="Objects\GeoPoint.cs" />
     <Compile Include="Objects\GpsAdressComponent.cs" />
     <Compile Include="Objects\GpsFile.cs" />
+    <Compile Include="Objects\MediaItemRequestGeoData.cs" />
     <Compile Include="Objects\MediaItemSqlRequest.cs" />
     <Compile Include="Utilities\GPS\GpsLocation.cs" />
     <Compile Include="Utilities\GPS\Gpx.cs" />

@@ -64,8 +64,9 @@
       <TextBlock x:Name="label" Visibility="Hidden" />
     </StatusBar>
 
-        <StackPanel Grid.Row="3"  Orientation="Vertical" HorizontalAlignment="Right">
-            <Button x:Name="selectDaysBtn" Grid.Column="1" Content="Tagebuch auswählen" Click="selectDaysBtn_Click"  Margin="4" Padding="5,0" />
+        <StackPanel Grid.Row="3"  Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button x:Name="selectItemsBtn" Content="Medien auswählen" Click="selectItemsBtn_Click"  Margin="4" Padding="5,0" />
+            <Button x:Name="selectDaysBtn" Content="Tage auswählen" Click="selectDaysBtn_Click"  Margin="4" Padding="5,0" />
 
         </StackPanel>
 

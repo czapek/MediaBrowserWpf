@@ -1287,7 +1287,7 @@ namespace MediaBrowserWPF.UserControls
             this.MenuItemOpenDublicate.Visibility = (this.thumblistContainer.SelectedMediaItems.Count == 1
                 && this.thumblistContainer.SelectedMediaItems[0].IsMd5Dublicate) ? Visibility.Visible : Visibility.Collapsed;
 
-           // this.MenuItemGeo.Visibility = MediaBrowserContext.HasGeodata ? Visibility.Visible : Visibility.Collapsed;
+            // this.MenuItemGeo.Visibility = MediaBrowserContext.HasGeodata ? Visibility.Visible : Visibility.Collapsed;
 
         }
 
@@ -1352,6 +1352,23 @@ namespace MediaBrowserWPF.UserControls
             }
         }
 
+        private void MenuItemUpdateGeodata_Click(object sender, RoutedEventArgs e)
+        {
+            Mouse.OverrideCursor = Cursors.Wait;
+            foreach (MediaItem mItem in this.thumblistContainer.SelectedMediaItems)
+            {
+                GeoPoint gps = MediaBrowserContext.GetGpsNearest(mItem.MediaDate);
+                if (gps != null)
+                {
+                    mItem.Longitude = gps.Longitude;
+                    mItem.Latitude = gps.Latitude;                    
+                }
+            }
+
+            MediaBrowserContext.SetGeodata(this.thumblistContainer.SelectedMediaItems);
+            Mouse.OverrideCursor = null;
+        }
+
         private void MenuItemOpenGeoNearest_Click(object sender, RoutedEventArgs e)
         {
             if (this.thumblistContainer.SelectedMediaItem != null)
@@ -1359,7 +1376,10 @@ namespace MediaBrowserWPF.UserControls
                 GeoPoint gps = MediaBrowserContext.GetGpsNearest(this.thumblistContainer.SelectedMediaItem.MediaDate);
 
                 if (gps != null)
-                {      
+                {
+                    this.thumblistContainer.SelectedMediaItem.Longitude = gps.Longitude;
+                    this.thumblistContainer.SelectedMediaItem.Latitude = gps.Latitude;
+                    MediaBrowserContext.SetGeodata(new List<MediaItem>() { this.thumblistContainer.SelectedMediaItem });
                     string url = $"https://www.google.com/maps/place/{gps.Latitude}+{gps.Longitude}/@{gps.Latitude},{gps.Longitude},15z&language=de".Replace(",", ".").Replace(" ", ",");
                     System.Diagnostics.Process.Start(url);
                 }
@@ -1533,6 +1553,6 @@ namespace MediaBrowserWPF.UserControls
             }
 
             MessageBox.Show($"{geoList.Sum(x => x.DistanceMeter):n0} Meter");
-        }     
+        }
     }
 }

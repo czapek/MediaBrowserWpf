@@ -13,6 +13,7 @@ using MapControl;
 using MediaBrowser4;
 using MediaBrowser4.Objects;
 using MediaBrowserWPF;
+using MediaBrowserWPF.UserControls;
 
 namespace MapControl
 {
@@ -20,6 +21,7 @@ namespace MapControl
     public sealed partial class MapSearchWindow : Window
     {
         private int _maxDownload = -1;
+        public static event EventHandler<MediaItemRequestMessageArgs> OnRequest;
 
         /// <summary>Initializes a new instance of the MainWindow class.</summary>
         public MapSearchWindow()
@@ -152,9 +154,22 @@ namespace MapControl
             }
         }
 
+        private void selectItemsBtn_Click(object sender, RoutedEventArgs e)
+        {
+            SearchResult searchResult = this.searchMarker.DataContext as SearchResult;
+            if (searchResult != null)
+            {
+                MediaItemRequestGeoData request = new MediaItemRequestGeoData(searchResult.Longitude, searchResult.Size.Width, searchResult.Latitude, searchResult.Size.Height, searchResult.DisplayName);
+               if (OnRequest != null)
+                    OnRequest(this, new MediaItemRequestMessageArgs(request));
+
+                this.Close();
+            }
+        }
+
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
 
-        }
+        }       
     }
 }

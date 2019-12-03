@@ -142,7 +142,9 @@ END;";
                 + "HISTORYVERSION INTEGER DEFAULT 0 NOT NULL, "
                 + "ISDUBLICATE BOOLEAN DEFAULT FALSE not null, "
                 + "WIDTH INTEGER, "
-                + "HEIGHT INTEGER)";
+                + "HEIGHT INTEGER, "
+                + "LONGITUDE NUMERIC NULL, "  
+                + "LATITUDE NUMERIC NULL)";
 
             cmd.ExecuteNonQuery();
 
@@ -159,6 +161,10 @@ END;";
             cmd.CommandText = "CREATE INDEX [idx_MediafIles_MediaDate] ON [MEDIAFILES]([MEDIADATE]  ASC)";
             cmd.ExecuteNonQuery();
             cmd.CommandText = "CREATE INDEX [idx_MediafIles_DESCRIPTION_FK] ON [MEDIAFILES] (DESCRIPTION_FK)";
+            cmd.ExecuteNonQuery();
+            cmd.CommandText = "CREATE INDEX [idx_MediafIles_LONGITUDE] ON [MEDIAFILES] (LONGITUDE)";
+            cmd.ExecuteNonQuery();
+            cmd.CommandText = "CREATE INDEX [idx_MediafIles_LATITUDE] ON [MEDIAFILES] (LATITUDE)";
             cmd.ExecuteNonQuery();
 
             cmd.CommandText = "CREATE TABLE VARIATIONS (ID INTEGER PRIMARY KEY, "
@@ -404,6 +410,11 @@ END;";
             cmd.ExecuteNonQuery();
             cmd.CommandText = "CREATE INDEX idx_DATALOGGER_GPS_FILETIME on DATALOGGER_GPS (FILETIME)";
             cmd.ExecuteNonQuery();
+            cmd.CommandText = "CREATE INDEX [idx_DATALOGGER_LONGITUDE] ON [DATALOGGER_GPS] (LONGITUDE)";
+            cmd.ExecuteNonQuery();
+            cmd.CommandText = "CREATE INDEX [idx_DATALOGGER_LATITUDE] ON [DATALOGGER_GPS] (LATITUDE)";
+            cmd.ExecuteNonQuery();
+
 
             cmd.Dispose();
             con.Close();

@@ -93,6 +93,8 @@
         <MenuItem Name="MenuItemOpenGeoWeather" Header="Wetter" Click="MenuItemOpenGeoWeather_Click" />
         <MenuItem Name="MenuItemGoogleTimeline" Header="Google Timeline" Click="MenuItemGoogleTimeline_Click" />        
         <MenuItem Name="MenuItemDistance" Header="Entfernung Medien Zeitraum" Click="MenuItemDistance_Click" />
+        <Separator></Separator>
+        <MenuItem Name="MenuItemUpdateGeodata" Header="Geodaten an Medien übertragen" Click="MenuItemUpdateGeodata_Click" />
     </MenuItem>
 
     <MenuItem Header="Markieren ...">

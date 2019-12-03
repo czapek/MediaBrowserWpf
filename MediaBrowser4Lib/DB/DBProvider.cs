@@ -78,6 +78,7 @@ namespace MediaBrowser4.DB
         public abstract List<Layer> GetLayers(Variation variation);
         public abstract byte[] GetThumbJpegData(int variationId);
         public abstract List<MediaBrowser4.Objects.Category> GetCategoriesGeoData(double longitute, double width, double latitude, double height);
+        public abstract List<MediaBrowser4.Objects.MediaItem> GetMediaItemsGeoData(double longitute, double width, double latitude, double height, int limitRequest);
         public abstract Dictionary<MediaBrowser4.Objects.Category, int> GetCategoriesFromMediaItems(List<MediaItem> mItemList);
         public abstract List<MediaBrowser4.Objects.MediaItem> GetMediaItemsFromCategories(List<MediaBrowser4.Objects.Category> categoryList, bool isIntersection, bool isRecursive, string sortString, int limtRequest);
         public abstract List<MediaBrowser4.Objects.MediaItem> GetMediaItemsFromTrashfolder(string sortString, int limtRequest);
@@ -88,6 +89,7 @@ namespace MediaBrowser4.DB
         public abstract void SetBookmark(List<MediaBrowser4.Objects.MediaItem> mediaItemList, bool set);
         public abstract void SetDeleted(List<MediaBrowser4.Objects.MediaItem> mediaItemList, bool set);
         public abstract void UpdateDublicate(MediaBrowser4.Objects.MediaItem mediaItem);
+        public abstract void SetGeodata(List<MediaBrowser4.Objects.MediaItem> mediaItemList);
         public abstract void ReplaceVariations(Dictionary<MediaItem, List<Variation>> mediaItemDic);
         public abstract void SetCategory(Category category);
         public abstract void SetFolder(Folder folder);

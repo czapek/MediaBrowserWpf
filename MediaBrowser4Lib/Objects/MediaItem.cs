@@ -503,6 +503,10 @@ namespace MediaBrowser4.Objects
             }
         }
 
+        public double? Longitude { get; set; }
+
+        public double? Latitude { get; set; }
+
         public string ToolTip
         {
             get

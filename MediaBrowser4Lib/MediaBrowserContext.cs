@@ -769,6 +769,12 @@ namespace MediaBrowser4
                 return null;
         }
 
+        public static void SetGeodata(List<MediaBrowser4.Objects.MediaItem> mediaItemList)
+        {
+            if (mainDBProvider != null)
+                mainDBProvider.SetGeodata(mediaItemList);   
+        }
+
         public static void InsertGpsPoints(List<GeoPoint> gpsList)
         {
             if (mainDBProvider != null)
@@ -1052,6 +1058,14 @@ namespace MediaBrowser4
                 return mainDBProvider.GetCategoriesGeoData(longitute, width, latitude, height);            
             else
                 return new List<Category>();
+        }
+
+        public static List<MediaItem> GetMediaItemsGeoData(double longitute, double width, double latitude, double height)
+        {
+            if (MainDBProvider != null)
+                return mainDBProvider.GetMediaItemsGeoData(longitute, width, latitude, height, LimitRequest);
+            else
+                return new List<MediaItem>();
         }
 
         public static Dictionary<MediaBrowser4.Objects.Category, int> GetCategoriesFromMediaItems(List<MediaItem> mItemList)
