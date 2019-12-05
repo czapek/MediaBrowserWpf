@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Threading;
 using MapControl;
 
 namespace MapControl
@@ -72,17 +73,26 @@ namespace MapControl
 
         private void OnSearchButtonClick(object sender, RoutedEventArgs e)
         {
-            this.resultsArea.Visibility = Visibility.Collapsed;
             string search = (this.searchBox.Text ?? string.Empty).Trim();
-            if (search.Length == 0)
+            Search(search);
+        }
+
+        public void Search(String search)
+        {
+            if (!String.IsNullOrWhiteSpace(search))
             {
-                this.statusLabel.Text = "Please enter a search term to find or a longitude and latitude to navigate to.";
-                return;
-            }
-            if (_provider.Search(search, this.SearchArea))
-            {
+                this.searchBox.Text = search;
+                this.resultsArea.Visibility = Visibility.Collapsed;
+
+                if (search.Length == 0)
+                {
+                    this.statusLabel.Text = "Please enter a search term to find or a longitude and latitude to navigate to.";
+                    return;
+                }
+
                 this.searchBtn.IsEnabled = false; // Only one search at a time
                 this.statusLabel.Text = "Searching...";
+                _provider.Search(search, this.SearchArea);
             }
         }
 
@@ -102,7 +112,7 @@ namespace MapControl
                     {
                         this.NavigateTo(results[0]);
                     }
-                }              
+                }
             }
             else
             {
@@ -135,6 +145,6 @@ namespace MapControl
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
             searchBox.Focus();
-        }        
+        }
     }
 }

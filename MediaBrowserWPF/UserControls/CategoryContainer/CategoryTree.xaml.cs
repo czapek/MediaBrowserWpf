@@ -12,6 +12,9 @@ using MediaBrowserWPF.UserControls.CategoryContainer;
 using System.Threading;
 using System.Windows.Threading;
 using System.Windows.Controls.Primitives;
+using Nominatim.API.Geocoders;
+using Nominatim.API.Models;
+using System.Threading.Tasks;
 
 namespace MediaBrowserWPF.UserControls
 {
@@ -837,6 +840,9 @@ namespace MediaBrowserWPF.UserControls
 
         private void ContextMenu_Opened(object sender, RoutedEventArgs e)
         {
+            Category selectedCategory = treeViewMain.SelectedItem as Category;
+            GeoDataShow.IsEnabled = selectedCategory != null && selectedCategory.Longitude != null;
+            GeoDataGet.IsEnabled = selectedCategory != null && selectedCategory.IsLocation;
             this.BuildRecentFolders();
         }
 
@@ -970,6 +976,112 @@ namespace MediaBrowserWPF.UserControls
                 this.BlackoutCalendar();
                 this.CalendarCategory.SelectedDate = null;
                 MediaBrowserContext.UpdateCatecoryCalendar = false;
+            }
+        }
+
+        private void MenuItemGeoData_Click(object sender, RoutedEventArgs e)
+        {   
+            Category selectedCategory = treeViewMain.SelectedItem as Category;
+
+            String catPath = String.Join(", ", selectedCategory.FullPath.Replace("\\", "/").Replace("Orte", "").Replace("Amerika", "").Replace("Asien", "").Trim('/').Trim('/').Trim().Split('/').Reverse());
+            if (selectedCategory.IsLocation && catPath.Length > 0)
+            {
+                MapControl.MapSearchWindow sc = new MapControl.MapSearchWindow(catPath, selectedCategory);
+                sc.Owner = MainWindow.MainWindowStatic;
+                sc.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+                sc.ShowDialog();
+            }
+        }
+
+        private void ScanGeoData()
+        {
+            //foreach (Category cat in selectedCategory.AllChildrenRecursive())
+            //{
+
+            //    if (cat.IsLocation && !cat.Latitude.HasValue)
+            //    {
+            //        Console.WriteLine(cat.FullPath);
+            //    }
+            //}
+
+            Category selectedCategory = treeViewMain.SelectedItem as Category;
+
+            if (selectedCategory != null)
+            {
+                foreach (Category cat in selectedCategory.AllChildrenRecursive())
+                {
+                    String catPath = cat.FullPath.Replace("\\", "/").Replace("Orte", "").Replace("Amerika", "").Replace("Asien", "").Trim('/').Trim('/').Trim();
+                    if (cat.IsLocation && !cat.Latitude.HasValue)
+                    {
+
+                        if (catPath.Length > 0)
+                        {
+
+
+                            catPath = String.Join(", ", catPath.Split('/').Reverse());
+
+                            System.Diagnostics.Debug.WriteLine(catPath);
+
+                            var x = new ForwardGeocoder();
+
+                            var r = x.Geocode(new ForwardGeocodeRequest
+                            {
+                                queryString = catPath,
+                                BreakdownAddressElements = true,
+                                ShowExtraTags = true,
+                                ShowAlternativeNames = true,
+                                ShowGeoJSON = true
+                            });
+                            r.Wait();
+
+                            if (r.Status == TaskStatus.RanToCompletion && r.Result.Length > 0)
+                            {
+
+                                GeocodeResponse gr = r.Result.FirstOrDefault(g => g.Class == "boundary" && g.ClassType == "administrative") as GeocodeResponse;
+
+                                if (gr == null)
+                                {
+                                    gr = r.Result.FirstOrDefault(g => g.Class == "place" && g.ClassType == "town") as GeocodeResponse;
+                                }
+
+                                if (gr == null)
+                                {
+                                    gr = r.Result.FirstOrDefault(g => g.Class == "place" && g.ClassType == "village") as GeocodeResponse;
+                                }
+
+                                if (gr == null)
+                                {
+                                    gr = r.Result[0];
+                                }
+
+                                if (gr != null)
+                                {
+                                    Console.WriteLine(gr.DisplayName + " " + gr.Latitude + " " + gr.Longitude);
+                                    cat.Longitude = gr.Longitude;
+                                    cat.Latitude = gr.Latitude;
+                                    MediaBrowserContext.SetCategory(cat);
+                                }
+                                else
+                                {
+
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private void GeoDataShow_Click(object sender, RoutedEventArgs e)
+        {
+            Category selectedCategory = treeViewMain.SelectedItem as Category;
+            if (selectedCategory != null)
+            {
+                if (selectedCategory.Longitude != null)
+                {
+                    string url = $"https://www.google.com/maps/place/{selectedCategory.Latitude}+{selectedCategory.Longitude}/@{selectedCategory.Latitude},{selectedCategory.Longitude},15z&language=de".Replace(",", ".").Replace(" ", ",");
+                    System.Diagnostics.Process.Start(url);
+                }
             }
         }
     }

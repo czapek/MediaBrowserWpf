@@ -1052,10 +1052,18 @@ namespace MediaBrowser4
                 return new List<Category>();
         }
 
-        public static List<Category> GetCategoriesGeoData(double longitute, double width, double latitude, double height)
+        public static List<Category> GetCategoriesLocationGeoData(double longitute, double width, double latitude, double height)
+        {
+            if (MainDBProvider != null)
+                return mainDBProvider.GetCategoriesLocationGeoData(longitute, width, latitude, height);
+            else
+                return new List<Category>();
+        }
+
+        public static List<Category> GetCategoriesDiaryGeoData(double longitute, double width, double latitude, double height)
         {
             if (MainDBProvider != null)            
-                return mainDBProvider.GetCategoriesGeoData(longitute, width, latitude, height);            
+                return mainDBProvider.GetCategoriesDiaryGeoData(longitute, width, latitude, height);            
             else
                 return new List<Category>();
         }

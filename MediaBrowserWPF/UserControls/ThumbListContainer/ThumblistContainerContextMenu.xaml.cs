@@ -1361,11 +1361,11 @@ namespace MediaBrowserWPF.UserControls
                 if (gps != null)
                 {
                     mItem.Longitude = gps.Longitude;
-                    mItem.Latitude = gps.Latitude;                    
+                    mItem.Latitude = gps.Latitude;
                 }
             }
 
-            MediaBrowserContext.SetGeodata(this.thumblistContainer.SelectedMediaItems);
+            MediaBrowserContext.SetGeodata(this.thumblistContainer.SelectedMediaItems.Where(x => x.Latitude.HasValue).ToList());
             Mouse.OverrideCursor = null;
         }
 

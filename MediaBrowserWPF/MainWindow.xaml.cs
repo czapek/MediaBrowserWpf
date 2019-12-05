@@ -796,6 +796,8 @@ namespace MediaBrowserWPF
                     if (Keyboard.Modifiers == ModifierKeys.Shift)
                     {
                         MapControl.MapSearchWindow sc = new MapControl.MapSearchWindow();
+                        sc.Owner = MainWindow.MainWindowStatic;
+                        sc.WindowStartupLocation = WindowStartupLocation.CenterOwner;
                         sc.ShowDialog();
                    
                     }

@@ -29,7 +29,7 @@ namespace MapControl
         {
             get { return _results.ToArray(); }
         }
-        
+
         /// <summary>Searches for the specified query in the specified area.</summary>
         /// <param name="query">The information to search for.</param>
         /// <param name="area">The area to localize results.</param>
@@ -52,14 +52,14 @@ namespace MapControl
                 ShowAlternativeNames = true,
                 ShowGeoJSON = true
             });
-            response.Wait();
 
-
-            if (response.Status != System.Threading.Tasks.TaskStatus.RanToCompletion)
-                return false;
-                 
             try
             {
+                response.Wait();
+
+                if (response.Status != System.Threading.Tasks.TaskStatus.RanToCompletion)
+                    return false;
+
                 int index = 1;
                 _results.Clear();
                 foreach (GeocodeResponse node in response.Result)
@@ -68,12 +68,12 @@ namespace MapControl
                     result.DisplayName = node.DisplayName;
                     result.Latitude = node.Latitude;
                     result.Longitude = node.Longitude;
-                    result.Size = new Size(node.BoundingBox.Value.maxLongitude - node.BoundingBox.Value.minLongitude, node.BoundingBox.Value.maxLatitude - node.BoundingBox.Value.minLatitude);                
+                    result.Size = new Size(node.BoundingBox.Value.maxLongitude - node.BoundingBox.Value.minLongitude, node.BoundingBox.Value.maxLatitude - node.BoundingBox.Value.minLatitude);
                     _results.Add(result);
                 }
                 this.OnSearchCompleted();
-            }      
-            catch (Exception ex) 
+            }
+            catch (Exception ex)
             {
                 this.OnSearchError(ex.Message);
             }

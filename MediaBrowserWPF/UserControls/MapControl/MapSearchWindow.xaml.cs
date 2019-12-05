@@ -22,9 +22,27 @@ namespace MapControl
     {
         private int _maxDownload = -1;
         public static event EventHandler<MediaItemRequestMessageArgs> OnRequest;
+        private Category category;
+        private String searchPath;
 
         /// <summary>Initializes a new instance of the MainWindow class.</summary>
         public MapSearchWindow()
+        {
+            Init();
+        }
+
+        public MapSearchWindow(String searchPath, Category category)
+        {
+            this.category = category;
+            this.searchPath = searchPath;
+            Init();
+            saveCategoryBtn.Visibility = Visibility.Visible;
+            selectItemsBtn.Visibility = Visibility.Collapsed;
+            selectDaysBtn.Visibility = Visibility.Collapsed;
+            selectLocationBtn.Visibility = Visibility.Collapsed;
+        }
+
+        private void Init()
         {
             // Very important we set the CacheFolder before doing anything so the MapCanvas knows where
             // to save the downloaded files to.
@@ -141,14 +159,25 @@ namespace MapControl
             this.zoomGrid.RenderTransform = new ScaleTransform(); // Clear the old transform
             this.zoomGrid.Visibility = Visibility.Visible;
             ((Storyboard)this.zoomGrid.FindResource(name)).Begin();
-        }    
+        }
+
+        private void selectLocationBtn_Click(object sender, RoutedEventArgs e)
+        {
+            SearchResult searchResult = this.searchMarker.DataContext as SearchResult;
+            if (searchResult != null)
+            {
+                List<Category> categories = MediaBrowserContext.GetCategoriesLocationGeoData(searchResult.Longitude, searchResult.Size.Width, searchResult.Latitude, searchResult.Size.Height);
+                MainWindow.MainWindowStatic.CategoryTree.SetCategories(categories);
+                this.Close();
+            }
+        }
 
         private void selectDaysBtn_Click(object sender, RoutedEventArgs e)
         {
             SearchResult searchResult = this.searchMarker.DataContext as SearchResult;
             if (searchResult != null)
             {
-                List<Category> categories = MediaBrowserContext.GetCategoriesGeoData(searchResult.Longitude, searchResult.Size.Width, searchResult.Latitude, searchResult.Size.Height);
+                List<Category> categories = MediaBrowserContext.GetCategoriesDiaryGeoData(searchResult.Longitude, searchResult.Size.Width, searchResult.Latitude, searchResult.Size.Height);
                 MainWindow.MainWindowStatic.CategoryTree.SetCategories(categories);
                 this.Close();
             }
@@ -160,7 +189,7 @@ namespace MapControl
             if (searchResult != null)
             {
                 MediaItemRequestGeoData request = new MediaItemRequestGeoData(searchResult.Longitude, searchResult.Size.Width, searchResult.Latitude, searchResult.Size.Height, searchResult.DisplayName);
-               if (OnRequest != null)
+                if (OnRequest != null)
                     OnRequest(this, new MediaItemRequestMessageArgs(request));
 
                 this.Close();
@@ -169,7 +198,27 @@ namespace MapControl
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            if (!String.IsNullOrWhiteSpace(searchPath))
+            {
+                searchCtrl.Search(searchPath);
+            }
+        }
 
-        }       
+        private void saveCategory_Click(object sender, RoutedEventArgs e)
+        {
+            SearchResult searchResult = this.searchMarker.DataContext as SearchResult;
+            if (category != null && searchResult != null)
+            {
+                category.Longitude = searchResult.Longitude;
+                category.Latitude = searchResult.Latitude;
+                MediaBrowserContext.SetCategory(category);
+            }
+            this.Close();
+        }
+
+        private void cancelBtn_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }   
     }
 }

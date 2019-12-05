@@ -178,7 +178,7 @@ namespace MediaBrowser4.Objects
         }
 
         [NonSerialized]
-        public decimal Longitude, Latitude;
+        public double? Longitude, Latitude;
         public DateTime Date;
         public bool IsUnique;
         public bool IsUniqueChanged = false;

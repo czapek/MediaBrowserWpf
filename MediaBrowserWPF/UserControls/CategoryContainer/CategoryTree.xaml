@@ -65,6 +65,9 @@
                                 <MenuItem Header="... den jüngsten Tagebucheintrag" Click="MenuItemNewest_Click" />
                             </MenuItem>
                             <MenuItem Header="Alle schließen" InputGestureText="Q" Click="MenuItemCollapseAll_Click" />
+                            <Separator></Separator>
+                            <MenuItem Header="Geodaten ermitteln" Name="GeoDataGet" Click="MenuItemGeoData_Click" />
+                            <MenuItem Header="Geodaten im Browser öffnen" Name="GeoDataShow" Click="GeoDataShow_Click" />
                         </ContextMenu>
                     </TreeView.ContextMenu>
                 </TreeView>

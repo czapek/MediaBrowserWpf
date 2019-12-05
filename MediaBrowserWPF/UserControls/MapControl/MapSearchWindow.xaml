@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:MapControl"
         xmlns:map="clr-namespace:MapControl"
-        Title="Map" Height="500" Width="500">
+        Title="Map" Height="500" Width="500" Loaded="Window_Loaded">
   <Grid Background="{x:Static SystemColors.ControlBrush}">
     <Grid.RowDefinitions>
       <RowDefinition Height="Auto" />
@@ -11,7 +11,7 @@
       <RowDefinition />
       <RowDefinition Height="Auto" />
     </Grid.RowDefinitions>
-    <local:SearchControl Grid.Row="0" Margin="10,10,10,0" VerticalAlignment="Top"
+    <local:SearchControl Grid.Row="0" Margin="10,10,10,0" VerticalAlignment="Top" x:Name="searchCtrl"
                          Navigate="OnSearchControlNavigate" SearchArea="{Binding ElementName=tileCanvas, Path=Viewport}" />
     <TextBlock x:Name="errorBar" Grid.Row="1" Background="LightPink" Foreground="Red" Padding="2,1" Visibility="Collapsed" />
     <Border Grid.Row="2" BorderBrush="{x:Static SystemColors.ActiveBorderBrush}" BorderThickness="1" Background="{x:Static SystemColors.AppWorkspaceBrush}">
@@ -67,7 +67,9 @@
         <StackPanel Grid.Row="3"  Orientation="Horizontal" HorizontalAlignment="Right">
             <Button x:Name="selectItemsBtn" Content="Medien auswählen" Click="selectItemsBtn_Click"  Margin="4" Padding="5,0" />
             <Button x:Name="selectDaysBtn" Content="Tage auswählen" Click="selectDaysBtn_Click"  Margin="4" Padding="5,0" />
-
+            <Button x:Name="selectLocationBtn" Content="Orte auswählen" Click="selectLocationBtn_Click"  Margin="4" Padding="5,0" />
+            <Button x:Name="saveCategoryBtn" Visibility="Collapsed" Content="Speichern" Click="saveCategory_Click"  Margin="4" Padding="5,0" />
+            <Button x:Name="cancelBtn" Content="Abbrechen" Click="cancelBtn_Click"  Margin="4" Padding="5,0" />
         </StackPanel>
 
 

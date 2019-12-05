@@ -12,6 +12,7 @@ using System.Data.Common;
 using System.Collections.ObjectModel;
 using MediaBrowser4.Utilities;
 using System.Xml;
+using System.Device.Location;
 
 namespace MediaBrowser4.DB.SQLite
 {
@@ -501,7 +502,7 @@ INNER JOIN CATEGORIZE ON CATEGORIZE.VARIATIONS_FK=VARIATIONS.ID"
                + "INNER JOIN FOLDERS ON FOLDERS.ID=MEDIAFILES.FOLDERS_FK "
                + "INNER JOIN CATEGORIZE ON CATEGORIZE.VARIATIONS_FK=VARIATIONS.ID "
                + searchTokenSql.JoinSqlCategory
-               + "WHERE " + (request.Header.EndsWith(" (!)") ? "MEDIAFILES.ISBOOKMARKED = 0 AND " : String.Empty)
+               + "WHERE " + (request != null && request.Header.EndsWith(" (!)") ? "MEDIAFILES.ISBOOKMARKED = 0 AND " : String.Empty)
                + "VARIATIONS.ID IN " + allVariationsSqlString
                + (searchTokenSql.IsValid ? " AND " + searchTokenSql.WhereSql : "")
                + " AND HISTORYVERSION=0", searchTokenSql.ParameterList, sortString, limtRequest, request);
@@ -2121,12 +2122,12 @@ LIMIT 10"
 
             if (row["LATITUDE"] != DBNull.Value)
             {
-                category.Latitude = row["LATITUDE"] is decimal ? (decimal)row["LATITUDE"] : (decimal)(double)row["LATITUDE"];
+                category.Latitude = (double)(decimal)row["LATITUDE"];
             }
 
             if (row["LONGITUDE"] != DBNull.Value)
             {
-                category.Longitude = row["LONGITUDE"] is decimal ? (decimal)row["LONGITUDE"] : (decimal)(double)row["LONGITUDE"];
+                category.Longitude = (double)(decimal)row["LONGITUDE"];
             }
 
 
@@ -2686,6 +2687,17 @@ LIMIT 10"
         {
             List<MediaItem> mediaItems = new List<MediaItem>();
 
+            var sCoord = new GeoCoordinate(latitude, longitute);
+            var eCoord = new GeoCoordinate(latitude + height, longitute + width);
+
+            double dist = sCoord.GetDistanceTo(eCoord);
+
+            if (dist > 10000)
+            {
+                width = width / 2;
+                height = height / 2;
+            }
+
             string lo1 = (longitute - width).ToString().Replace(',', '.');
             string lo2 = (longitute + width).ToString().Replace(',', '.');
             string la1 = (latitude - height).ToString().Replace(',', '.');
@@ -2704,14 +2716,69 @@ LIMIT 10"
                 la1 = (latitude + height).ToString().Replace(',', '.');
             }
 
-            List<MediaItem> result = LoadMediaItems(
-                "FROM MEDIAFILES, FOLDERS WHERE FOLDERS.ID = MEDIAFILES.FOLDERS_FK AND HISTORYVERSION=0 AND (LONGITUDE BETWEEN " + lo1 + " and " + lo2 + " ) and (LATITUDE BETWEEN " + la1 + " and " + la2 + ")",
-                null, String.Empty, limitRequest, null);
+            List<Category> categoryList = GetCategoriesLocationGeoData(longitute, width, latitude, height);
+            List<MediaItem> resultFromCategories = GetMediaItemsFromCategories(categoryList, false, true, String.Empty, limitRequest, null);
 
-            return result;
+            String sql = "FROM MEDIAFILES, FOLDERS WHERE FOLDERS.ID = MEDIAFILES.FOLDERS_FK AND HISTORYVERSION=0 AND (LONGITUDE BETWEEN " + lo1 + " and " + lo2 + " ) and (LATITUDE BETWEEN " + la1 + " and " + la2 + ")";
+            List<MediaItem> resultMediaItems = LoadMediaItems(sql, null, String.Empty, limitRequest, null);
+
+            return resultMediaItems.Union(resultFromCategories).Distinct().OrderBy(x => x.MediaDate).ToList();
         }
 
-        public override List<MediaBrowser4.Objects.Category> GetCategoriesGeoData(double longitute, double width, double latitude, double height)
+        public override List<MediaBrowser4.Objects.Category> GetCategoriesLocationGeoData(double longitute, double width, double latitude, double height)
+        {
+            List<Category> categories = new List<Category>();
+
+            var sCoord = new GeoCoordinate(latitude, longitute);
+            var eCoord = new GeoCoordinate(latitude + height, longitute + width);
+
+            double dist = sCoord.GetDistanceTo(eCoord);
+
+            if (dist > 10000)
+            {
+                width = width / 2;
+                height = height / 2;
+            }
+
+            using (MediaBrowser4.DB.ICommandHelper com = this.MBCommand)
+            {
+                string lo1 = (longitute - width).ToString().Replace(',', '.');
+                string lo2 = (longitute + width).ToString().Replace(',', '.');
+                string la1 = (latitude - height).ToString().Replace(',', '.');
+                string la2 = (latitude + height).ToString().Replace(',', '.');
+
+                if ((longitute - width) > (longitute + width))
+                {
+                    lo2 = (longitute - width).ToString().Replace(',', '.');
+                    lo1 = (longitute + width).ToString().Replace(',', '.');
+                }
+
+
+                if ((latitude - height) > (latitude + height))
+                {
+                    la2 = (latitude - height).ToString().Replace(',', '.');
+                    la1 = (latitude + height).ToString().Replace(',', '.');
+                }
+
+
+                using (DbDataReader reader = com.ExecuteReader(
+                    "select ID from CATEGORY c where c.ISLOCATION = 1 and (LONGITUDE BETWEEN " + lo1 + " and " + lo2 + " ) and (LATITUDE BETWEEN " + la1 + " and " + la2 + ") order by FULLPATH"))
+                {
+                    while (reader.Read())
+                    {
+                        Category cat = MediaBrowserContext.CategoryTreeSingelton.GetcategoryById((int)(long)reader["ID"]);
+                        if (cat != null && !cat.FullPath.StartsWith(MediaBrowserContext.CategoryHistoryName))
+                        {
+                            categories.Add(cat);
+                        }
+                    }
+                }
+            }
+
+            return categories;
+        }
+
+        public override List<MediaBrowser4.Objects.Category> GetCategoriesDiaryGeoData(double longitute, double width, double latitude, double height)
         {
             List<Category> categories = new List<Category>();
 

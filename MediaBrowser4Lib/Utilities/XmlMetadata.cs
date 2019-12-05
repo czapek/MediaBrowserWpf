@@ -122,8 +122,8 @@ namespace MediaBrowser4.Utilities
 
                     if (category.IsLocation)
                     {
-                        category.Latitude = XmlConvert.ToDecimal(categoryNode.Attributes["latitude"].Value);
-                        category.Longitude = XmlConvert.ToDecimal(categoryNode.Attributes["longitude"].Value);
+                        category.Latitude = XmlConvert.ToDouble(categoryNode.Attributes["latitude"].Value);
+                        category.Longitude = XmlConvert.ToDouble(categoryNode.Attributes["longitude"].Value);
                     }
 
                     category.IsDate = categoryNode.Attributes["date"] != null;
@@ -444,14 +444,14 @@ namespace MediaBrowser4.Utilities
                 categorizeIsUnique.Value = XmlConvert.ToString(cat.Value.IsUnique);
                 categorizeNode.Attributes.Append(categorizeIsUnique);
 
-                if (cat.Value.IsLocation)
+                if (cat.Value.IsLocation && cat.Value.Latitude.HasValue)
                 {
                     XmlAttribute categorizeLatitude = xmlDoc.CreateAttribute("latitude");
-                    categorizeLatitude.Value = XmlConvert.ToString(cat.Value.Latitude);
+                    categorizeLatitude.Value = XmlConvert.ToString(cat.Value.Latitude.Value);
                     categorizeNode.Attributes.Append(categorizeLatitude);
 
                     XmlAttribute categorizeLongitude = xmlDoc.CreateAttribute("longitude");
-                    categorizeLongitude.Value = XmlConvert.ToString(cat.Value.Longitude);
+                    categorizeLongitude.Value = XmlConvert.ToString(cat.Value.Longitude.Value);
                     categorizeNode.Attributes.Append(categorizeLongitude);
                 }
 
