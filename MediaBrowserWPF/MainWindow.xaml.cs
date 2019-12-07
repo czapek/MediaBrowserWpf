@@ -1125,6 +1125,18 @@ namespace MediaBrowserWPF
         private void Window_Closed(object sender, EventArgs e)
         {
             MediaBrowserContext.AbortInsert();
+            if(MediaBrowserContext.MediaItemsCache != null)
+            {
+                foreach(String file in MediaBrowserContext.MediaItemsCache)
+                {
+                    try
+                    {
+                        File.Delete(file);
+                    }
+                    catch { }
+                }
+            }
+
             Application.Current.Shutdown();
         }
 
@@ -1383,6 +1395,16 @@ namespace MediaBrowserWPF
                     MediaBrowserWPF.Utilities.FilesAndFolders.OpenExplorer(StatusBarTextblock.Text, false);
                 }
             }
+        }
+
+        private void MenuItemUseLocalCache_Click(object sender, RoutedEventArgs e)
+        {
+            if (MenuItemUseLocalCache.IsChecked)
+            {
+                MediaBrowserContext.MediaItemsCache = new List<string>();
+            }
+
+            MenuItemUseLocalCache.IsChecked = true;
         }
     }
 }

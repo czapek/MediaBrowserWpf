@@ -1330,26 +1330,15 @@ namespace MediaBrowserWPF.UserControls.RgbImage
             }
             else
             {
-                String filePath = this.visibleMediaItem.ImageCachePath != null ? this.visibleMediaItem.ImageCachePath : this.visibleMediaItem.FileObject.FullName;
-                Stopwatch sw = new Stopwatch();
-                sw.Start();
-                if (this.visibleMediaItem.ImageCachePath != null) sw.Stop();
+                if (MediaBrowserContext.MediaItemsCache != null && this.visibleMediaItem.ImageCachePath == null)
+                {
+                    this.visibleMediaItem.ImageCachePath = System.IO.Path.GetTempFileName() + System.IO.Path.GetExtension(this.visibleMediaItem.FileObject.FullName);
+                    System.IO.File.Copy(this.visibleMediaItem.FileObject.FullName, this.visibleMediaItem.ImageCachePath);
+                    MediaBrowserContext.MediaItemsCache.Add(this.visibleMediaItem.ImageCachePath);
+                }
 
                 bmp = new CacheBitmapImage();
-                bmp.BitmapImage = this.LoadImage(filePath);
-
-                sw.Stop();
-
-                if (sw.ElapsedMilliseconds > 1000 && this.visibleMediaItem.ImageCachePath == null)
-                {
-                    Log.Info("Load: " + sw.ElapsedMilliseconds);
-                    sw.Reset();
-                    sw.Start();
-                    this.visibleMediaItem.ImageCachePath = System.IO.Path.GetTempFileName() + System.IO.Path.GetExtension(filePath);
-                    System.IO.File.Copy(filePath, this.visibleMediaItem.ImageCachePath);
-                    sw.Stop();
-                    Log.Info("Cache: " + sw.ElapsedMilliseconds);
-                }
+                bmp.BitmapImage = this.LoadImage(this.visibleMediaItem.ImageCachePath != null ? this.visibleMediaItem.ImageCachePath : this.visibleMediaItem.FileObject.FullName);
 
 
                 //if (!this.NoCache)

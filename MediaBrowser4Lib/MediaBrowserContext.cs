@@ -69,6 +69,7 @@ namespace MediaBrowser4
         public static bool IsCheckedMenuItemCategories = true;
         public static string DriveMappingLetter;
         public static bool HasGeodata = false;
+        public static List<string> MediaItemsCache;
 
         public static void ResetContext()
         {

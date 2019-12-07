@@ -1049,7 +1049,14 @@ namespace MediaBrowserWPF.UserControls.Video
                 }
                 else
                 {
-                    this.videoPlayer.Source = this.visibleMediaItem.FileObject.FullName;
+                    if (MediaBrowserContext.MediaItemsCache != null && this.visibleMediaItem.ImageCachePath == null)
+                    {
+                        this.visibleMediaItem.ImageCachePath = System.IO.Path.GetTempFileName() + System.IO.Path.GetExtension(this.visibleMediaItem.FileObject.FullName);
+                        System.IO.File.Copy(this.visibleMediaItem.FileObject.FullName, this.visibleMediaItem.ImageCachePath);
+                        MediaBrowserContext.MediaItemsCache.Add(this.visibleMediaItem.ImageCachePath);
+                    }
+         
+                    this.videoPlayer.Source = this.visibleMediaItem.ImageCachePath != null ? this.visibleMediaItem.ImageCachePath : this.visibleMediaItem.FileObject.FullName;
                     this.ResetDefaults();
                 }
             }
@@ -1059,7 +1066,7 @@ namespace MediaBrowserWPF.UserControls.Video
                 return this.visibleMediaItem;
             }
         }
-
+               
         public void ForceRelation(double relation)
         {
             MediaControlHelper.ForceRelation(relation, this);
