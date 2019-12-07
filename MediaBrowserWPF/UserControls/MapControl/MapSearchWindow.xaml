@@ -68,7 +68,8 @@
             <Button x:Name="selectItemsBtn" Content="Medien auswählen" Click="selectItemsBtn_Click"  Margin="4" Padding="5,0" />
             <Button x:Name="selectDaysBtn" Content="Tage auswählen" Click="selectDaysBtn_Click"  Margin="4" Padding="5,0" />
             <Button x:Name="selectLocationBtn" Content="Orte auswählen" Click="selectLocationBtn_Click"  Margin="4" Padding="5,0" />
-            <Button x:Name="saveCategoryBtn" Visibility="Collapsed" Content="Speichern" Click="saveCategory_Click"  Margin="4" Padding="5,0" />
+            <CheckBox x:Name="cbxOverwrite" Content="überschreiben" VerticalAlignment="Center" Visibility="Collapsed" />
+            <Button x:Name="saveLocationBtn" Visibility="Collapsed" Content="Speichern" Click="saveLocation_Click"  Margin="4" Padding="5,0" />
             <Button x:Name="cancelBtn" Content="Abbrechen" Click="cancelBtn_Click"  Margin="4" Padding="5,0" />
         </StackPanel>
 

@@ -1355,7 +1355,7 @@ namespace MediaBrowserWPF.UserControls
         private void MenuItemUpdateGeodata_Click(object sender, RoutedEventArgs e)
         {
             Mouse.OverrideCursor = Cursors.Wait;
-            foreach (MediaItem mItem in this.thumblistContainer.SelectedMediaItems)
+            foreach (MediaItem mItem in this.thumblistContainer.SelectedMediaItems.Where(x => !x.Latitude.HasValue))
             {
                 GeoPoint gps = MediaBrowserContext.GetGpsNearest(mItem.MediaDate);
                 if (gps != null)
@@ -1369,11 +1369,24 @@ namespace MediaBrowserWPF.UserControls
             Mouse.OverrideCursor = null;
         }
 
+
+        private void MenuItemUpdateGeodataDialog_Click(object sender, RoutedEventArgs e)
+        {
+            MapControl.MapSearchWindow sc = new MapControl.MapSearchWindow(this.thumblistContainer.SelectedMediaItems);
+            sc.Owner = MainWindow.MainWindowStatic;
+            sc.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+            sc.ShowDialog();
+        }
+
         private void MenuItemOpenGeoNearest_Click(object sender, RoutedEventArgs e)
         {
             if (this.thumblistContainer.SelectedMediaItem != null)
-            {
-                GeoPoint gps = MediaBrowserContext.GetGpsNearest(this.thumblistContainer.SelectedMediaItem.MediaDate);
+            {             
+                GeoPoint gps = null;
+                if (this.thumblistContainer.SelectedMediaItem.Latitude.HasValue)
+                    gps = new GeoPoint() { Latitude = this.thumblistContainer.SelectedMediaItem.Latitude.Value, Longitude = this.thumblistContainer.SelectedMediaItem.Longitude.Value };
+                else
+                    gps = MediaBrowserContext.GetGpsNearest(this.thumblistContainer.SelectedMediaItem.MediaDate);
 
                 if (gps != null)
                 {
@@ -1436,7 +1449,11 @@ namespace MediaBrowserWPF.UserControls
         {
             if (this.thumblistContainer.SelectedMediaItem != null)
             {
-                GeoPoint gps = MediaBrowserContext.GetGpsNearest(this.thumblistContainer.SelectedMediaItem.MediaDate);
+                GeoPoint gps = null;
+                if (this.thumblistContainer.SelectedMediaItem.Latitude.HasValue)
+                    gps = new GeoPoint() { Latitude = this.thumblistContainer.SelectedMediaItem.Latitude.Value, Longitude = this.thumblistContainer.SelectedMediaItem.Longitude.Value };
+                else
+                    gps = MediaBrowserContext.GetGpsNearest(this.thumblistContainer.SelectedMediaItem.MediaDate);
 
                 if (gps != null)
                 {
@@ -1554,5 +1571,6 @@ namespace MediaBrowserWPF.UserControls
 
             MessageBox.Show($"{geoList.Sum(x => x.DistanceMeter):n0} Meter");
         }
+
     }
 }

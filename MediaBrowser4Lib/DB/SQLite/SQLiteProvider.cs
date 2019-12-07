@@ -2722,7 +2722,10 @@ LIMIT 10"
             String sql = "FROM MEDIAFILES, FOLDERS WHERE FOLDERS.ID = MEDIAFILES.FOLDERS_FK AND HISTORYVERSION=0 AND (LONGITUDE BETWEEN " + lo1 + " and " + lo2 + " ) and (LATITUDE BETWEEN " + la1 + " and " + la2 + ")";
             List<MediaItem> resultMediaItems = LoadMediaItems(sql, null, String.Empty, limitRequest, null);
 
-            return resultMediaItems.Union(resultFromCategories).Distinct().OrderBy(x => x.MediaDate).ToList();
+            resultFromCategories.RemoveAll(x => resultMediaItems.Contains(x)); //wenn am Mediaitem, dann ist die Position da besser
+            List<MediaItem> result = resultMediaItems.Union(resultFromCategories).Distinct().OrderBy(x => x.MediaDate).ToList();
+
+            return result;
         }
 
         public override List<MediaBrowser4.Objects.Category> GetCategoriesLocationGeoData(double longitute, double width, double latitude, double height)

@@ -1121,7 +1121,11 @@ namespace MediaBrowserWPF.UserControls
         {
             if (this.SelectedMediaItem != null)
             {
-                GeoPoint gps = MediaBrowserContext.GetGpsNearest(this.SelectedMediaItem.MediaDate);
+                GeoPoint gps = null;
+                if (this.SelectedMediaItem.Latitude.HasValue)
+                    gps = new GeoPoint() { Latitude = this.SelectedMediaItem.Latitude.Value, Longitude = this.SelectedMediaItem.Longitude.Value };
+                else
+                    gps = MediaBrowserContext.GetGpsNearest(this.SelectedMediaItem.MediaDate);
 
                 if (gps != null)
                 {

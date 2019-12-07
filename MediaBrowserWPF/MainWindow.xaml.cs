@@ -798,8 +798,7 @@ namespace MediaBrowserWPF
                         MapControl.MapSearchWindow sc = new MapControl.MapSearchWindow();
                         sc.Owner = MainWindow.MainWindowStatic;
                         sc.WindowStartupLocation = WindowStartupLocation.CenterOwner;
-                        sc.ShowDialog();
-                   
+                        sc.ShowDialog();                   
                     }
                     break;
 

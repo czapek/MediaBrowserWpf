@@ -24,6 +24,7 @@ namespace MapControl
         public static event EventHandler<MediaItemRequestMessageArgs> OnRequest;
         private Category category;
         private String searchPath;
+        private List<MediaItem> mediaItems;
 
         /// <summary>Initializes a new instance of the MainWindow class.</summary>
         public MapSearchWindow()
@@ -36,7 +37,18 @@ namespace MapControl
             this.category = category;
             this.searchPath = searchPath;
             Init();
-            saveCategoryBtn.Visibility = Visibility.Visible;
+            saveLocationBtn.Visibility = Visibility.Visible;
+            selectItemsBtn.Visibility = Visibility.Collapsed;
+            selectDaysBtn.Visibility = Visibility.Collapsed;
+            selectLocationBtn.Visibility = Visibility.Collapsed;
+        }
+
+        public MapSearchWindow(List<MediaItem> mediaItems)
+        {
+            this.mediaItems = mediaItems;
+            Init();
+            saveLocationBtn.Visibility = Visibility.Visible;
+            cbxOverwrite.Visibility = Visibility.Visible;
             selectItemsBtn.Visibility = Visibility.Collapsed;
             selectDaysBtn.Visibility = Visibility.Collapsed;
             selectLocationBtn.Visibility = Visibility.Collapsed;
@@ -204,14 +216,31 @@ namespace MapControl
             }
         }
 
-        private void saveCategory_Click(object sender, RoutedEventArgs e)
+        private void saveLocation_Click(object sender, RoutedEventArgs e)
         {
             SearchResult searchResult = this.searchMarker.DataContext as SearchResult;
-            if (category != null && searchResult != null)
+            if (searchResult != null)
             {
-                category.Longitude = searchResult.Longitude;
-                category.Latitude = searchResult.Latitude;
-                MediaBrowserContext.SetCategory(category);
+                if (category != null)
+                {
+                    category.Longitude = searchResult.Longitude;
+                    category.Latitude = searchResult.Latitude;
+                    MediaBrowserContext.SetCategory(category);
+                }
+
+                if (mediaItems != null)
+                {
+                    if (!(cbxOverwrite.IsChecked.HasValue && cbxOverwrite.IsChecked.Value))
+                        mediaItems.RemoveAll(x => x.Latitude.HasValue);
+
+                    mediaItems.ForEach(item =>
+                    {
+                        item.Latitude = searchResult.Latitude;
+                        item.Longitude = searchResult.Longitude;
+                    });    
+
+                    MediaBrowserContext.SetGeodata(mediaItems);
+                }
             }
             this.Close();
         }
@@ -219,6 +248,6 @@ namespace MapControl
         private void cancelBtn_Click(object sender, RoutedEventArgs e)
         {
             this.Close();
-        }   
+        }
     }
 }

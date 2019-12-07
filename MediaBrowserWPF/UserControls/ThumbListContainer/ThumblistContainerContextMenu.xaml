@@ -78,23 +78,24 @@
     </MenuItem>
 
     <MenuItem Header="Geodaten ..." Name="MenuItemGeo">    
-        <MenuItem Name="MenuItemOpenGeoDay" Header="Geodaten Medien Zeitraum" Click="MenuItemOpenGeoDay_Click" />
-        <MenuItem Name="MenuItemOpenGeoLast1Day" Header="Geodaten heute" Click="MenuItemOpenGeo_Click" />       
-        <MenuItem Name="MenuItemOpenGeoYesterday" Header="Geodaten gestern" Click="MenuItemOpenGeoYesterday_Click" />
-        <MenuItem Name="MenuItemOpenGeoCustom" Header="Geodaten Zeitraum wählbar" Click="MenuItemOpenGeoCustom_Click" />
+        <MenuItem Name="MenuItemOpenGeoDay" Header="Geoarchiv Medien Zeitraum" Click="MenuItemOpenGeoDay_Click" />
+        <MenuItem Name="MenuItemOpenGeoLast1Day" Header="Geoarchiv heute" Click="MenuItemOpenGeo_Click" />
+        <MenuItem Name="MenuItemOpenGeoYesterday" Header="Geoarchiv gestern" Click="MenuItemOpenGeoYesterday_Click" />
+        <MenuItem Name="MenuItemOpenGeoCustom" Header="Geoarchiv Zeitraum wählbar" Click="MenuItemOpenGeoCustom_Click" />
         <Separator></Separator>
         <MenuItem Name="MenuItemExportGpxMedia" Header="Export Medien Zeitraum" Click="MenuItemExportGpxMedia_Click" />
         <MenuItem Name="MenuItemExportGpxLast1Day" Header="Export heute" Click="MenuItemOpenGps_Click" />
         <MenuItem Name="MenuItemExportGpxYesterday" Header="Export gestern" Click="MenuItemOpenYesterday_Click" />
         <MenuItem Name="MenuItemExportGpxCustom" Header="Export Zeitraum wählbar" Click="MenuItemOpenCustom_Click" />
         <Separator></Separator>
-        <MenuItem Name="MenuItemOpenGeoNearest" Header="nächste Position in Browser" Click="MenuItemOpenGeoNearest_Click" />
-        <MenuItem Name="MenuItemOpenGeoAdress" Header="nächste Adresse" InputGestureText="Umschalt+A" Click="MenuItemOpenGeoAdress_Click" />
+        <MenuItem Name="MenuItemOpenGeoNearest" Header="Position in Browser" Click="MenuItemOpenGeoNearest_Click" />
+        <MenuItem Name="MenuItemOpenGeoAdress" Header="Adresse" InputGestureText="Umschalt+A" Click="MenuItemOpenGeoAdress_Click" />
         <MenuItem Name="MenuItemOpenGeoWeather" Header="Wetter" Click="MenuItemOpenGeoWeather_Click" />
-        <MenuItem Name="MenuItemGoogleTimeline" Header="Google Timeline" Click="MenuItemGoogleTimeline_Click" />        
-        <MenuItem Name="MenuItemDistance" Header="Entfernung Medien Zeitraum" Click="MenuItemDistance_Click" />
+        <MenuItem Name="MenuItemGoogleTimeline" Header="Google Timeline" Click="MenuItemGoogleTimeline_Click" />
+        <MenuItem Name="MenuItemDistance" Header="Geoarchiv Distanz aus Zeitraum" Click="MenuItemDistance_Click" />
         <Separator></Separator>
-        <MenuItem Name="MenuItemUpdateGeodata" Header="Geodaten an Medien übertragen" Click="MenuItemUpdateGeodata_Click" />
+        <MenuItem Name="MenuItemUpdateGeodata" Header="Geodaten aus Archiv an Medien übertragen" Click="MenuItemUpdateGeodata_Click" />
+        <MenuItem Name="MenuItemUpdateGeodataDialog" Header="Geodaten manuell auswählen" Click="MenuItemUpdateGeodataDialog_Click" />
     </MenuItem>
 
     <MenuItem Header="Markieren ...">

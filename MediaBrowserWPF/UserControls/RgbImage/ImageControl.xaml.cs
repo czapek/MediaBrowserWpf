@@ -21,6 +21,8 @@ using System.Windows.Threading;
 using MediaBrowser4;
 using WpfAnimatedGif;
 using System.Windows.Media.Animation;
+using System.Diagnostics;
+using MediaBrowser4.Utilities;
 
 namespace MediaBrowserWPF.UserControls.RgbImage
 {
@@ -1056,7 +1058,7 @@ namespace MediaBrowserWPF.UserControls.RgbImage
             }
 
             if (!this.usePreviewDb && this.visibleMediaItem.Filename.ToLower().EndsWith(".gif") && ViewerSource.CountFrames(this.visibleMediaItem) > 1)
-            {
+            {       
                 var image = new BitmapImage();
                 image.BeginInit();
                 image.UriSource = new Uri(this.visibleMediaItem.FileObject.FullName);
@@ -1328,8 +1330,27 @@ namespace MediaBrowserWPF.UserControls.RgbImage
             }
             else
             {
+                String filePath = this.visibleMediaItem.ImageCachePath != null ? this.visibleMediaItem.ImageCachePath : this.visibleMediaItem.FileObject.FullName;
+                Stopwatch sw = new Stopwatch();
+                sw.Start();
+                if (this.visibleMediaItem.ImageCachePath != null) sw.Stop();
+
                 bmp = new CacheBitmapImage();
-                bmp.BitmapImage = this.LoadImage(this.visibleMediaItem.FileObject.FullName);
+                bmp.BitmapImage = this.LoadImage(filePath);
+
+                sw.Stop();
+
+                if (sw.ElapsedMilliseconds > 1000 && this.visibleMediaItem.ImageCachePath == null)
+                {
+                    Log.Info("Load: " + sw.ElapsedMilliseconds);
+                    sw.Reset();
+                    sw.Start();
+                    this.visibleMediaItem.ImageCachePath = System.IO.Path.GetTempFileName() + System.IO.Path.GetExtension(filePath);
+                    System.IO.File.Copy(filePath, this.visibleMediaItem.ImageCachePath);
+                    sw.Stop();
+                    Log.Info("Cache: " + sw.ElapsedMilliseconds);
+                }
+
 
                 //if (!this.NoCache)
                 //    imageCache.Add(this.visibleMediaItem.FileObject.FullName, bmp);

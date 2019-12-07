@@ -301,6 +301,23 @@ namespace MediaBrowser4.DB.SQLite
                             trans.SetParameter("@metadataId", metaData.Id, DbType.Int32);
                             trans.ExecuteNonQuery("INSERT INTO METADATA(MEDIAFILES_FK, METANAME_FK, VALUE) VALUES("
                                 + mItem.Id + ", @metadataId, @metavalue)");
+
+                            if ((mData.Name == "GPS Latitude" || mData.Name == "GPS Longitude") && !String.IsNullOrWhiteSpace(mData.Value))
+                            {
+                                double degree = Double.Parse(mData.Value.Split('"')[0]);
+                                double minute = Double.Parse(mData.Value.Split('"')[1].Split('\'')[0]);
+                                double second = Double.Parse(mData.Value.Split('"')[1].Split('\'')[1]);
+
+                                double gps = degree + (minute * (1.0 / 60.0)) + ((second / 60.0) * (1.0 / 60.0));
+
+                                trans.SetParameter("@gps", gps, DbType.Double);
+
+                                if (mData.Name == "GPS Longitude")
+                                    trans.ExecuteNonQuery("UPDATE MEDIAFILES SET LONGITUDE=@gps WHERE ID=" + mItem.Id);
+
+                                if (mData.Name == "GPS Latitude")
+                                    trans.ExecuteNonQuery("UPDATE MEDIAFILES SET LATITUDE=@gps WHERE ID=" + mItem.Id);
+                            }
                         }
                     }
                 }

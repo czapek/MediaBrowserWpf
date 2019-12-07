@@ -25,6 +25,8 @@ namespace MediaBrowser4.Objects
             LEFTisBOTTOM = 3
         }
 
+        public String ImageCachePath { get; set;  }
+
         public static string OrientationInfo(MediaOrientation orientation)
         {
             switch (orientation)
