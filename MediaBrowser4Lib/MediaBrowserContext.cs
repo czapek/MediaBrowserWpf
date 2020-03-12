@@ -262,11 +262,11 @@ namespace MediaBrowser4
         {
             get
             {
-                string gpsLoggerPath = GetDBProperty("GPSLoggerPath");
+                string gpsLoggerPath = @"H:\Google Drive\GPSLog";// GetDBProperty("GPSLoggerPath");
 
                 if (!Directory.Exists(gpsLoggerPath))
                 {
-                    gpsLoggerPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), @"Google Drive\GPSLogger\");
+                    gpsLoggerPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), @"Google Drive\GPSLog\");
                 }
 
                 return gpsLoggerPath;

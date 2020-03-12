@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Device.Location;
 using System.Globalization;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -42,7 +43,7 @@ namespace MediaBrowser4.Utilities
                 if (grt24Hours)
                     sb.AppendLine($"<name>{dateMin.Date:dd.MM} - {dateMax.Date:dd.MM.yyyy}</name>");
                 else
-                    sb.AppendLine($"<name>{dateMin.Date:dd.MM.yyyy}</name>");   
+                    sb.AppendLine($"<name>{dateMin.Date:dd.MM.yyyy}</name>");
 
                 int lastPoint = 0;
                 int cnt = 0;
@@ -58,10 +59,10 @@ namespace MediaBrowser4.Utilities
                         distance += geoList[distanceCnt].GetDistanceTo(geoList[distanceCnt - 1]);
                         distanceCnt--;
                     }
-              
+
                     //jede 1000 Meter ein Placemark
-                    if(i == 0 || distance > 1000)
-                    {                       
+                    if (i == 0 || distance > 1000)
+                    {
                         AddPlacemark(placemarkTag, geoList[i], $"{geoList[i].LocalTime:ddd} {geoList[i].LocalTime:HH:mm} Uhr");
                         placeMarkDic.Add(cnt, geoList[i]);
                         lastPoint = i;
@@ -142,6 +143,22 @@ namespace MediaBrowser4.Utilities
         public static List<GeoPoint> ParseFolder(string folder, List<GpsFile> ignoreList)
         {
             List<GeoPoint> gpsList = new List<GeoPoint>();
+
+            foreach (String file in Directory.GetFiles(folder, "*.zip", SearchOption.AllDirectories))
+            {
+                using (ZipArchive archive = ZipFile.OpenRead(file))
+                {
+                    foreach (ZipArchiveEntry entry in archive.Entries)
+                    {
+                        String newPath =  Path.Combine(folder, entry.FullName);
+                        if (File.Exists(newPath))
+                            File.Delete(newPath);
+
+                        entry.ExtractToFile(newPath);
+                    }
+                }
+                File.Delete(file);
+            }
 
             foreach (String file in Directory.GetFiles(folder, "*.kml", SearchOption.AllDirectories))
             {

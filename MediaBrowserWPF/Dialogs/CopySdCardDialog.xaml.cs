@@ -111,11 +111,17 @@ namespace MediaBrowserWPF.Dialogs
                     this.MediaSource.Items.Add(new { Name = String.Format("{0} ({1}) {2:n1} GB", drive.VolumeLabel, drive.Name, drive.TotalSize / 1024.0 / 1024.0 / 1024.0), Value = drive });
 
                     if ((this.NotCopiedList.Count + this.CopyDictionary.Count) == 0 && Directory.Exists(drive.Name + "DCIM"))
-                    {
-                        this.AddFiles(drive);
+                    {                  
                         this.MediaSource.SelectedIndex = this.MediaSource.Items.Count - 1;
                     }
                 }
+            }
+
+            if (Directory.Exists(@"P:\sebastian.czapek\huawei"))
+            {
+                string sourceFolder = @"P:\sebastian.czapek\huawei";
+                this.MediaSource.Items.Add(new { Name = String.Format("{0}", "Huawei"), Value = sourceFolder });
+                this.MediaSource.SelectedIndex = this.MediaSource.Items.Count - 1;
             }
         }
 
@@ -154,8 +160,31 @@ namespace MediaBrowserWPF.Dialogs
             this.NotCopiedList = new List<string>();
             this.DirectoryList = new List<string>();
 
-            this.AddFiles(this.MediaSource.SelectedValue as DriveInfo);
-            SetData();
+            if (this.MediaSource.SelectedValue is DriveInfo)
+            {
+                this.AddFiles(this.MediaSource.SelectedValue as DriveInfo);
+            }
+            else
+            {
+                string sourceFolder = this.MediaSource.SelectedValue as String;
+                if (Directory.Exists(sourceFolder))
+                {                                
+                    string resultDrainFolder = DrainFolder + "\\" + DateTime.Now.ToString("yyMMdd-HHmm-ss");
+                    AddFiles(sourceFolder, resultDrainFolder);
+                }
+            }
+
+            SetData();                   
+
+            if (!(this.MediaSource.SelectedValue is DriveInfo))
+            {
+                checkDeleteOther.IsChecked = false;
+                checkBoxDelete.IsChecked = true;
+            }
+            else
+            {
+                checkBoxDelete.IsChecked = false;
+            }
         }
 
         private void CheckCopyLog()
@@ -419,7 +448,7 @@ namespace MediaBrowserWPF.Dialogs
 
                     if (noWriteAccess)
                     {
-                        Microsoft.Windows.Controls.MessageBox.Show(MainWindow.MainWindowStatic,"Es wurden keine Dateien kopiert.",
+                        Microsoft.Windows.Controls.MessageBox.Show(MainWindow.MainWindowStatic, "Es wurden keine Dateien kopiert.",
                               "Kein Schreibzugriff auf den Datenträger!", MessageBoxButton.OK, MessageBoxImage.Error);
                     }
                     else if (copyErrors.Count > 0)
@@ -457,6 +486,11 @@ namespace MediaBrowserWPF.Dialogs
                 + (drive.VolumeLabel.Length == 0 ? string.Empty : drive.VolumeLabel + "_")
                 + DateTime.Now.ToString("yyMMdd-HHmm-ss");
 
+            AddFiles(sourceFolder, resultDrainFolder);
+        }
+
+        private void AddFiles(string sourceFolder, string resultDrainFolder)
+        {
             this.DirectoryList = new List<string>();
             ScanDirs(DirectoryList, sourceFolder);
             CopyItem cp;
@@ -554,6 +588,16 @@ namespace MediaBrowserWPF.Dialogs
                         this.CopyDictionary.Add(cp.To, cp);
                     }
                     else if (System.IO.Path.GetExtension(source).ToLower() == ".mp4")
+                    {
+                        cp = new CopyItem()
+                        {
+                            IsCopy = copy,
+                            To = resultDrainFolder + folderIdentifier + "\\" + System.IO.Path.GetFileName(source),
+                            From = source
+                        };
+                        this.CopyDictionary.Add(cp.To, cp);
+                    }
+                    else if (System.IO.Path.GetExtension(source).ToLower() == ".gif")
                     {
                         cp = new CopyItem()
                         {
