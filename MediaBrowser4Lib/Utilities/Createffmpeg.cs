@@ -32,7 +32,7 @@ namespace MediaBrowser4.Utilities
             if (index == 1)
             {
                 deinterlace = false;
-                qscale = (int)XvidQuality.GOOD;
+                videoQuality = (int)XvidQuality.GOOD;
                 videoSize = new System.Drawing.Size(0, 0);
                 audioBitrate = 112;
                 audioCodec = "libmp3lame";
@@ -43,7 +43,7 @@ namespace MediaBrowser4.Utilities
             else if (index == 0)
             {
                 deinterlace = false;
-                qscale = (int)H264Quality.EXTRAGOOD;
+                videoQuality = (int)H264Quality.EXTRAGOOD;
                 videoSize = new System.Drawing.Size(0, 0);
                 audioBitrate = 112;
                 audioCodec = "libvo_aacenc";
@@ -62,7 +62,7 @@ namespace MediaBrowser4.Utilities
             else if (index == 3)
             {
                 deinterlace = false;
-                qscale = (int)VorbisQuality.HIGH;
+                videoQuality = (int)VorbisQuality.HIGH;
                 videoSize = new System.Drawing.Size(0, 0);
                 audioCodec = "libvorbis";
                 videoCodec = "libtheora";
@@ -79,7 +79,7 @@ namespace MediaBrowser4.Utilities
             {
                 videoSize = new System.Drawing.Size(720, 576);
                 audioCodec = "mp2";
-                qscale = 6;
+                videoQuality = 6;
                 videoCodec = "mpeg2video";
                 containerFormat = "vob";
             }
@@ -89,6 +89,17 @@ namespace MediaBrowser4.Utilities
                 audioCodec = null;
                 videoCodec = null;
                 containerFormat = "image2";
+            }
+            else if (index == 7)
+            {
+                deinterlace = false;
+                videoQuality = (int)VorbisQuality.HIGH;
+                videoSize = new System.Drawing.Size(0, 0);
+                audioCodec = "libopus";
+                audioBitrate = 112;
+                videoCodec = "libvpx-vp9";
+                videoQuality = 30;
+                containerFormat = "webm";
             }
             else if (index == 200)
             {
@@ -146,11 +157,11 @@ namespace MediaBrowser4.Utilities
             set { deinterlace = value; }
         }
 
-        int qscale = 5;
+        int videoQuality = 5;
         public int VideoQuality
         {
-            get { return qscale; }
-            set { qscale = value; }
+            get { return videoQuality; }
+            set { videoQuality = value; }
         }
 
         System.Drawing.Size videoSize = new System.Drawing.Size(0, 0);
@@ -308,7 +319,18 @@ namespace MediaBrowser4.Utilities
                         }
                         else if (videoCodec.Trim().Length > 0)
                         {
-                            sb.Append(" -c:v " + videoCodec.Trim() + (videoCodec.Trim() == "libx264" ? " -crf " : " -q:v ") + qscale);
+                            switch (videoCodec.Trim())
+                            {
+                                case "libx264":
+                                    sb.Append(" -c:v " + videoCodec.Trim() + " -crf " + videoQuality);
+                                    break;
+                                case "libvpx-vp9":
+                                    sb.Append(" -c:v " + videoCodec.Trim() + " -crf " + videoQuality);
+                                    break;
+                                default:
+                                    sb.Append(" -c:v " + videoCodec.Trim() + " -crf 30 -b:v 0 " + videoQuality);
+                                    break;
+                            }            
                         }
                         else
                         {
@@ -327,7 +349,7 @@ namespace MediaBrowser4.Utilities
                             }
                             else
                             {
-                                sb.Append(" -c:a " + audioCodec.Trim() + (this.AudioBitrate == 0 ? String.Empty : " -ab " + AudioBitrate + "k"));
+                                sb.Append(" -c:a " + audioCodec.Trim() + (this.AudioBitrate == 0 ? String.Empty : " -b:a " + AudioBitrate + "k"));
                             }
                         }
                         else

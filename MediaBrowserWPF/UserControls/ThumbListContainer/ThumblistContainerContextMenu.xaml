@@ -108,6 +108,8 @@
         <MenuItem Name="MenuItemRedateToSummerTime" Header="... nach Winterzeit (-1h)" Click="MenuItemRedateToSummerTime_Click" />
         <MenuItem Name="MenuItemRedateToWinterTime" Header="... nach Sommerzeit (+1h)" Click="MenuItemRedateToWinterTime_Click" />
         <MenuItem Name="MenuItemAdjustMediaDate" Header="... frei einstellen" Click="MenuItemAdjustExifTime_Click" />
+        <Separator></Separator>
+        <MenuItem Name="MenuItemLocalCache" Header="In lokalen Cache laden"  Click="MenuItemLocalCache_Click"   />
     </MenuItem>
 
     <MenuItem Header="Entferne ...">
@@ -183,7 +185,8 @@
         <MenuItem Name="MenuItemFFMpeg_MP3" Header="FFMpeg-Skript Audio MP3 extrahieren" Click="MenuItemFFMpeg_Mp3_Click" />
         <!--<MenuItem Name="MenuItemFFMpegMpeg2_720x576" Header="FFMpeg-Skript MPEG2, 720x576 Pixel" Click="MenuItemFFMpegMpeg2_720x57_Click" />-->
         <MenuItem Name="MenuItemFFMpegImage25" Header="FFMpeg-Skript 25 Thumbnails" Click="MenuItemFFMpegImage25_Click" />
-        <MenuItem Name="MenuItemFFMpegOgg_NoREsize" Header="FFMpeg-Skript Ogg Theora" Click="MenuItemFFMpegOggTheora_NoResize_Click" />
+        <!--<MenuItem Name="MenuItemFFMpegOgg_NoREsize" Header="FFMpeg-Skript Ogg Theora" Click="MenuItemFFMpegOggTheora_NoResize_Click" />-->
+        <MenuItem Name="MenuItemFFMpegWebm_NoREsize" Header="FFMpeg-Skript Webm (vp9/opus)" Click="MenuItemFFMpegWebm_NoREsize_Click"  />
         <MenuItem Name="MenuItemFFMpeg_Copy" Header="FFMpeg-Skript in MKV kopieren" Click="MenuItemFFMpeg_Copy_Click" />
         <MenuItem Name="MenuItemMKVMerge_Join" Header="MKVMerge-Skript aneinander fügen" Click="MenuItemMKVMerge_Join_Click" />
         <Separator/>

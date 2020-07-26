@@ -964,7 +964,7 @@ namespace MediaBrowserWPF.UserControls.RgbImage
             {
                 //http://wpfanimatedgif.codeplex.com/documentation
                 ImageBehavior.SetAnimatedSource(this.MainImage, null);
-                
+
                 this.usePreviewDb = this.UsePreviewDb;
                 this.MainImage.Source = null;
                 this.visibleMediaItem = value as MediaItemBitmap;
@@ -1058,7 +1058,7 @@ namespace MediaBrowserWPF.UserControls.RgbImage
             }
 
             if (!this.usePreviewDb && this.visibleMediaItem.Filename.ToLower().EndsWith(".gif") && ViewerSource.CountFrames(this.visibleMediaItem) > 1)
-            {       
+            {
                 var image = new BitmapImage();
                 image.BeginInit();
                 image.UriSource = new Uri(this.visibleMediaItem.FileObject.FullName);
@@ -1158,7 +1158,7 @@ namespace MediaBrowserWPF.UserControls.RgbImage
 
                         unsafe
                         {
-                            Parallel.ForEach(startStopList, delegate(Tuple<int, int> startStop)
+                            Parallel.ForEach(startStopList, delegate (Tuple<int, int> startStop)
                             {
                                 byte* pbuff = (byte*)buff.ToPointer();
                                 for (int x = startStop.Item1; x < startStop.Item2; x++)
@@ -1330,23 +1330,14 @@ namespace MediaBrowserWPF.UserControls.RgbImage
             }
             else
             {
-                if (MediaBrowserContext.MediaItemsCache != null && this.visibleMediaItem.ImageCachePath == null)
-                {
-                    this.visibleMediaItem.ImageCachePath = System.IO.Path.GetTempFileName() + System.IO.Path.GetExtension(this.visibleMediaItem.FileObject.FullName);
-                    System.IO.File.Copy(this.visibleMediaItem.FileObject.FullName, this.visibleMediaItem.ImageCachePath);
-                    MediaBrowserContext.MediaItemsCache.Add(this.visibleMediaItem.ImageCachePath);
-                }
-
+                this.visibleMediaItem.SetCachedImage();
                 bmp = new CacheBitmapImage();
                 bmp.BitmapImage = this.LoadImage(this.visibleMediaItem.ImageCachePath != null ? this.visibleMediaItem.ImageCachePath : this.visibleMediaItem.FileObject.FullName);
-
-
-                //if (!this.NoCache)
-                //    imageCache.Add(this.visibleMediaItem.FileObject.FullName, bmp);
             }
 
             return bmp;
         }
+
 
         private BitmapImage LoadImage(string myImageFile)
         {
@@ -1407,7 +1398,7 @@ namespace MediaBrowserWPF.UserControls.RgbImage
             System.Drawing.Bitmap bmp = null;
 
             if (bmp == null)
-            {        
+            {
                 BitmapSource renderTargetBitmap = TakeRenderTargetBitmap();
 
                 BmpBitmapEncoder png = new BmpBitmapEncoder();
@@ -1416,7 +1407,7 @@ namespace MediaBrowserWPF.UserControls.RgbImage
                 Stream ms = new MemoryStream();
                 png.Save(ms);
                 ms.Position = 0;
-                bmp = (System.Drawing.Bitmap)System.Drawing.Image.FromStream(ms);               
+                bmp = (System.Drawing.Bitmap)System.Drawing.Image.FromStream(ms);
             }
 
             return bmp;
@@ -1468,7 +1459,7 @@ namespace MediaBrowserWPF.UserControls.RgbImage
             {
                 double fontSize = (this.RenderSize.Width + this.RenderSize.Height + 30) / 60;
                 this.InfoTextBlockTime.FontSize = fontSize;
-                this.InfoTextBlockTimeBlur.FontSize = fontSize;            
+                this.InfoTextBlockTimeBlur.FontSize = fontSize;
             }
         }
     }

@@ -1255,6 +1255,16 @@ namespace MediaBrowserWPF.UserControls
             }
         }
 
+        public void SendToLokalCache()
+        {
+            Mouse.OverrideCursor = Cursors.Wait;
+            foreach (MediaItem mItem in this.SelectedMediaItems)
+            {
+                mItem.SetCachedImage();
+            }
+            Mouse.OverrideCursor = null;
+        }
+
         public void ToggleMarkDelete()
         {
             if (this.SelectedMediaItem != null)

@@ -74,7 +74,6 @@
                         <MenuItem Name="MenuItemMissingFileBehaviorIgnore" Header="... ignorieren" IsCheckable="True" Click="MenuItemMissingFileBehaviorIgnore_Click" />
                         <MenuItem Name="MenuItemMissingFileBehaviorDelete" Header="... löschen" IsEnabled="False" IsCheckable="True" Click="MenuItemMissingFileBehaviorDelete_Click"/>                        
                     </MenuItem>
-                    <MenuItem Name="MenuItemUseLocalCache" Header="Lokalen Cache benutzen" IsCheckable="True" Click="MenuItemUseLocalCache_Click"/>
                 </MenuItem>
                 <MenuItem Name="MenuItemHelp" Header="?" Click="MenuItemHelp_Click"  />
             </Menu>

@@ -1049,13 +1049,7 @@ namespace MediaBrowserWPF.UserControls.Video
                 }
                 else
                 {
-                    if (MediaBrowserContext.MediaItemsCache != null && this.visibleMediaItem.ImageCachePath == null)
-                    {
-                        this.visibleMediaItem.ImageCachePath = System.IO.Path.GetTempFileName() + System.IO.Path.GetExtension(this.visibleMediaItem.FileObject.FullName);
-                        System.IO.File.Copy(this.visibleMediaItem.FileObject.FullName, this.visibleMediaItem.ImageCachePath);
-                        MediaBrowserContext.MediaItemsCache.Add(this.visibleMediaItem.ImageCachePath);
-                    }
-         
+                    this.visibleMediaItem.SetCachedImage();       
                     this.videoPlayer.Source = this.visibleMediaItem.ImageCachePath != null ? this.visibleMediaItem.ImageCachePath : this.visibleMediaItem.FileObject.FullName;
                     this.ResetDefaults();
                 }

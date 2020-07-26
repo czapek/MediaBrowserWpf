@@ -25,7 +25,7 @@ namespace MediaBrowser4.Objects
             LEFTisBOTTOM = 3
         }
 
-        public String ImageCachePath { get; set;  }
+        public String ImageCachePath { get; set; }
 
         public static string OrientationInfo(MediaOrientation orientation)
         {
@@ -896,14 +896,14 @@ namespace MediaBrowser4.Objects
             return (this.Foldername.Length > 50 ? (this.foldername.Substring(0, 10) + " ... " + this.foldername.Substring(this.foldername.Length - 30, 30)) : this.Foldername) + "\n"
                 + string.Format("{0:n0}", (this.FileLength / 1024)) + " KB, "
                 + DimmensionToolTip
-                + (this is MediaBrowser4.Objects.MediaItemVideo ?  $"{MediaBrowser4.Utilities.DateAndTime.FormatVideoTime(this.Duration)} Spielzeit, {this.FileLength / (this.Duration*1024):n0} KBs = {this.FileLength * 8 / (this.Duration * 1024 * 1024):n1} Mbs\n" : "")
+                + (this is MediaBrowser4.Objects.MediaItemVideo ? $"{MediaBrowser4.Utilities.DateAndTime.FormatVideoTime(this.Duration)} Spielzeit, {this.FileLength / (this.Duration * 1024):n0} KBs = {this.FileLength * 8 / (this.Duration * 1024 * 1024):n1} Mbs\n" : "")
                 + $"{this.MediaDate:dddd} {this.MediaDate:g}";
         }
-       
+
         public string DimmensionToolTip
         {
-           get
-            {        
+            get
+            {
                 return $"{this.Width:n0} x {this.Height:n0} = {((double)this.Width * (double)this.Height) / 1000000:n1} Mio Pixel ({AspectRatioToolTip})\n";
             }
         }
@@ -916,7 +916,7 @@ namespace MediaBrowser4.Objects
                 double rel = (double)Math.Max(this.Width, this.Height) / (double)Math.Min(this.Width, this.Height);
 
                 string aspCalc = CalculateAspectString(calcRel);
-                string asp = CalculateAspectString(rel);    
+                string asp = CalculateAspectString(rel);
 
                 if (rel != calcRel)
                 {
@@ -925,7 +925,7 @@ namespace MediaBrowser4.Objects
                 else
                 {
                     return $"{asp}";
-                }               
+                }
             }
         }
 
@@ -936,13 +936,48 @@ namespace MediaBrowser4.Objects
                 System.Windows.Size size = this.CalculatedSize;
                 return Math.Max(size.Width, size.Height) / Math.Min(size.Width, size.Height);
             }
-        }      
+        }
 
         private string GetToolTipPartC()
         {
             return (this.Categories.Count > 0 ? "\n\nKategorien:\n" + String.Join("\n", this.Categories.Select(item => (item.IsDate ? MediaBrowserContext.GetDBProperty("DiaryCategorizeFolder")
                 + ": " + item.Date.ToLongDateString() : item.ToString()))) : "")
                 + (String.IsNullOrWhiteSpace(this.Description) ? "" : "\n\"" + (this.Description.Length > 50 ? this.Description.Substring(0, 46) + " ..." : this.Description).Trim('"') + "\"");
+        }
+
+        public void SetCachedImage()
+        {
+            if (!IsNetworkPath(this.FileObject.FullName))
+                return;
+
+            string tempPath = GetCacheFolder();
+
+            String filename = MediaBrowserContext.DBGuid + "_" + this.Id + "." + System.IO.Path.GetExtension(this.FullName);
+            String cachePath = System.IO.Path.Combine(tempPath, filename);
+            if (!File.Exists(cachePath))
+                File.Copy(this.FileObject.FullName, cachePath);
+
+            this.ImageCachePath = cachePath;
+        }
+
+        public static string GetCacheFolder()
+        {
+            String tempPath = System.IO.Path.Combine(System.IO.Path.GetTempPath() + "MediaBrowserCache");
+            if (!Directory.Exists(tempPath))
+                Directory.CreateDirectory(tempPath);
+            return tempPath;
+        }
+
+        public static bool IsNetworkPath(string path)
+        {
+            if (!path.StartsWith(@"/") && !path.StartsWith(@"\"))
+            {
+                string rootPath = System.IO.Path.GetPathRoot(path); // get drive's letter
+                System.IO.DriveInfo driveInfo = new System.IO.DriveInfo(rootPath); // get info about the drive
+                return driveInfo.DriveType == DriveType.Network; // return true if a network drive
+            }
+
+            return true; // is a UNC path
         }
 
         public override string ToString()

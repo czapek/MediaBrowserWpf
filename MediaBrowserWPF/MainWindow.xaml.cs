@@ -581,7 +581,7 @@ namespace MediaBrowserWPF
             foreach (var drive in DriveInfo.GetDrives())
             {
                 AddDbPath(System.IO.Path.Combine(drive.Name, "Fotos\\DB"), extension, path);
-            }              
+            }
 
             this.DatabasesInFolder.IsEnabled = this.DatabasesInFolder.Items.Count > 0;
         }
@@ -590,7 +590,7 @@ namespace MediaBrowserWPF
         {
             if (Directory.Exists(path))
                 foreach (string name in Directory.GetFiles(path).Where(x => x.EndsWith(extension)))
-                {  
+                {
                     if (!this.DatabasesInFolder.Items.Cast<MenuItem>().Any(x => x.Header.ToString().Equals(System.IO.Path.Combine(path, name), StringComparison.InvariantCultureIgnoreCase)))
                     {
                         MenuItem menuItem = new MenuItem();
@@ -798,7 +798,7 @@ namespace MediaBrowserWPF
                         MapControl.MapSearchWindow sc = new MapControl.MapSearchWindow();
                         sc.Owner = MainWindow.MainWindowStatic;
                         sc.WindowStartupLocation = WindowStartupLocation.CenterOwner;
-                        sc.ShowDialog();                   
+                        sc.ShowDialog();
                     }
                     break;
 
@@ -1125,17 +1125,16 @@ namespace MediaBrowserWPF
         private void Window_Closed(object sender, EventArgs e)
         {
             MediaBrowserContext.AbortInsert();
-            if(MediaBrowserContext.MediaItemsCache != null)
+
+            if (Directory.GetFiles(MediaItem.GetCacheFolder()).Length > 1000)
             {
-                foreach(String file in MediaBrowserContext.MediaItemsCache)
+                DirectoryInfo dInfo = new DirectoryInfo(MediaItem.GetCacheFolder());
+                foreach(FileInfo fInfo in dInfo.GetFiles().OrderByDescending(x => x.LastWriteTime).Skip(1000))
                 {
-                    try
-                    {
-                        File.Delete(file);
-                    }
-                    catch { }
+                    fInfo.Delete();
                 }
             }
+
 
             Application.Current.Shutdown();
         }
@@ -1395,16 +1394,6 @@ namespace MediaBrowserWPF
                     MediaBrowserWPF.Utilities.FilesAndFolders.OpenExplorer(StatusBarTextblock.Text, false);
                 }
             }
-        }
-
-        private void MenuItemUseLocalCache_Click(object sender, RoutedEventArgs e)
-        {
-            if (MenuItemUseLocalCache.IsChecked)
-            {
-                MediaBrowserContext.MediaItemsCache = new List<string>();
-            }
-
-            MenuItemUseLocalCache.IsChecked = true;
         }
     }
 }

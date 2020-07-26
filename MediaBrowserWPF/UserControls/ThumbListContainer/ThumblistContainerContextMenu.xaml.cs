@@ -375,6 +375,11 @@ namespace MediaBrowserWPF.UserControls
             this.thumblistContainer.ToggleBookmark();
         }
 
+        private void MenuItemLocalCache_Click(object sender, RoutedEventArgs e)
+        {
+            this.thumblistContainer.SendToLokalCache();
+        }
+
         private void MenuItemMarkDeleted_Click(object sender, RoutedEventArgs e)
         {
             this.thumblistContainer.ToggleMarkDelete();
@@ -698,6 +703,11 @@ namespace MediaBrowserWPF.UserControls
         private void MenuItemFFMpegImage25_Click(object sender, RoutedEventArgs e)
         {
             this.FFMpegScript(new System.Drawing.Size(0, 0), 6);
+        }
+
+        private void MenuItemFFMpegWebm_NoREsize_Click(object sender, RoutedEventArgs e)
+        {
+            this.FFMpegScript(new System.Drawing.Size(0, 0), 7);
         }
 
         private void FFMpegScript(System.Drawing.Size size, int index)
@@ -1571,6 +1581,6 @@ namespace MediaBrowserWPF.UserControls
 
             MessageBox.Show($"{geoList.Sum(x => x.DistanceMeter):n0} Meter");
         }
-
+      
     }
 }
