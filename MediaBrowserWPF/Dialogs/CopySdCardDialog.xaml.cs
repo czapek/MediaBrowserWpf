@@ -123,6 +123,13 @@ namespace MediaBrowserWPF.Dialogs
                 this.MediaSource.Items.Add(new { Name = String.Format("{0}", "Huawei"), Value = sourceFolder });
                 this.MediaSource.SelectedIndex = this.MediaSource.Items.Count - 1;
             }
+
+            if (Directory.Exists(@"D:\lumix"))
+            {
+                string sourceFolder = @"D:\lumix";
+                this.MediaSource.Items.Add(new { Name = String.Format("{0}", "Lumix"), Value = sourceFolder });
+                this.MediaSource.SelectedIndex = this.MediaSource.Items.Count - 1;
+            }
         }
 
         private void SetData()
