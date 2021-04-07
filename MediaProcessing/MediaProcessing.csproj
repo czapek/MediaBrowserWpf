@@ -66,11 +66,10 @@
     <Reference Include="MetaDataExtractor">
       <HintPath>..\Resources\MetaDataExtractor.dll</HintPath>
     </Reference>
-    <Reference Include="NReco.VideoConverter, Version=1.1.1.0, Culture=neutral, PublicKeyToken=395ccb334978a0cd, processorArchitecture=MSIL">
-      <HintPath>..\packages\NReco.VideoConverter.1.1.1\lib\net20\NReco.VideoConverter.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="NReco.VideoConverter, Version=1.1.4.0, Culture=neutral, PublicKeyToken=395ccb334978a0cd, processorArchitecture=MSIL">
+      <HintPath>..\packages\NReco.VideoConverter.1.1.4\lib\net40\NReco.VideoConverter.dll</HintPath>
     </Reference>
-    <Reference Include="NReco.VideoInfo">
+    <Reference Include="NReco.VideoInfo, Version=1.1.1.0, Culture=neutral, PublicKeyToken=8f59ee36d2987295, processorArchitecture=MSIL">
       <HintPath>..\packages\NReco.VideoInfo.1.1.1\lib\net35\NReco.VideoInfo.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore" />
