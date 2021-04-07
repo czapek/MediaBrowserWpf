@@ -63,6 +63,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Resources\DirectShowLib-2005.dll</HintPath>
     </Reference>
+    <Reference Include="ICSharpCode.SharpZipLib, Version=1.3.1.9, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpZipLib.1.3.1\lib\net45\ICSharpCode.SharpZipLib.dll</HintPath>
+    </Reference>
     <Reference Include="MetaDataExtractor">
       <HintPath>..\Resources\MetaDataExtractor.dll</HintPath>
     </Reference>
@@ -79,7 +82,11 @@
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
     <Reference Include="WindowsBase" />
+    <Reference Include="XmpCore, Version=6.1.10.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\XmpCore.6.1.10\lib\net35\XmpCore.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BlurEffect.cs" />
