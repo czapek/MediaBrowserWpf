@@ -111,7 +111,7 @@ namespace MediaBrowserWPF.Dialogs
                     this.MediaSource.Items.Add(new { Name = String.Format("{0} ({1}) {2:n1} GB", drive.VolumeLabel, drive.Name, drive.TotalSize / 1024.0 / 1024.0 / 1024.0), Value = drive });
 
                     if ((this.NotCopiedList.Count + this.CopyDictionary.Count) == 0 && Directory.Exists(drive.Name + "DCIM"))
-                    {                  
+                    {
                         this.MediaSource.SelectedIndex = this.MediaSource.Items.Count - 1;
                     }
                 }
@@ -175,13 +175,13 @@ namespace MediaBrowserWPF.Dialogs
             {
                 string sourceFolder = this.MediaSource.SelectedValue as String;
                 if (Directory.Exists(sourceFolder))
-                {                                
+                {
                     string resultDrainFolder = DrainFolder + "\\" + DateTime.Now.ToString("yyMMdd-HHmm-ss");
                     AddFiles(sourceFolder, resultDrainFolder);
                 }
             }
 
-            SetData();                   
+            SetData();
 
             if (!(this.MediaSource.SelectedValue is DriveInfo))
             {
@@ -505,6 +505,9 @@ namespace MediaBrowserWPF.Dialogs
 
             foreach (string directory in DirectoryList)
             {
+                if (System.IO.Path.GetFileName(directory).StartsWith("."))
+                    continue;
+
                 currentCount = this.CopyDictionary.Count;
                 bool copy = System.IO.Path.GetPathRoot(directory) != directory;
                 foreach (string source in Directory.GetFiles(directory))
@@ -628,10 +631,17 @@ namespace MediaBrowserWPF.Dialogs
 
         private void ScanDirs(List<string> directoryList, string root)
         {
-            directoryList.Add(root);
-            foreach (string dir in Directory.GetDirectories(root))
+            try
             {
-                ScanDirs(directoryList, dir);
+                foreach (string dir in Directory.GetDirectories(root))
+                {
+                    ScanDirs(directoryList, dir);
+                }
+                directoryList.Add(root);
+            }
+            catch
+            {
+
             }
         }
 
