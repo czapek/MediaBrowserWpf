@@ -74,6 +74,7 @@
                         <MenuItem Name="MenuItemMissingFileBehaviorIgnore" Header="... ignorieren" IsCheckable="True" Click="MenuItemMissingFileBehaviorIgnore_Click" />
                         <MenuItem Name="MenuItemMissingFileBehaviorDelete" Header="... löschen" IsEnabled="False" IsCheckable="True" Click="MenuItemMissingFileBehaviorDelete_Click"/>                        
                     </MenuItem>
+                    <MenuItem Name="MenuItemClearLocalImageCache" Header="Lokalen Medien-Cache leeren" IsCheckable="True" Click="MenuItemClearLocalImageCache_Click" />
                 </MenuItem>
                 <MenuItem Name="MenuItemHelp" Header="?" Click="MenuItemHelp_Click"  />
             </Menu>
