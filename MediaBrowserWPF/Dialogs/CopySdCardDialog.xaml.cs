@@ -124,10 +124,10 @@ namespace MediaBrowserWPF.Dialogs
                 this.MediaSource.SelectedIndex = this.MediaSource.Items.Count - 1;
             }
 
-            if (Directory.Exists(@"D:\lumix"))
+            if (Directory.Exists(@"D:\photo\import"))
             {
-                string sourceFolder = @"D:\lumix";
-                this.MediaSource.Items.Add(new { Name = String.Format("{0}", "Lumix"), Value = sourceFolder });
+                string sourceFolder = @"D:\photo\import";
+                this.MediaSource.Items.Add(new { Name = String.Format("{0}", "photo\\import"), Value = sourceFolder });
                 this.MediaSource.SelectedIndex = this.MediaSource.Items.Count - 1;
             }
         }
