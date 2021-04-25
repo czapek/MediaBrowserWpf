@@ -535,7 +535,7 @@ INNER JOIN CATEGORIZE ON CATEGORIZE.VARIATIONS_FK=VARIATIONS.ID"
 
             if (dbPath.EndsWith("mediafilesNew.mb4") && sortRequest.Header == "200 zufällig ausgewählte")
             {
-                mediaItemListSql = "(FOLDERS.FOLDERNAME LIKE '%\\Alle Bilder\\%' OR FOLDERS.FOLDERNAME LIKE '%\\Foto-Temp\\%') and FOLDERS.FOLDERNAME NOT LIKE '%\\panorama%' AND ";
+                mediaItemListSql = "(FOLDERS.FOLDERNAME LIKE '%\\Alle Bilder\\%' OR FOLDERS.FOLDERNAME LIKE '%\\Foto-Temp\\%' OR FOLDERS.FOLDERNAME LIKE '%\\photo\\%') and FOLDERS.FOLDERNAME NOT LIKE '%\\panorama%' AND ";
             }
 
             return LoadMediaItems("FROM MEDIAFILES INNER JOIN FOLDERS ON FOLDERS.ID = MEDIAFILES.FOLDERS_FK "
