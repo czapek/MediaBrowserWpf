@@ -114,20 +114,13 @@ namespace MediaBrowserWPF.Dialogs
                     {
                         this.MediaSource.SelectedIndex = this.MediaSource.Items.Count - 1;
                     }
-                }
-            }
+                }            }
 
-            if (Directory.Exists(@"P:\sebastian.czapek\huawei"))
-            {
-                string sourceFolder = @"P:\sebastian.czapek\huawei";
-                this.MediaSource.Items.Add(new { Name = String.Format("{0}", "Huawei"), Value = sourceFolder });
-                this.MediaSource.SelectedIndex = this.MediaSource.Items.Count - 1;
-            }
 
-            if (Directory.Exists(@"D:\photo\import"))
+            if (Directory.Exists(@"D:\Photos\MobileBackup"))
             {
-                string sourceFolder = @"D:\photo\import";
-                this.MediaSource.Items.Add(new { Name = String.Format("{0}", "photo\\import"), Value = sourceFolder });
+                string sourceFolder = @"D:\Photos\MobileBackup";
+                this.MediaSource.Items.Add(new { Name = String.Format("{0}", "Moments\\MobileBackup"), Value = sourceFolder });
                 this.MediaSource.SelectedIndex = this.MediaSource.Items.Count - 1;
             }
         }
