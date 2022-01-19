@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>MediaProcessing</RootNamespace>
     <AssemblyName>MediaProcessing</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
@@ -154,8 +154,8 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>if $(ConfigurationName) == Release (
-xcopy /Q /Y "$(TargetDir)$(TargetName).dll" "%25userprofile%25\SynologyDrive\Programme\MediaBrowserWpf"
-xcopy /Q /Y "$(TargetDir)$(TargetName).pdb" "%25userprofile%25\SynologyDrive\Programme\MediaBrowserWpf"
+xcopy /Q /Y "$(TargetDir)$(TargetName).dll" "%25userprofile%25\SynologyDriveDeployment\MediaBrowserWpf"
+xcopy /Q /Y "$(TargetDir)$(TargetName).pdb" "%25userprofile%25\SynologyDriveDeployment\MediaBrowserWpf"
 )</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

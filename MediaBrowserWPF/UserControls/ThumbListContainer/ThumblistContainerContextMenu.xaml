@@ -150,6 +150,13 @@
         <MenuItem Name="MenuItemExport1024" Header="Exportieren (1024x1024 Pix)" Click="MenuItemExport1024_Click" />
         <MenuItem Name="MenuItemExport1920" Header="Exportieren (1920x1920 Pix)" Click="MenuItemExport1920_Click" />
         <MenuItem Name="MenuItemExport3840" Header="Exportieren (3840x3840  Pix)" Click="MenuItemExport3840_Click" />
+        <MenuItem Name="MenuItemExportFramsungOptions" Header="Framsung">
+            <MenuItem Name="MenuItemExportFramsung0" Header="0% (7680x4320  Pix)" Click="MenuItemExportFramsung0_Click" />
+            <MenuItem Name="MenuItemExportFramsung25" Header="25% (7680x4320  Pix)" Click="MenuItemExportFramsung25_Click" />
+            <MenuItem Name="MenuItemExportFramsung50" Header="50% (7680x4320  Pix)" Click="MenuItemExportFramsung50_Click" />
+            <MenuItem Name="MenuItemExportFramsung75" Header="75% (7680x4320  Pix)" Click="MenuItemExportFramsung75_Click" />
+            <MenuItem Name="MenuItemExportFramsung100" Header="100% (7680x4320  Pix)" Click="MenuItemExportFramsung100_Click" />
+        </MenuItem>
         <MenuItem Name="MenuItemExportImageOptions" Header="Optionen">
             <MenuItem Name="MenuItemExportImageOptionsBorder05" Header=".5% Rahmen" StaysOpenOnClick="True" IsCheckable="True" Unchecked="MenuItemExportImageOptionsBorder_Unchecked" Checked="MenuItemExportImageOptionsBorder_Checked" IsChecked="False" />
             <MenuItem Name="MenuItemExportImageOptionsBorder1" Header="1% Rahmen" StaysOpenOnClick="True" IsCheckable="True" Unchecked="MenuItemExportImageOptionsBorder_Unchecked" Checked="MenuItemExportImageOptionsBorder_Checked" IsChecked="False" />

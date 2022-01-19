@@ -11,7 +11,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>MediaBrowser4</RootNamespace>
     <AssemblyName>MediaBrowser4Lib</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
@@ -223,8 +223,8 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>if $(ConfigurationName) == Release (
-xcopy /Q /Y "$(TargetDir)$(TargetName).dll" "%25userprofile%25\SynologyDrive\Programme\MediaBrowserWpf"
-xcopy /Q /Y "$(TargetDir)$(TargetName).pdb" "%25userprofile%25\SynologyDrive\Programme\MediaBrowserWpf"
+xcopy /Q /Y "$(TargetDir)$(TargetName).dll" "%25userprofile%25\SynologyDriveDeployment\MediaBrowserWpf"
+xcopy /Q /Y "$(TargetDir)$(TargetName).pdb" "%25userprofile%25\SynologyDriveDeployment\MediaBrowserWpf"
 )</PostBuildEvent>
   </PropertyGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

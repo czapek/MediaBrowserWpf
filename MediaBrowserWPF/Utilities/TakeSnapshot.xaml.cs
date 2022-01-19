@@ -37,9 +37,10 @@ namespace MediaBrowserWPF.Utilities
             InitializeComponent();
         }
 
+
         public void ExportImage(List<MediaItem> mediaItems, double exportSize, double borderRel,
             double relation, int jpegQuality, SharpenImage.Quality sharpenQuality, bool lightbox,
-            bool fullname, bool isPreviewDb, List<int> previewDbVariationIdList, bool isForcedCrop)
+            bool fullname, bool isPreviewDb, List<int> previewDbVariationIdList, bool isForcedCrop, double? forcedHeight = null, double relforcedPos = .5)
         {
             double border = exportSize * borderRel / 100;
             string path = isPreviewDb ? FilesAndFolders.CreateDesktopPreviewDbFolder() : FilesAndFolders.CreateDesktopExportFolder();
@@ -154,10 +155,7 @@ namespace MediaBrowserWPF.Utilities
                                 size = new System.Windows.Size(System.Math.Max(mItem.Width, mItem.Height), System.Math.Max(mItem.Width, mItem.Height));
                             }
 
-                            string newName = isPreviewDb ? variation.Id + ".jpg.prv" :
-                                (fullname ? System.IO.Path.GetFileNameWithoutExtension(mItem.Filename) + (vList.Count == 1 ? String.Empty : "_v" + variation.Position) + "_" + exportSize.ToString().PadLeft(4, '0') + "pix_"
-                                + jpegQuality.ToString().PadLeft(3, '0') + "jpg_" + ((int)sharpenQuality) + "Xsharp.jpg"
-                                : System.IO.Path.GetFileNameWithoutExtension(mItem.Filename) + (vList.Count == 1 ? String.Empty : "_v" + variation.Position) + ".jpg");
+                            string newName = GetExportName(exportSize, jpegQuality, sharpenQuality, fullname, isPreviewDb, mItem, vList, variation);
 
                             if (mItem is MediaItemVideo && !lightbox && !isPreviewDb)
                             {
@@ -278,7 +276,7 @@ namespace MediaBrowserWPF.Utilities
 
                                         System.Drawing.Size sizecache = new System.Drawing.Size(bmp.Width, bmp.Height);
 
-                                        WriteBitmap(bmp, jpegQuality, sharpenQuality, size, border, relation, mItem.FileObject.FullName, System.IO.Path.Combine(path, newName));
+                                        WriteBitmap(bmp, jpegQuality, sharpenQuality, size, border, relation, mItem.FileObject.FullName, System.IO.Path.Combine(path, newName), forcedHeight.HasValue ? (System.Drawing.Size?)new System.Drawing.Size((int)exportSize, (int)forcedHeight.Value) : null, relforcedPos);
 
                                         if (mItem is MediaItemBitmap)
                                         {
@@ -290,7 +288,7 @@ namespace MediaBrowserWPF.Utilities
                                                 {
                                                     MediaInfoLib sInfo = new MediaInfoLib(soundffmpeg);
                                                     string playTime = (float.Parse(sInfo.PlayTime) / 1000).ToString().Replace(',', '.');
-                                                 
+
                                                     Process process = new Process
                                                     {
                                                         StartInfo = new ProcessStartInfo
@@ -421,6 +419,14 @@ namespace MediaBrowserWPF.Utilities
             thread.Start();
         }
 
+        private static string GetExportName(double exportSize, int jpegQuality, SharpenImage.Quality sharpenQuality, bool fullname, bool isPreviewDb, MediaItem mItem, List<Variation> vList, Variation variation)
+        {
+            return isPreviewDb ? variation.Id + ".jpg.prv" :
+                (fullname ? System.IO.Path.GetFileNameWithoutExtension(mItem.Filename) + (vList.Count == 1 ? String.Empty : "_v" + variation.Position) + "_" + exportSize.ToString().PadLeft(4, '0') + "pix_"
+                + jpegQuality.ToString().PadLeft(3, '0') + "jpg_" + ((int)sharpenQuality) + "Xsharp.jpg"
+                : System.IO.Path.GetFileNameWithoutExtension(mItem.Filename) + (vList == null || vList.Count == 1 ? String.Empty : "_v" + variation.Position) + ".jpg");
+        }
+
         public void ExportImage(MediaItem mItem, string exportFilename, double exportSize, int jpegQuality, bool overWrite)
         {
             if (this.imageControl == null)
@@ -505,7 +511,7 @@ namespace MediaBrowserWPF.Utilities
             }
         }
 
-        private static void WriteBitmap(System.Drawing.Bitmap bmp, int jpegQuality, SharpenImage.Quality sharpeQuality, System.Windows.Size size, double border, double relation, string fullName, string newFullname)
+        private static void WriteBitmap(System.Drawing.Bitmap bmp, int jpegQuality, SharpenImage.Quality sharpeQuality, System.Windows.Size size, double border, double relation, string fullName, string newFullname, System.Drawing.Size? forcedSize = null, double relforcedPos = .5)
         {
             if (bmp == null)
             {
@@ -514,7 +520,22 @@ namespace MediaBrowserWPF.Utilities
 
             bmp = SharpenImage.Work(bmp, sharpeQuality);
 
-            if (bmp.Width < size.Width)
+            if (forcedSize.HasValue)
+            {
+                Bitmap resultImage = new Bitmap(forcedSize.Value.Width, forcedSize.Value.Height);
+                Graphics g = Graphics.FromImage((System.Drawing.Image)resultImage);
+                g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.High;
+                double rel = (double)bmp.Width / (double)bmp.Height;
+                double realHight = resultImage.Width / rel;
+                double diff = realHight - resultImage.Height;
+                int posY = (int)(diff * relforcedPos);
+                Rectangle rec = new Rectangle(0, -posY, resultImage.Width, (int)(resultImage.Width / rel));
+                g.DrawImage(bmp, rec);
+
+                g.Dispose();
+                bmp = resultImage;
+            }
+            else if (bmp.Width < size.Width)
             {
                 Bitmap resultImage = null;
 
@@ -544,7 +565,14 @@ namespace MediaBrowserWPF.Utilities
 
             if (bmp != null)
             {
-                MediaProcessing.EncodeImage.SaveJPGFile(bmp, newFullname, jpegQuality);
+                if (Path.GetExtension(newFullname).ToLower() == ".jpg")
+                {
+                    MediaProcessing.EncodeImage.SaveJPGFile(bmp, newFullname, jpegQuality);
+                }
+                else
+                {
+                    bmp.Save(newFullname);
+                }
             }
             else
             {

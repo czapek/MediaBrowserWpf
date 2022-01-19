@@ -417,6 +417,48 @@ namespace MediaBrowserWPF.UserControls
             this.ExportImage(3840, false);
         }
 
+        private void MenuItemExportFramsung0_Click(object sender, RoutedEventArgs e)
+        {
+            ExportFramsung(0.0);
+        }
+
+        private void MenuItemExportFramsung25_Click(object sender, RoutedEventArgs e)
+        {
+            ExportFramsung(0.25);
+        }
+
+        private void MenuItemExportFramsung50_Click(object sender, RoutedEventArgs e)
+        {
+            ExportFramsung(0.5);
+        }
+
+        private void MenuItemExportFramsung75_Click(object sender, RoutedEventArgs e)
+        {
+            ExportFramsung(0.75);
+        }
+
+        private void MenuItemExportFramsung100_Click(object sender, RoutedEventArgs e)
+        {
+            ExportFramsung(1.0);
+        }
+
+        private void ExportFramsung(double relforcedPos)
+        {
+            using (TakeSnapshot takeSnapshot = new TakeSnapshot())
+            {
+                takeSnapshot.ExportImage(
+                    this.thumblistContainer.SelectedMediaItems.Where(x => x.AspectRatioCropped > 0 && x is MediaItemBitmap && MediaBrowserContext.GetVariations(x).Count == 1).OrderBy(x => x.FileObject.Name).ToList(),
+                    7680,
+                    this.RelativeImageBorder,
+                    this.ImageRelation,
+                    this.ImageQuality,
+                    this.SharpenQuality,
+                    false,
+                    MenuItemExportImageOptionsFullName.IsChecked,
+                    false, null, this.MenuItemExportImageOptionsForceCrop.IsChecked, 4320, relforcedPos);
+            }
+        }
+
         private void MenuItemExport1920_Click(object sender, RoutedEventArgs e)
         {
             this.ExportImage(1920, false);
@@ -1581,6 +1623,5 @@ namespace MediaBrowserWPF.UserControls
 
             MessageBox.Show($"{geoList.Sum(x => x.DistanceMeter):n0} Meter");
         }
-      
     }
 }

@@ -11,7 +11,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>MediaBrowserWPF</RootNamespace>
     <AssemblyName>MediaBrowserWPF</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
@@ -675,8 +675,8 @@
   <PropertyGroup>
     <PostBuildEvent>if $(ConfigurationName) == Release (
 xcopy "$(SolutionDir)Resources\Resources" "Resources\" /Y /I /E
-xcopy /Q /Y "$(TargetDir)$(TargetName).exe" "%25userprofile%25\SynologyDrive\Programme\MediaBrowserWpf"
-xcopy /Q /Y "$(TargetDir)$(TargetName).pdb" "%25userprofile%25\SynologyDrive\Programme\MediaBrowserWpf"
+xcopy /Q /Y "$(TargetDir)$(TargetName).exe" "%25userprofile%25\SynologyDriveDeployment\MediaBrowserWpf"
+xcopy /Q /Y "$(TargetDir)$(TargetName).pdb" "%25userprofile%25\SynologyDriveDeployment\MediaBrowserWpf"
 )</PostBuildEvent>
   </PropertyGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
