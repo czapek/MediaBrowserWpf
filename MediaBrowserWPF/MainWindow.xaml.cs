@@ -1131,7 +1131,14 @@ namespace MediaBrowserWPF
                 DirectoryInfo dInfo = new DirectoryInfo(MediaItem.GetCacheFolder());
                 foreach(FileInfo fInfo in dInfo.GetFiles().OrderByDescending(x => x.LastWriteTime).Skip(1000))
                 {
-                    fInfo.Delete();
+                    try
+                    {
+                        fInfo.Delete();
+                    }
+                    catch
+                    {
+
+                    }
                 }
             }
 

@@ -396,7 +396,7 @@ namespace MediaBrowserWPF.Utilities
                     Createffmpeg cf = new Createffmpeg();
                     cf.ExportPath = path;
                     cf.SetByPredefinedValue(0);
-                    cf.VideoSize = new System.Drawing.Size(1920, 1920); ;
+                    cf.VideoSize = new System.Drawing.Size(Math.Min(1920, (int)exportSize), Math.Min(1920, (int)exportSize)); ;
                     cf.Start(new List<MediaItem>(mediaItems));
                 }
 

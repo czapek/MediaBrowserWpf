@@ -114,7 +114,8 @@ namespace MediaBrowserWPF.Dialogs
                     {
                         this.MediaSource.SelectedIndex = this.MediaSource.Items.Count - 1;
                     }
-                }            }
+                }
+            }
 
 
             if (Directory.Exists(@"D:\Photos\MobileBackup"))
@@ -388,57 +389,83 @@ namespace MediaBrowserWPF.Dialogs
                     }
                 }
 
-                foreach (string key in copiedItems.Keys)
+                if (!this.DirectoryList.Any(x => x.StartsWith("D:\\Photos\\MobileBackup"))) 
                 {
-                    StringBuilder sb = new StringBuilder();
-                    string logFileName = System.IO.Path.Combine(key, "MediaBrowserWpfCopyLog_" + System.Environment.MachineName + ".log");
-                    List<string> lastCopiedFiles = System.IO.File.Exists(logFileName) ? System.IO.File.ReadAllLines(logFileName).ToList() : new List<string>();
-                    List<string> copyLog = new List<string>();
-
-                    foreach (CopyItem kv in this.CopyGrid.Items)
+                    foreach (string key in copiedItems.Keys)
                     {
-                        if (kv.From.StartsWith(key) && lastCopiedFiles.Contains(kv.From.Substring(key.Length)))
+                        StringBuilder sb = new StringBuilder();
+                        string logFileName = System.IO.Path.Combine(key, "MediaBrowserWpfCopyLog_" + System.Environment.MachineName + ".log");
+                        List<string> lastCopiedFiles = System.IO.File.Exists(logFileName) ? System.IO.File.ReadAllLines(logFileName).ToList() : new List<string>();
+                        List<string> copyLog = new List<string>();
+
+                        foreach (CopyItem kv in this.CopyGrid.Items)
                         {
-                            copyLog.Add(kv.From.Substring(key.Length));
+                            if (kv.From.StartsWith(key) && lastCopiedFiles.Contains(kv.From.Substring(key.Length)))
+                            {
+                                copyLog.Add(kv.From.Substring(key.Length));
+                            }
                         }
-                    }
 
-                    foreach (string value in copiedItems[key])
-                    {
-                        if (!copyLog.Contains(value))
-                            copyLog.Add(value);
-                    }
+                        foreach (string value in copiedItems[key])
+                        {
+                            if (!copyLog.Contains(value))
+                                copyLog.Add(value);
+                        }
 
-                    try
-                    {
-                        System.IO.File.WriteAllLines(logFileName, copyLog);
+                        try
+                        {
+                            System.IO.File.WriteAllLines(logFileName, copyLog);
+                        }
+                        catch { }
                     }
-                    catch { }
                 }
 
-                if (deleteOther && this.DirectoryList != null && !noWriteAccess)
+
+                if (this.DirectoryList != null)
                 {
-                    foreach (string file in this.NotCopiedList)
+                    if (delete)
                     {
-                        try
+                        foreach (String dir in this.DirectoryList.Where(x => x.StartsWith("D:\\Photos\\MobileBackup")).OrderByDescending(x => x).ToList())
                         {
-                            File.Delete(file);
+                            if (Directory.GetFiles(dir).Count() + Directory.GetDirectories(dir).Count() == 0 && dir != "D:\\Photos\\MobileBackup")
+                            {
+                                try
+                                {
+                                    Directory.Delete(dir);
+                                    this.DirectoryList.Remove(dir);
+                                }
+                                catch
+                                {
+
+                                }
+                            }
                         }
-                        catch { }
                     }
 
-                    this.DirectoryList.Sort();
-                    this.DirectoryList.Reverse();
-
-                    foreach (string directory in this.DirectoryList)
+                    if (deleteOther && !noWriteAccess)
                     {
-                        try
+                        foreach (string file in this.NotCopiedList)
                         {
-                            if (Directory.GetFiles(directory).Length == 0
-                                && !System.IO.Path.GetPathRoot(directory).Equals(directory))
-                                Directory.Delete(directory);
+                            try
+                            {
+                                File.Delete(file);
+                            }
+                            catch { }
                         }
-                        catch { }
+
+                        this.DirectoryList.Sort();
+                        this.DirectoryList.Reverse();
+
+                        foreach (string directory in this.DirectoryList)
+                        {
+                            try
+                            {
+                                if (Directory.GetFiles(directory).Length == 0
+                                    && !System.IO.Path.GetPathRoot(directory).Equals(directory))
+                                    Directory.Delete(directory);
+                            }
+                            catch { }
+                        }
                     }
                 }
 
