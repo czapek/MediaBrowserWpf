@@ -46,7 +46,7 @@ namespace MediaBrowser4.Utilities
                 videoQuality = (int)H264Quality.EXTRAGOOD;
                 videoSize = new System.Drawing.Size(0, 0);
                 audioBitrate = 112;
-                audioCodec = "libvo_aacenc";
+                audioCodec = "aac";
                 videoCodec = "libx264 -preset slow";
                 containerFormat = "mp4";
             }

@@ -12,10 +12,7 @@ namespace MediaBrowserLauncher
     {
         static void Main(string[] args)
         {
-            string path = Path.Combine(Environment.ExpandEnvironmentVariables("%userprofile%"), @"SynologyDrive\Programme\MediaBrowserWpf\MediaBrowserWPF.exe");
-
-            if (!File.Exists(path)) 
-                path = Path.Combine(Environment.ExpandEnvironmentVariables("%userprofile%"), @"Shared with me\MediaBrowserWpf\MediaBrowserWPF.exe");
+            string path = Path.Combine(Environment.ExpandEnvironmentVariables("%userprofile%"), @"SynologyDriveDeployment\MediaBrowserWpf\MediaBrowserWPF.exe");
 
             if (File.Exists(path))
             {

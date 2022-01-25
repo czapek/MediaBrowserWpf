@@ -294,13 +294,13 @@ namespace MediaBrowserWPF.Utilities
                                                         StartInfo = new ProcessStartInfo
                                                         {
                                                             FileName = ffmpegPath,
-                                                            Arguments = $"-loop 1 -i \"{System.IO.Path.Combine(path, newName)}\" -i \"{soundffmpeg}\" -t {playTime} -c:v libx264 -crf 24 -c:a libvo_aacenc -ab 112k \"{System.IO.Path.Combine(path, newName)}.mp4\""
+                                                            Arguments = $"-loop 1 -i \"{System.IO.Path.Combine(path, newName)}\" -i \"{soundffmpeg}\" -t {playTime} -c:v libx264 -crf 24 -c:a aac -ab 112k \"{System.IO.Path.Combine(path, newName)}.mp4\""
                                                         }
                                                     };
                                                     process.Start();
                                                     process.WaitForExit();
 
-                                                    File.WriteAllText(System.IO.Path.Combine(path, newName) + ".bat", $"\"{ffmpegPath}\" -loop 1 -i \"{System.IO.Path.Combine(path, newName)}\" -i \"{soundffmpeg}\" -t {playTime} -c:v libx264 -crf 24 -c:a libvo_aacenc -ab 112k \"{System.IO.Path.Combine(path, newName)}.mp4\"");
+                                                    File.WriteAllText(System.IO.Path.Combine(path, newName) + ".bat", $"\"{ffmpegPath}\" -loop 1 -i \"{System.IO.Path.Combine(path, newName)}\" -i \"{soundffmpeg}\" -t {playTime} -c:v libx264 -crf 24 -c:a aac -ab 112k \"{System.IO.Path.Combine(path, newName)}.mp4\"");
                                                 }
                                             }
                                         }
@@ -396,7 +396,7 @@ namespace MediaBrowserWPF.Utilities
                     Createffmpeg cf = new Createffmpeg();
                     cf.ExportPath = path;
                     cf.SetByPredefinedValue(0);
-                    cf.VideoSize = new System.Drawing.Size(0, 0); ;
+                    cf.VideoSize = new System.Drawing.Size(1920, 1920); ;
                     cf.Start(new List<MediaItem>(mediaItems));
                 }
 
