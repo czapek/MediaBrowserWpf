@@ -17,6 +17,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
 using System.Xml;
+using FilesAndFolders = MediaBrowserWPF.Utilities.FilesAndFolders;
 
 namespace MediaBrowserWPF.UserControls
 {
@@ -444,7 +445,7 @@ namespace MediaBrowserWPF.UserControls
 
         private void ExportFramsung(double relforcedPos)
         {
-            using (TakeSnapshot takeSnapshot = new TakeSnapshot())
+            using (TakeSnapshot takeSnapshot = new TakeSnapshot() { ExportPath = FilesAndFolders.FindFramsungPath(), OverwriteExisting = true } )
             {
                 takeSnapshot.ExportImage(
                     this.thumblistContainer.SelectedMediaItems.Where(x => x.AspectRatioCropped > 0 && x is MediaItemBitmap && MediaBrowserContext.GetVariations(x).Count == 1).OrderBy(x => x.FileObject.Name).ToList(),

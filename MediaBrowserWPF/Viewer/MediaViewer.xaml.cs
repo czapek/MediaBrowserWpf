@@ -1912,13 +1912,36 @@ namespace MediaBrowserWPF.Viewer
                     break;
 
                 case Key.A:
-                    if (Keyboard.Modifiers == ModifierKeys.Control)
+                    if (Keyboard.Modifiers == (ModifierKeys.Control | ModifierKeys.Alt))
+                    {
+                        this.RemoveStartPosition();
+                    }
+                    else if (Keyboard.Modifiers == (ModifierKeys.Shift))
+                    {
+                        this.SetStartPosition();
+                    }
+                    else if (Keyboard.Modifiers == ModifierKeys.Control)
                     {
                         this.SetOrientation(1);
-                    }
+                    }                   
                     else
                     {
                         this.IsOrientateMode = !this.IsOrientateMode;
+                    }
+                    break;
+
+                case Key.B:
+                    if (Keyboard.Modifiers == (ModifierKeys.Control | ModifierKeys.Alt))
+                    {
+                        this.RemoveStopPosition();
+                    }
+                    else if (Keyboard.Modifiers == ModifierKeys.Shift)
+                    {
+                        this.SetStopPosition();
+                    }
+                    else
+                    {
+                        this.ToggleBookmark();
                     }
                     break;
 
@@ -2055,10 +2078,6 @@ namespace MediaBrowserWPF.Viewer
                     }
                     break;
 
-                case Key.B:
-                    // if (Keyboard.Modifiers == ModifierKeys.Control)
-                    this.ToggleBookmark();
-                    break;
 
                 case Key.Delete:
                     if (Keyboard.Modifiers == ModifierKeys.Control)

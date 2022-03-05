@@ -49,6 +49,7 @@
                 <ComboBox Grid.Column="1" IsEditable="True" Margin="3"  Name="txtTemplate" >
                     <ComboBoxItem>%mediadate%{yyMMdd-HHmm-ss}</ComboBoxItem>
                     <ComboBoxItem>%folder%{4:1}∕%increment%{0:3}</ComboBoxItem>
+                    <ComboBoxItem>%paddnummeric%{3}</ComboBoxItem>
                     <ComboBoxItem>%increment%{0:3} %metadata%{Exposure Time} ISO%metadata%{ISO Speed Ratings} %metadata%{F-Number} Brennweite %metadata%{Focal Length} %metadata%{Model}</ComboBoxItem>
                     <ComboBox.ContextMenu>
                         <ContextMenu Name="txtContextMenu">

@@ -8,33 +8,14 @@ namespace SmartRename.Replacements
     public class IncrementReplacement : ReplacementBase
     {
 
-        public IncrementReplacement() {}
-
-        public IncrementReplacement(int defaultSeedValue) 
-        {
-            this.Arguments.Add(defaultSeedValue.ToString());
-            this._index = defaultSeedValue;
-        }
-
         private int _index;
-        private int Index
-        {
-            get { return _index; }
-            set { _index = value; }
-        }
-
-        private int _padding;
-        private int Padding
-        {
-            get { return _padding; }
-            set { _padding = value; }
-        }
+        private int _padding; 
 
         protected override string GetReplacement(RenameFile inputFile)
         { 
-            string replacement = this.Index.ToString();
-            this.Index++;
-            return this.Padding > 0 ? replacement.PadLeft(this.Padding, '0') : replacement;
+            string replacement = this._index.ToString();
+            this._index++;
+            return this._padding > 0 ? replacement.PadLeft(this._padding, '0') : replacement;
         }
 
         public override void Reset()

@@ -169,6 +169,8 @@ namespace SmartRename
                     Rep.TimeReplacement replacement8 = new Rep.TimeReplacement();
                     Rep.MediaDateReplacement replacement9 = new Rep.MediaDateReplacement();
                     Rep.MetadataReplacement replacement10 = new Rep.MetadataReplacement();
+                    Rep.Paddnummeric replacement11 = new Rep.Paddnummeric();
+
 
                     this._replacements.Add(replacement1.EscapeKey, replacement1);
                     this._replacements.Add(replacement2.EscapeKey, replacement2);
@@ -180,6 +182,7 @@ namespace SmartRename
                     this._replacements.Add(replacement8.EscapeKey, replacement8);
                     this._replacements.Add(replacement9.EscapeKey, replacement9);
                     this._replacements.Add(replacement10.EscapeKey, replacement10);
+                    this._replacements.Add(replacement11.EscapeKey, replacement11);
                 }
 
                 return this._replacements;

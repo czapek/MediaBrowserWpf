@@ -30,7 +30,11 @@ namespace MediaBrowserWPF.Utilities
         ImageControl imageControl;
         IVideoControl videoControl;
 
+        public string ExportPath { get; set; }
         public bool CopyVideo { get; set; } = true;
+
+        public bool OverwriteExisting { get; set; } = false;
+
 
         public TakeSnapshot()
         {
@@ -43,7 +47,7 @@ namespace MediaBrowserWPF.Utilities
             bool fullname, bool isPreviewDb, List<int> previewDbVariationIdList, bool isForcedCrop, double? forcedHeight = null, double relforcedPos = .5)
         {
             double border = exportSize * borderRel / 100;
-            string path = isPreviewDb ? FilesAndFolders.CreateDesktopPreviewDbFolder() : FilesAndFolders.CreateDesktopExportFolder();
+            string path = ExportPath??(isPreviewDb ? FilesAndFolders.CreateDesktopPreviewDbFolder() : FilesAndFolders.CreateDesktopExportFolder());
             int countVideo = mediaItems.Count(x => x is MediaItemVideo);
 
             if (isPreviewDb)
@@ -201,7 +205,7 @@ namespace MediaBrowserWPF.Utilities
                             }
                             else if (mItem is MediaItemBitmap)
                             {
-                                if (!System.IO.File.Exists(System.IO.Path.Combine(path, newName)))
+                                if (OverwriteExisting || !System.IO.File.Exists(System.IO.Path.Combine(path, newName)))
                                 {
                                     mItem.ChangeVariation(variation);
                                     imageControl.MediaItemSource = mItem;

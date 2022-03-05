@@ -23,10 +23,10 @@
         <MenuItem Name="MenuItemEditVideo" Header="Video">
             <MenuItem Header="Springe an den Anfang" InputGestureText="Pos1"  Click="MenuItemJumpStartPosition_Click" />
             <MenuItem Header="Springe nahe dem Ende" InputGestureText="Ende"  Click="MenuItemJumpStopPosition_Click" />
-            <MenuItem Header="Startposition festlegen" InputGestureText="Strg+Pos1"  Click="MenuItemSetStartPosition_Click" />
-            <MenuItem Header="Stoppposition festlegen" InputGestureText="Strg+Ende"  Click="MenuItemSetStoppPosition_Click" />
-            <MenuItem Header="Entferne Startposition" InputGestureText="Strg+Alt+Pos1"  Click="MenuItemRemoveStartPosition_Click" />
-            <MenuItem Header="Entferne Stopppostion" InputGestureText="Strg+Alt+Ende"  Click="MenuItemRemoveStopPosition_Click" />
+            <MenuItem Header="Startposition festlegen" InputGestureText="Shift+A"  Click="MenuItemSetStartPosition_Click" />
+            <MenuItem Header="Stoppposition festlegen" InputGestureText="Shift+B"  Click="MenuItemSetStoppPosition_Click" />
+            <MenuItem Header="Entferne Startposition" InputGestureText="Strg+Alt+A"  Click="MenuItemRemoveStartPosition_Click" />
+            <MenuItem Header="Entferne Stopppostion" InputGestureText="Strg+Alt+A"  Click="MenuItemRemoveStopPosition_Click" />
             <MenuItem Header="Stoppposition zu Startposition" InputGestureText="Strg+Tab"  Click="MenuItem_Stopp2Start_Click" />
             <Separator></Separator>
             <MenuItem Header="Multiplayer" InputGestureText="M"  Click="MenuItemMultiplayer_Click" />

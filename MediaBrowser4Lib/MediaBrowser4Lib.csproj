@@ -118,6 +118,7 @@
     <Compile Include="Objects\GpsFile.cs" />
     <Compile Include="Objects\MediaItemRequestGeoData.cs" />
     <Compile Include="Objects\MediaItemSqlRequest.cs" />
+    <Compile Include="SmartRename\Replacements\Paddnummeric.cs" />
     <Compile Include="Utilities\GPS\GpsLocation.cs" />
     <Compile Include="Utilities\GPS\Gpx.cs" />
     <Compile Include="Utilities\GPS\GpxProperties.cs" />

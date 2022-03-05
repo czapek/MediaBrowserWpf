@@ -95,6 +95,20 @@ namespace MediaBrowserWPF.Utilities
             }
         }
 
+        public static string FindFramsungPath()
+        {
+            string path = null;
+            String framsungPath = Path.Combine(Environment.ExpandEnvironmentVariables("%userprofile%"), @"SynologyDrive\Documents\Framsung_7680x4320\tmp");
+
+            if (Directory.Exists(framsungPath))
+            {
+                path = framsungPath;
+
+            }
+
+            return path;
+        }
+
         public static string CreateDesktopExportFolder()
         {
             string path = DesktopExportFolder;
@@ -127,7 +141,7 @@ namespace MediaBrowserWPF.Utilities
             {
                 bool move = false;
                 Mouse.OverrideCursor = Cursors.Wait;
-                List<MediaItem> mediaList = new List<MediaItem>();                
+                List<MediaItem> mediaList = new List<MediaItem>();
                 List<string> xmlList = new List<string>();
                 int newMediaItemsCount = 0;
 
@@ -177,7 +191,7 @@ namespace MediaBrowserWPF.Utilities
                             mediaList.Add(mItem);
                             newMediaItemsCount++;
                         }
-                        else if(file.ToLower().EndsWith(".xml"))
+                        else if (file.ToLower().EndsWith(".xml"))
                         {
                             xmlList.Add(file);
                         }
@@ -189,8 +203,8 @@ namespace MediaBrowserWPF.Utilities
                 }
                 Mouse.OverrideCursor = null;
 
-                if(xmlList.Count > 0)
-                {                    
+                if (xmlList.Count > 0)
+                {
                     return clipboardList;
                 }
 
