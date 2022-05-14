@@ -18,6 +18,14 @@ namespace MediaBrowser4.Utilities
                         mediaDateFormatString, System.Threading.Thread.CurrentThread.CurrentCulture,
                         System.Globalization.DateTimeStyles.None, out dateValue))
                     mItem.MediaDate = dateValue;
+                else if (mItem.FileObject.Name.Length >= 26 && DateTime.TryParseExact(mItem.FileObject.Name.Substring(7, 19),
+                        "yyyy-MM-dd-HH-mm-ss", System.Threading.Thread.CurrentThread.CurrentCulture,
+                        System.Globalization.DateTimeStyles.None, out dateValue))
+                    mItem.MediaDate = dateValue;
+                else if (mItem.FileObject.Name.Length >= 23 && DateTime.TryParseExact(mItem.FileObject.Name.Substring(4, 15),
+                        "yyyyMMdd_HHmmss", System.Threading.Thread.CurrentThread.CurrentCulture,
+                        System.Globalization.DateTimeStyles.None, out dateValue))
+                    mItem.MediaDate = dateValue;
             }
 
             if (mItem.MediaDate.Ticks == 0)
