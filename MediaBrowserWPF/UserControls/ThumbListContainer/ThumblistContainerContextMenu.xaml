@@ -150,6 +150,7 @@
         <MenuItem Name="MenuItemExport1024" Header="Exportieren (1024x1024 Pix)" Click="MenuItemExport1024_Click" />
         <MenuItem Name="MenuItemExport1920" Header="Exportieren (1920x1920 Pix)" Click="MenuItemExport1920_Click" />
         <MenuItem Name="MenuItemExport3840" Header="Exportieren (3840x3840  Pix)" Click="MenuItemExport3840_Click" />
+        <MenuItem Name="MenuItemExport10000" Header="Exportieren (10000x10000 Pix)" Click="MenuItemExport10000_Click" />
         <MenuItem Name="MenuItemExportFramsungOptions" Header="Framsung">
             <MenuItem Name="MenuItemExportFramsung0" Header="0% (7680x4320  Pix)" Click="MenuItemExportFramsung0_Click" />
             <MenuItem Name="MenuItemExportFramsung25" Header="25% (7680x4320  Pix)" Click="MenuItemExportFramsung25_Click" />
