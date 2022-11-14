@@ -143,6 +143,12 @@ namespace MediaBrowserWPF.Utilities
                         if (isPreviewDb && previewDbVariationIdList.Contains(variation.Id))
                             continue;
 
+                        if(exportSize == 150)
+                        {                   
+                            File.WriteAllBytes(System.IO.Path.Combine(path, Path.GetFileNameWithoutExtension(mItem.Filename) + ".jpg"), MediaBrowserContext.MainDBProvider.GetThumbJpegData(variation.Id));
+                            continue;
+                        }
+
                         try
                         {
                             if (!mItem.FileObject.Exists)

@@ -146,6 +146,7 @@
     <t:CopyMenuItem x:Name="CopyMenuItem" Header="Kopiere ..."></t:CopyMenuItem>
 
     <MenuItem Header="Exportiere ...">
+        <MenuItem Name="MenuItemExportThumbnails" Header="Exportieren (150x150 Pix)" Click="MenuItemExportThumbnails_Click" />
         <MenuItem Name="MenuItemExport800" Header="Exportieren (800x800 Pix)" Click="MenuItemExport800_Click" />
         <MenuItem Name="MenuItemExport1024" Header="Exportieren (1024x1024 Pix)" Click="MenuItemExport1024_Click" />
         <MenuItem Name="MenuItemExport1920" Header="Exportieren (1920x1920 Pix)" Click="MenuItemExport1920_Click" />

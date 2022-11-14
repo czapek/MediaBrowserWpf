@@ -423,6 +423,11 @@ namespace MediaBrowserWPF.UserControls
             this.ExportImage(10000, false);
         }
 
+        private void MenuItemExportThumbnails_Click(object sender, RoutedEventArgs e)
+        {
+            this.ExportImage(exportSize: 150, false);
+        }
+
         private void MenuItemExportFramsung0_Click(object sender, RoutedEventArgs e)
         {
             ExportFramsung(0.0);
@@ -1629,6 +1634,6 @@ namespace MediaBrowserWPF.UserControls
 
             MessageBox.Show($"{geoList.Sum(x => x.DistanceMeter):n0} Meter");
         }
-    
+
     }
 }
