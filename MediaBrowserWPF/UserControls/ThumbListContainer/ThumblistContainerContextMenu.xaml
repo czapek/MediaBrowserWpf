@@ -189,13 +189,20 @@
         <MenuItem Name="MenuItemFFMpegH264_NoResize" Header="FFMpeg-Skript MP4 (h264/aac)" Click="MenuItemFFMpegH264_NoResize_Click" />
         <MenuItem Name="MenuItemFFMpegH264_1280x720" Header="FFMpeg-Skript MP4 (h264/aac), 1280x720 Pixel" Click="MenuItemFFMpegH264_1280x720_Click" />
         <MenuItem Name="MenuItemFFMpegH264_1920x1080" Header="FFMpeg-Skript MP4 (h264/aac), 1920x1080 Pixel" Click="MenuItemFFMpegH264_1920x1080_Click" />
-        <MenuItem Name="MenuItemFFMpegXVid_NoResize" Header="FFMpeg-Skript AVI (xvid/mp3)" Click="MenuItemFFMpegXVid_NoResize_Click" />
-        <MenuItem Name="MenuItemFFMpegXVid_640x480" Header="FFMpeg-Skript AVI (xvid/mp3), 640x480 Pixel" Click="MenuItemFFMpegXVid_640x480_Click" />
+
+        <MenuItem Name="MenuItemFFMpegH265_NoResize" Header="FFMpeg-Skript MP4 (h265/aac)" Click="MenuItemFFMpegH265_NoResize_Click" />
+        <MenuItem Name="MenuItemFFMpegH265_1920x1080" Header="FFMpeg-Skript MP4 (h265/aac), 1920x1080 Pixel" Click="MenuItemFFMpegH265_1920x1080_Click" />
+        <MenuItem Name="MenuItemFFMpegH265_3840x2160" Header="FFMpeg-Skript MP4 (h265/aac), 3840x2160 Pixel" Click="MenuItemFFMpegH265_3840x2160_Click" />
+
+        <MenuItem Name="MenuItemFFMpegWebm_NoREsize" Header="FFMpeg-Skript Webm (vp9/opus)" Click="MenuItemFFMpegWebm_NoREsize_Click"  />
+        <MenuItem Name="MenuItemFFMpegWebm_1920x1080" Header="FFMpeg-Skript Webm (vp9/opus), 1920x1080 Pixel" Click="MenuItemFFMpegWebm_1920x1080_Click"  />
+        <MenuItem Name="MenuItemFFMpegWebm_3840x2160" Header="FFMpeg-Skript Webm (vp9/opus), 3840x2160 Pixel" Click="MenuItemFFMpegWebm_3840x2160_Click"  />
+
         <MenuItem Name="MenuItemFFMpeg_MP3" Header="FFMpeg-Skript Audio MP3 extrahieren" Click="MenuItemFFMpeg_Mp3_Click" />
         <!--<MenuItem Name="MenuItemFFMpegMpeg2_720x576" Header="FFMpeg-Skript MPEG2, 720x576 Pixel" Click="MenuItemFFMpegMpeg2_720x57_Click" />-->
         <MenuItem Name="MenuItemFFMpegImage25" Header="FFMpeg-Skript 25 Thumbnails" Click="MenuItemFFMpegImage25_Click" />
         <!--<MenuItem Name="MenuItemFFMpegOgg_NoREsize" Header="FFMpeg-Skript Ogg Theora" Click="MenuItemFFMpegOggTheora_NoResize_Click" />-->
-        <MenuItem Name="MenuItemFFMpegWebm_NoREsize" Header="FFMpeg-Skript Webm (vp9/opus)" Click="MenuItemFFMpegWebm_NoREsize_Click"  />
+        
         <MenuItem Name="MenuItemFFMpeg_Copy" Header="FFMpeg-Skript in MKV kopieren" Click="MenuItemFFMpeg_Copy_Click" />
         <MenuItem Name="MenuItemMKVMerge_Join" Header="MKVMerge-Skript aneinander fügen" Click="MenuItemMKVMerge_Join_Click" />
         <Separator/>

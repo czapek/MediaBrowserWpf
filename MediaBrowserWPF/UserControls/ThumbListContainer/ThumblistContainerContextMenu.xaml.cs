@@ -728,6 +728,21 @@ namespace MediaBrowserWPF.UserControls
             this.FFMpegScript(new System.Drawing.Size(0, 0), 1);
         }
 
+        private void MenuItemFFMpegH265_NoResize_Click(object sender, RoutedEventArgs e)
+        {
+            this.FFMpegScript(new System.Drawing.Size(0, 0), 8);
+        }
+
+        private void MenuItemFFMpegH265_1920x1080_Click(object sender, RoutedEventArgs e)
+        {
+            this.FFMpegScript(new System.Drawing.Size(1920, 1080), 8);
+        }
+
+        private void MenuItemFFMpegH265_3840x2160_Click(object sender, RoutedEventArgs e)
+        {
+            this.FFMpegScript(new System.Drawing.Size(3840, 2160), 8);
+        }
+
         private void MenuItemFFMpegXVid_640x480_Click(object sender, RoutedEventArgs e)
         {
             this.FFMpegScript(new System.Drawing.Size(640, 480), 1);
@@ -761,6 +776,16 @@ namespace MediaBrowserWPF.UserControls
         private void MenuItemFFMpegWebm_NoREsize_Click(object sender, RoutedEventArgs e)
         {
             this.FFMpegScript(new System.Drawing.Size(0, 0), 7);
+        }
+
+        private void MenuItemFFMpegWebm_1920x1080_Click(object sender, RoutedEventArgs e)
+        {
+            this.FFMpegScript(new System.Drawing.Size(1920, 1080), 7);
+        }
+
+        private void MenuItemFFMpegWebm_3840x2160_Click(object sender, RoutedEventArgs e)
+        {
+            this.FFMpegScript(new System.Drawing.Size(3840, 2160), 7);
         }
 
         private void FFMpegScript(System.Drawing.Size size, int index)
@@ -1634,6 +1659,6 @@ namespace MediaBrowserWPF.UserControls
 
             MessageBox.Show($"{geoList.Sum(x => x.DistanceMeter):n0} Meter");
         }
-
+     
     }
 }

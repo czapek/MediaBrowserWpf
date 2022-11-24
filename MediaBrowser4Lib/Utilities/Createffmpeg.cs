@@ -101,6 +101,16 @@ namespace MediaBrowser4.Utilities
                 videoQuality = 30;
                 containerFormat = "webm";
             }
+            else if (index == 8)
+            {
+                deinterlace = false;
+                videoQuality = (int)H264Quality.EXTRAGOOD;
+                videoSize = new System.Drawing.Size(0, 0);
+                audioBitrate = 112;
+                audioCodec = "aac";
+                videoCodec = "libx265 -preset slow";
+                containerFormat = "mp4";
+            }
             else if (index == 200)
             {
                 videoSize = new System.Drawing.Size(0, 0);
@@ -545,13 +555,24 @@ namespace MediaBrowser4.Utilities
                 return app;
 
             foreach (string look in System.IO.Directory.GetDirectories(
-                System.Environment.GetFolderPath(System.Environment.SpecialFolder.ProgramFilesX86), dirStartsWith + "*"))
+                System.Environment.GetFolderPath(System.Environment.SpecialFolder.ProgramFiles), dirStartsWith + "*"))
                 {
                     if (System.IO.File.Exists(look + "\\" + contains))
                         return look + "\\" + contains;
                     else if (System.IO.File.Exists(look + "\\bin\\" + contains))
                         return look + "\\bin\\" + contains;
                 }
+
+
+            foreach (string look in System.IO.Directory.GetDirectories(
+               System.Environment.GetFolderPath(System.Environment.SpecialFolder.ProgramFilesX86), dirStartsWith + "*"))
+            {
+                if (System.IO.File.Exists(look + "\\" + contains))
+                    return look + "\\" + contains;
+                else if (System.IO.File.Exists(look + "\\bin\\" + contains))
+                    return look + "\\bin\\" + contains;
+            }
+
             return null;
         }
 
