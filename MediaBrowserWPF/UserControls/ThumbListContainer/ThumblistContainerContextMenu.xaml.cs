@@ -318,9 +318,19 @@ namespace MediaBrowserWPF.UserControls
             }
         }
 
+        private void MenuItemExportNameCsv_Click(object sender, RoutedEventArgs e)
+        {
+            if (this.thumblistContainer.SelectedMediaItem == null)
+                return;
+
+            String result = String.Join(",", this.thumblistContainer.SelectedMediaItems
+                .Select(x => Path.GetFileNameWithoutExtension(x.Filename)));
+
+            Clipboard.SetText(result);
+        }
+
         private void MenuItemExportMediaList_Click(object sender, RoutedEventArgs e)
         {
-
             if (this.thumblistContainer.SelectedMediaItem == null)
                 return;
 
@@ -455,7 +465,7 @@ namespace MediaBrowserWPF.UserControls
 
         private void ExportFramsung(double relforcedPos)
         {
-            using (TakeSnapshot takeSnapshot = new TakeSnapshot() { ExportPath = FilesAndFolders.FindFramsungPath(), OverwriteExisting = true } )
+            using (TakeSnapshot takeSnapshot = new TakeSnapshot() { ExportPath = FilesAndFolders.FindFramsungPath(), OverwriteExisting = true })
             {
                 takeSnapshot.ExportImage(
                     this.thumblistContainer.SelectedMediaItems.Where(x => x.AspectRatioCropped > 0 && x is MediaItemBitmap && MediaBrowserContext.GetVariations(x).Count == 1).OrderBy(x => x.FileObject.Name).ToList(),
@@ -1469,7 +1479,7 @@ namespace MediaBrowserWPF.UserControls
         private void MenuItemOpenGeoNearest_Click(object sender, RoutedEventArgs e)
         {
             if (this.thumblistContainer.SelectedMediaItem != null)
-            {             
+            {
                 GeoPoint gps = null;
                 if (this.thumblistContainer.SelectedMediaItem.Latitude.HasValue)
                     gps = new GeoPoint() { Latitude = this.thumblistContainer.SelectedMediaItem.Latitude.Value, Longitude = this.thumblistContainer.SelectedMediaItem.Longitude.Value };
@@ -1659,6 +1669,5 @@ namespace MediaBrowserWPF.UserControls
 
             MessageBox.Show($"{geoList.Sum(x => x.DistanceMeter):n0} Meter");
         }
-     
     }
 }

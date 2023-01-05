@@ -213,6 +213,7 @@
         <MenuItem Name="MenuItemExportChecksumList" Header="Prüfsummenliste (*.hash)"  ToolTip="Erstellt eine Textdatei mit den Prüfsummen der originaldateien" Click="MenuItemExportChecksumList_Click"/>
         <MenuItem Name="MenuItemExportPlayList" Header="Playlist (*.m3u)" ToolTip="Erstellt eine M3U-Liste mit relativen Dateipfaden" Click="MenuItemExportPlayList_Click"/>
         <MenuItem Name="MenuItemExportXmlFull" Header="Metadaten (*.xml)"  ToolTip="Erstellt eine XML-Datei mit allen Metadaten" Click="MenuItemExportXmlFull_Click" />
+        <MenuItem Name="MenuItemExportNameCsv" Header="Dateinamen als CSV in Zwischenablage"  ToolTip="Kopiert eine kommaseparierte Liste der Dateinamen ohne Dateierweiterung in die Zwischenablage" Click="MenuItemExportNameCsv_Click"/>
     </MenuItem>
 
     <MenuItem Header="Varianten ...">
