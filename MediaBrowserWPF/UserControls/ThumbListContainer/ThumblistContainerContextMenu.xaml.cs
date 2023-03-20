@@ -17,6 +17,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
 using System.Xml;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 using FilesAndFolders = MediaBrowserWPF.Utilities.FilesAndFolders;
 
 namespace MediaBrowserWPF.UserControls
@@ -431,6 +432,7 @@ namespace MediaBrowserWPF.UserControls
         private void MenuItemExport10000_Click(object sender, RoutedEventArgs e)
         {
             this.ExportImage(10000, false);
+            this.ExportImage(800, false, "thumbs");
         }
 
         private void MenuItemExportThumbnails_Click(object sender, RoutedEventArgs e)
@@ -465,7 +467,7 @@ namespace MediaBrowserWPF.UserControls
 
         private void ExportFramsung(double relforcedPos)
         {
-            using (TakeSnapshot takeSnapshot = new TakeSnapshot() { ExportPath = FilesAndFolders.FindFramsungPath(), OverwriteExisting = true })
+            using (TakeSnapshot takeSnapshot = new TakeSnapshot() { OverwriteExisting = true })
             {
                 takeSnapshot.ExportImage(
                     this.thumblistContainer.SelectedMediaItems.Where(x => x.AspectRatioCropped > 0 && x is MediaItemBitmap && MediaBrowserContext.GetVariations(x).Count == 1).OrderBy(x => x.FileObject.Name).ToList(),
@@ -488,6 +490,23 @@ namespace MediaBrowserWPF.UserControls
         private void MenuItemExportLigtbox_Click(object sender, RoutedEventArgs e)
         {
             this.ExportImage(1024, true);
+        }
+
+        private void ExportImage(double exportSize, bool lightbox, String subfolder)
+        {
+            using (TakeSnapshot takeSnapshot = new TakeSnapshot() { Subfolder = subfolder })
+            {
+                takeSnapshot.ExportImage(
+                    this.thumblistContainer.SelectedMediaItems.OrderBy(x => x.FileObject.Name).ToList(),
+                    exportSize,
+                this.RelativeImageBorder,
+                    this.ImageRelation,
+                    this.ImageQuality,
+                    this.SharpenQuality,
+                    lightbox,
+                MenuItemExportImageOptionsFullName.IsChecked,
+                    false, null, this.MenuItemExportImageOptionsForceCrop.IsChecked);
+            }
         }
 
         private void ExportImage(double exportSize, bool lightbox)

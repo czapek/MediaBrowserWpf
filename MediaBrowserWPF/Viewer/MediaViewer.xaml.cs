@@ -1055,10 +1055,24 @@ namespace MediaBrowserWPF.Viewer
                     string path = System.IO.Path.Combine(MediaBrowserWPF.Utilities.FilesAndFolders.CreateDesktopExportFolder(), System.IO.Path.GetFileNameWithoutExtension(
                         this.VisibleMediaItem.FileObject.Name) + $"_{(int)this.MediaControl.MediaRenderSize.Width}x{(int)this.MediaControl.MediaRenderSize.Height}pix.jpg");
 
+                    string path2 = System.IO.Path.Combine(MediaBrowserWPF.Utilities.FilesAndFolders.CreateDesktopExportFolder() + "\\thumbs", System.IO.Path.GetFileNameWithoutExtension(
+                        this.VisibleMediaItem.FileObject.Name)) + ".jpg";
+
+                    if (!Directory.Exists(MediaBrowserWPF.Utilities.FilesAndFolders.CreateDesktopExportFolder() + "\\thumbs"))
+                        Directory.CreateDirectory(MediaBrowserWPF.Utilities.FilesAndFolders.CreateDesktopExportFolder() + "\\thumbs");
+
                     if (File.Exists(path))
                         File.Delete(path);
 
+                    if (File.Exists(path2))
+                        File.Delete(path2);
+
                     bmp.Save(path, System.Drawing.Imaging.ImageFormat.Jpeg);
+
+                    bmp = MediaProcessing.ResizeImage.ActionFitIn(bmp, 800);
+
+                    bmp.Save(path2, System.Drawing.Imaging.ImageFormat.Jpeg);
+
                     Clipboard.SetText(path);
                 }
                 catch (Exception ex)

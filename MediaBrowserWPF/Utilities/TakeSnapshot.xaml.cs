@@ -31,6 +31,8 @@ namespace MediaBrowserWPF.Utilities
         IVideoControl videoControl;
 
         public string ExportPath { get; set; }
+
+        public string Subfolder { get; set; }
         public bool CopyVideo { get; set; } = true;
 
         public bool OverwriteExisting { get; set; } = false;
@@ -47,7 +49,15 @@ namespace MediaBrowserWPF.Utilities
             bool fullname, bool isPreviewDb, List<int> previewDbVariationIdList, bool isForcedCrop, double? forcedHeight = null, double relforcedPos = .5)
         {
             double border = exportSize * borderRel / 100;
-            string path = ExportPath??(isPreviewDb ? FilesAndFolders.CreateDesktopPreviewDbFolder() : FilesAndFolders.CreateDesktopExportFolder());
+            string path = ExportPath ?? (isPreviewDb ? FilesAndFolders.CreateDesktopPreviewDbFolder() : FilesAndFolders.CreateDesktopExportFolder());
+            if (Subfolder != null)
+            {
+                path = Path.Combine(path, Subfolder);
+                if (!Directory.Exists(path))
+                {
+                    Directory.CreateDirectory(path);
+                }
+            }
             int countVideo = mediaItems.Count(x => x is MediaItemVideo);
 
             if (isPreviewDb)
@@ -143,8 +153,8 @@ namespace MediaBrowserWPF.Utilities
                         if (isPreviewDb && previewDbVariationIdList.Contains(variation.Id))
                             continue;
 
-                        if(exportSize == 150)
-                        {                   
+                        if (exportSize == 150)
+                        {
                             File.WriteAllBytes(System.IO.Path.Combine(path, Path.GetFileNameWithoutExtension(mItem.Filename) + ".jpg"), MediaBrowserContext.MainDBProvider.GetThumbJpegData(variation.Id));
                             continue;
                         }
