@@ -15,6 +15,7 @@ using System.Web;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using System.Xml;
 using FilesAndFolders = MediaBrowserWPF.Utilities.FilesAndFolders;
@@ -1453,6 +1454,37 @@ namespace MediaBrowserWPF.UserControls
         private void MenuItemUpdateGeodata_Click(object sender, RoutedEventArgs e)
         {
             Mouse.OverrideCursor = Cursors.Wait;
+            foreach (MediaItem mItem in this.thumblistContainer.SelectedMediaItems)
+            {
+                using (Stream stream = new System.IO.FileStream(mItem.FileObject.FullName, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite))
+                {
+
+
+                    BitmapDecoder decoder;
+                    switch (Path.GetExtension(mItem.Filename).ToLower())
+                    {
+                        case ".jpg":
+                        case ".jpeg":
+                            decoder = new JpegBitmapDecoder(stream, BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.Default);
+                            break;
+                        case ".png":
+                            decoder = new PngBitmapDecoder(stream, BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.Default);
+                            break;
+                        default:
+                            throw new Exception();
+                    }
+
+                    BitmapFrame frame = decoder.Frames[0];
+
+                    InPlaceBitmapMetadataWriter inplace = frame.CreateInPlaceBitmapMetadataWriter();
+
+                    if (inplace.TrySave() == true)
+                    { 
+                        inplace.SetQuery("/Text/Description", "Have a nice day.");
+                    }
+                }
+            }
+            /**
             foreach (MediaItem mItem in this.thumblistContainer.SelectedMediaItems.Where(x => !x.Latitude.HasValue))
             {
                 GeoPoint gps = MediaBrowserContext.GetGpsNearest(mItem.MediaDate);
@@ -1464,6 +1496,7 @@ namespace MediaBrowserWPF.UserControls
             }
 
             MediaBrowserContext.SetGeodata(this.thumblistContainer.SelectedMediaItems.Where(x => x.Latitude.HasValue).ToList());
+            */
             Mouse.OverrideCursor = null;
         }
 
