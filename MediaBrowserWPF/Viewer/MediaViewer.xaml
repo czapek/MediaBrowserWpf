@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"   
         xmlns:mb="clr-namespace:MediaBrowserWPF.UserControls"
         xmlns:vid="clr-namespace:MediaBrowserWPF.UserControls.Video"
+        xmlns:pan="clr-namespace:MediaBrowserWPF.UserControls"
         xmlns:tmb="clr-namespace:MediaBrowserWPF.UserControls.ThumbListContainer"
         xmlns:toolkit="clr-namespace:Microsoft.Windows.Controls;assembly=WPFToolkit.Extended"  
         xmlns:ac="clr-namespace:AdornedControl"
@@ -154,9 +155,11 @@
                 <Grid.RenderTransform>
                     <RotateTransform x:Name="MainRotateTransform" />
                 </Grid.RenderTransform>
-
                 <Grid Name="VideoElement" Grid.ZIndex="0">
                     <vid:VideoControl x:Name="VideoPlayer" />
+                </Grid>
+                <Grid Name="PanoElement" Grid.ZIndex="0">
+                    <pan:PanoView x:Name="PanoPlayer" />
                 </Grid>
                 <Grid Name="ImageElement" xmlns:img="clr-namespace:MediaBrowserWPF.UserControls.RgbImage" Background="Black" Grid.ZIndex="0">
                     <img:ImageControl x:Name="ImagePlayer" />

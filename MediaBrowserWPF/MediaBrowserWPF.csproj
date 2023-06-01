@@ -201,6 +201,7 @@
     <Compile Include="Dialogs\VariationDialog.xaml.cs">
       <DependentUpon>VariationDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\GeometryHelper.cs" />
     <Compile Include="Helpers\TreeViewHelper.cs" />
     <Compile Include="UserControls\AttachmentsContainer\AttachmentsContainer.xaml.cs">
       <DependentUpon>AttachmentsContainer.xaml</DependentUpon>
@@ -363,6 +364,9 @@
     </Compile>
     <Compile Include="Viewer\MultiplayerCtrl_Generic.xaml.cs">
       <DependentUpon>MultiplayerCtrl_Generic.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\PanoView.xaml.cs">
+      <DependentUpon>PanoView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Viewer\SphereMeshGenerator.cs" />
     <Compile Include="Viewer\SphereViewer.xaml.cs">
@@ -575,6 +579,10 @@
     <Page Include="Viewer\MultiplayerCtrl_Generic.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UserControls\PanoView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Viewer\SphereViewer.xaml">
       <SubType>Designer</SubType>

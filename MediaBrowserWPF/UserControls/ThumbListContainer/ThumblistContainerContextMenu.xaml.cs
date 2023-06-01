@@ -1492,14 +1492,16 @@ namespace MediaBrowserWPF.UserControls
                         default:
                             throw new Exception();
                     }
-
+                    //135375
                     BitmapFrame frame = decoder.Frames[0];
 
                     InPlaceBitmapMetadataWriter inplace = frame.CreateInPlaceBitmapMetadataWriter();
+                    inplace.SetQuery("/Text/Description", "Das merkwürdige ist nur, dass der laptop mit 100% ausgeschaltet wird und am nächsten Tag mit 100% wieder hoch fährt.\r\nAb und an ist es auch so,dass wenn er am am netzteil ist und auf 100% geladen ist und ich ihn dann weiter nutze mit Netzteil er auf 90% runter geht..");
+
 
                     if (inplace.TrySave() == true)
                     { 
-                        inplace.SetQuery("/Text/Description", "Have a nice day.");
+                        inplace.SetQuery("/Text/Description", "Das merkwürdige ist nur, dass der laptop mit 100% ausgeschaltet wird und am nächsten Tag mit 100% wieder hoch fährt.\r\nAb und an ist es auch so,dass wenn er am am netzteil ist und auf 100% geladen ist und ich ihn dann weiter nutze mit Netzteil er auf 90% runter geht..");
                     }
                 }
             }

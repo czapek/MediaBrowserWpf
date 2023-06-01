@@ -162,6 +162,8 @@ namespace MediaBrowser4.Objects
                     return new Layer(edit, "", pos);
                 case "MPLY":
                     return new Layer(edit, "", pos);
+                case "PANO":
+                    return new Layer(edit, "", pos);
                 default:
                     return null;
             }

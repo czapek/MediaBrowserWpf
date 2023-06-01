@@ -486,6 +486,7 @@ namespace MediaBrowserWPF.Viewer
                     this.NextAnimation();
             }
 
+            this.PanoElement.Visibility = System.Windows.Visibility.Collapsed;
             this.VideoElement.Visibility = System.Windows.Visibility.Collapsed;
             this.ImageElement.Visibility = System.Windows.Visibility.Collapsed;
 
@@ -498,7 +499,11 @@ namespace MediaBrowserWPF.Viewer
             this.mediaViewerContextMenu.IsMarkedDeleted = this.VisibleMediaItem.IsDeleted;
             this.mediaViewerContextMenu.IsBookmarked = this.VisibleMediaItem.IsBookmarked;
 
-            if (this.VisibleMediaItem is MediaItemBitmap)
+            if (this.VisibleMediaItem.FindLayer("PANO") != null)
+            {
+                this.ViewMediaItemPano(this.VisibleMediaItem);
+            }
+            else if (this.VisibleMediaItem is MediaItemBitmap)
             {
                 this.ViewMediaItemRgb(this.VisibleMediaItem as MediaItemBitmap);
             }
@@ -538,6 +543,11 @@ namespace MediaBrowserWPF.Viewer
             this.isMediaLoading = false;
         }
 
+        private void ViewMediaItemPano(MediaItem mItem)
+        {
+            PanoPlayer.OpenMedia(mItem);
+            this.PanoElement.Visibility = System.Windows.Visibility.Visible;
+        }
 
         private void ViewMediaItemDirectShow(MediaItemVideo mItem)
         {
@@ -1402,7 +1412,7 @@ namespace MediaBrowserWPF.Viewer
                         infoList.Add(audioFormat);
 
                     infoList.Add(VideoDuration);
-                    infoList.Add($"{ this.VisibleMediaItem.FileLength / (this.VisibleMediaItem.Duration * 1024):n0} KBs = { this.VisibleMediaItem.FileLength * 8 / (this.VisibleMediaItem.Duration * 1024 * 1024):n1} Mbs\n");
+                    infoList.Add($"{this.VisibleMediaItem.FileLength / (this.VisibleMediaItem.Duration * 1024):n0} KBs = {this.VisibleMediaItem.FileLength * 8 / (this.VisibleMediaItem.Duration * 1024 * 1024):n1} Mbs\n");
                 }
 
                 this.InfoLeftBottom.Text = String.Join(", ", this.VisibleMediaItem.Categories.Where(x => !x.IsDate).Select(x => x.NameDate));
@@ -1824,6 +1834,10 @@ namespace MediaBrowserWPF.Viewer
                     this.ToggleMultiplayer();
                     break;
 
+                case Key.P:
+                    this.TogglePanoPlayer();
+                    break;
+
                 case Key.Q:
                     this.NextFrame();
                     break;
@@ -1937,7 +1951,7 @@ namespace MediaBrowserWPF.Viewer
                     else if (Keyboard.Modifiers == ModifierKeys.Control)
                     {
                         this.SetOrientation(1);
-                    }                   
+                    }
                     else
                     {
                         this.IsOrientateMode = !this.IsOrientateMode;
@@ -2015,8 +2029,7 @@ namespace MediaBrowserWPF.Viewer
                         this.Close();
                     break;
 
-                case Key.Pause:
-                case Key.P:
+                case Key.Pause:      
                     this.mediaViewerContextMenu.IsPause = !this.mediaViewerContextMenu.IsPause;
                     if (this.mediaViewerContextMenu.IsPause)
                         this.Pause();
@@ -2597,6 +2610,20 @@ namespace MediaBrowserWPF.Viewer
                 this.VisibleMediaItem = mItem;
                 this.StepNext(0);
             }
+        }
+
+        private void TogglePanoPlayer()
+        {
+            if (this.VisibleMediaItem.FindLayer("PANO") != null)
+            {
+                this.VisibleMediaItem.RemoveLayer("PANO");
+            }
+            else
+            {
+                this.VisibleMediaItem.AddDefaultLayer("PANO", 0);                
+            }            
+            this.InfoTextToolTip = "360° Viewer: " + (this.VisibleMediaItem.FindLayer("PANO") != null ? "an" : "aus");
+            ViewMediaItem();
         }
 
         private void ToggleMultiplayer()
