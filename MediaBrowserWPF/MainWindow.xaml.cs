@@ -1404,10 +1404,22 @@ namespace MediaBrowserWPF
         }
 
         private void MenuItemClearLocalImageCache_Click(object sender, RoutedEventArgs e)
-        {   
+        {
+            StringBuilder sb = new StringBuilder();
             foreach(String file in Directory.GetFiles(MediaItem.GetCacheFolder()))
             {
-                File.Delete(file);
+                try
+                {
+                    File.Delete(file);
+                }catch(Exception ex)
+                {
+                    sb.AppendLine(ex.Message);
+                }
+            }
+
+            if(sb.Length > 0)
+            {
+                MessageBox.Show(sb.ToString());
             }
         }
     }
