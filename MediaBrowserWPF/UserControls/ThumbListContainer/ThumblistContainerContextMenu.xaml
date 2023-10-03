@@ -186,6 +186,7 @@
         </MenuItem>
         <Separator/>
         <MenuItem Name="MenuItemExportLightbox" Header="Lightbox (1024x768 Pix)" Click="MenuItemExportLigtbox_Click" />
+        <MenuItem Name="MenuItemExportPhotoSphereViewer" Header="PhotoSphereViewer" Click="PhotoSphereViewer_Click" />
         <Separator/>
         <MenuItem Name="MenuItemFFMpegH264_NoResize" Header="FFMpeg-Skript MP4 (h264/aac)" Click="MenuItemFFMpegH264_NoResize_Click" />
         <MenuItem Name="MenuItemFFMpegH264_1280x720" Header="FFMpeg-Skript MP4 (h264/aac), 1280x720 Pixel" Click="MenuItemFFMpegH264_1280x720_Click" />
