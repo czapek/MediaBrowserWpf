@@ -1500,7 +1500,7 @@ namespace MediaBrowserWPF.UserControls
 
 
                     if (inplace.TrySave() == true)
-                    { 
+                    {
                         inplace.SetQuery("/Text/Description", "Das merkwürdige ist nur, dass der laptop mit 100% ausgeschaltet wird und am nächsten Tag mit 100% wieder hoch fährt.\r\nAb und an ist es auch so,dass wenn er am am netzteil ist und auf 100% geladen ist und ich ihn dann weiter nutze mit Netzteil er auf 90% runter geht..");
                     }
                 }
@@ -1723,5 +1723,54 @@ namespace MediaBrowserWPF.UserControls
 
             MessageBox.Show($"{geoList.Sum(x => x.DistanceMeter):n0} Meter");
         }
+
+        private void PhotoSphereViewer_Click(object sender, RoutedEventArgs e)
+        {
+            if (this.thumblistContainer.SelectedMediaItems.Count != 1)
+                return;
+            if (this.thumblistContainer.SelectedMediaItem.Width / this.thumblistContainer.SelectedMediaItem.Height != 2)
+                return;
+
+            String basePath = Path.Combine(@"\\192.168.2.129\web\insta360", Path.GetFileNameWithoutExtension(this.thumblistContainer.SelectedMediaItem.Filename));
+            if (Directory.Exists(basePath))
+            {
+                Process.Start("https://pilzchen.synology.me/insta360/"+ Path.GetFileNameWithoutExtension(this.thumblistContainer.SelectedMediaItem.Filename) + "/index.htm");
+                return;
+            }
+
+            Directory.CreateDirectory(basePath);
+
+            String html = @"<head>
+    <!-- for optimal display on high DPI devices -->
+    <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"" />
+    <link rel=""stylesheet"" href=""https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/core/index.min.css"" />
+</head>
+<!-- the viewer container must have a defined size -->
+<div id=""viewer"" style=""width: 100vw; height: 100vh;""></div>
+
+<script type=""importmap"">
+    {
+        ""imports"": {
+            ""three"": ""https://cdn.jsdelivr.net/npm/three/build/three.module.js"",
+            ""@photo-sphere-viewer/core"": ""https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/core/index.module.js""
+        }
+    }
+</script>
+<script type=""module"">
+    import { Viewer } from '@photo-sphere-viewer/core';
+
+    const viewer = new Viewer({
+        container: document.querySelector('#viewer'),
+        panorama: '" + this.thumblistContainer.SelectedMediaItem.Filename + @"',
+    });
+</script>";
+
+
+            File.WriteAllText(Path.Combine(basePath, "index.htm"), html);
+            File.Copy(this.thumblistContainer.SelectedMediaItem.FullName, Path.Combine(basePath, this.thumblistContainer.SelectedMediaItem.Filename));
+
+            Process.Start("https://pilzchen.synology.me/insta360/" + Path.GetFileNameWithoutExtension(this.thumblistContainer.SelectedMediaItem.Filename) + "/index.htm");
+        }
+    
     }
 }
