@@ -7,6 +7,8 @@ using MediaProcessing;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing.Imaging;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -1724,38 +1726,40 @@ namespace MediaBrowserWPF.UserControls
             MessageBox.Show($"{geoList.Sum(x => x.DistanceMeter):n0} Meter");
         }
 
+        public static void ResizeJpg(MediaItem mItem, string path, int nWidth, int nHeight)
+        {
+            using (var result = new Bitmap(nWidth, nHeight))
+            {
+                using (var input = new Bitmap(mItem.FullName))
+                {
+                    using (Graphics g = Graphics.FromImage((System.Drawing.Image)result))
+                    {
+                        g.DrawImage(input, 0, 0, nWidth, nHeight);
+                    }
+                }
+
+                var ici = ImageCodecInfo.GetImageEncoders().FirstOrDefault(ie => ie.MimeType == "image/jpeg");
+                var eps = new EncoderParameters(1);
+                eps.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 95L);
+                result.Save(Path.Combine(path, mItem.Filename), ici, eps);
+            }
+        }
+
         private void PhotoSphereViewer_Click(object sender, RoutedEventArgs e)
         {
-
-            foreach (MediaItem mitem in this.thumblistContainer.SelectedMediaItems)
+            string root = @"\\192.168.2.129\web\insta360";
+            string url = "https://pilzchen.synology.me/insta360/";
+            StringBuilder sb = new StringBuilder();
+            foreach (MediaItem mitem in this.thumblistContainer.SelectedMediaItems.Where(x => x.Width > x.Height && x.Width / x.Height == 2 && x is MediaItemBitmap))
             {
-
-                if (mitem.Width / mitem.Height != 2)
-                    return;
-
-                String basePath = Path.Combine(@"\\192.168.2.129\web\insta360", Path.GetFileNameWithoutExtension(mitem.Filename));
+                String basePath = Path.Combine(root, Path.GetFileNameWithoutExtension(mitem.Filename));
                 if (Directory.Exists(basePath))
                 {
                     Directory.Delete(basePath, true);
                 }
                 Directory.CreateDirectory(basePath);
 
-                this.ExportImage(10000, false);
-
-                using (TakeSnapshot takeSnapshot = new TakeSnapshot())
-                {
-                    takeSnapshot.ExportPath = basePath;
-                    takeSnapshot.ExportImage(
-                        new List<MediaItem>() { mitem },
-                        10000,
-                        this.RelativeImageBorder,
-                        this.ImageRelation,
-                        this.ImageQuality,
-                        this.SharpenQuality,
-                        false,
-                        MenuItemExportImageOptionsFullName.IsChecked,
-                        false, null, this.MenuItemExportImageOptionsForceCrop.IsChecked);
-                }
+                ResizeJpg(mitem, basePath, 10000, 5000);
 
                 String html = @"<head>
     <!-- for optimal display on high DPI devices -->
@@ -1782,11 +1786,15 @@ namespace MediaBrowserWPF.UserControls
     });
 </script>";
 
-
-                File.WriteAllText(Path.Combine(basePath, "index.htm"), html);
-                Process.Start("https://pilzchen.synology.me/insta360/" + Path.GetFileNameWithoutExtension(mitem.Filename) + "/index.htm");
+                File.WriteAllBytes(Path.Combine(basePath, "tn_" + mitem.Filename), mitem.ThumbJpegData);
+                File.WriteAllText(Path.Combine(basePath, "index.html"), html);
+                sb.AppendLine("<a href='" + Path.GetFileNameWithoutExtension(mitem.Filename) + "/index.html'><img src='" + Path.GetFileNameWithoutExtension(mitem.Filename) + "/" + "tn_" + mitem.Filename  + "'></a>");
+                Process.Start(url + Path.GetFileNameWithoutExtension(mitem.Filename) + "/index.html");
             }
+            File.WriteAllText(Path.Combine(root, "index.html"), sb.ToString());
         }
+
+
 
     }
 }
