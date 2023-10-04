@@ -1726,21 +1726,38 @@ namespace MediaBrowserWPF.UserControls
 
         private void PhotoSphereViewer_Click(object sender, RoutedEventArgs e)
         {
-            if (this.thumblistContainer.SelectedMediaItems.Count != 1)
-                return;
-            if (this.thumblistContainer.SelectedMediaItem.Width / this.thumblistContainer.SelectedMediaItem.Height != 2)
-                return;
 
-            String basePath = Path.Combine(@"\\192.168.2.129\web\insta360", Path.GetFileNameWithoutExtension(this.thumblistContainer.SelectedMediaItem.Filename));
-            if (Directory.Exists(basePath))
+            foreach (MediaItem mitem in this.thumblistContainer.SelectedMediaItems)
             {
-                Process.Start("https://pilzchen.synology.me/insta360/"+ Path.GetFileNameWithoutExtension(this.thumblistContainer.SelectedMediaItem.Filename) + "/index.htm");
-                return;
-            }
 
-            Directory.CreateDirectory(basePath);
+                if (mitem.Width / mitem.Height != 2)
+                    return;
 
-            String html = @"<head>
+                String basePath = Path.Combine(@"\\192.168.2.129\web\insta360", Path.GetFileNameWithoutExtension(mitem.Filename));
+                if (Directory.Exists(basePath))
+                {
+                    Directory.Delete(basePath, true);
+                }
+                Directory.CreateDirectory(basePath);
+
+                this.ExportImage(10000, false);
+
+                using (TakeSnapshot takeSnapshot = new TakeSnapshot())
+                {
+                    takeSnapshot.ExportPath = basePath;
+                    takeSnapshot.ExportImage(
+                        new List<MediaItem>() { mitem },
+                        10000,
+                        this.RelativeImageBorder,
+                        this.ImageRelation,
+                        this.ImageQuality,
+                        this.SharpenQuality,
+                        false,
+                        MenuItemExportImageOptionsFullName.IsChecked,
+                        false, null, this.MenuItemExportImageOptionsForceCrop.IsChecked);
+                }
+
+                String html = @"<head>
     <!-- for optimal display on high DPI devices -->
     <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"" />
     <link rel=""stylesheet"" href=""https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/core/index.min.css"" />
@@ -1761,16 +1778,15 @@ namespace MediaBrowserWPF.UserControls
 
     const viewer = new Viewer({
         container: document.querySelector('#viewer'),
-        panorama: '" + this.thumblistContainer.SelectedMediaItem.Filename + @"',
+        panorama: '" + mitem.Filename + @"',
     });
 </script>";
 
 
-            File.WriteAllText(Path.Combine(basePath, "index.htm"), html);
-            File.Copy(this.thumblistContainer.SelectedMediaItem.FullName, Path.Combine(basePath, this.thumblistContainer.SelectedMediaItem.Filename));
-
-            Process.Start("https://pilzchen.synology.me/insta360/" + Path.GetFileNameWithoutExtension(this.thumblistContainer.SelectedMediaItem.Filename) + "/index.htm");
+                File.WriteAllText(Path.Combine(basePath, "index.htm"), html);
+                Process.Start("https://pilzchen.synology.me/insta360/" + Path.GetFileNameWithoutExtension(mitem.Filename) + "/index.htm");
+            }
         }
-    
+
     }
 }
