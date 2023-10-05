@@ -1770,9 +1770,8 @@ namespace MediaBrowserWPF.UserControls
                 File.WriteAllText(Path.Combine(basePath, "original.html"), PhotoSphereViewer.Original);
                 File.WriteAllText(Path.Combine(basePath, "littleplanet.html"), PhotoSphereViewer.Littleplanet);
                 sb.AppendLine("<a target='_blank' href='" + Path.GetFileNameWithoutExtension(mitem.Filename) + "/fisheye.html'><img src='" + Path.GetFileNameWithoutExtension(mitem.Filename) + "/preview.jpg'></a>");
-
-                if (!File.Exists(Path.Combine(basePath, "image.jpg")))
-                    Process.Start(url + Path.GetFileNameWithoutExtension(mitem.Filename) + "/fisheye.html");
+                            
+                Process.Start(url + Path.GetFileNameWithoutExtension(mitem.Filename) + "/fisheye.html");
             }
             File.WriteAllText(Path.Combine(root, "index.html"), sb.ToString());
         }
