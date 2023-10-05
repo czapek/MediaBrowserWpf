@@ -1750,19 +1750,21 @@ namespace MediaBrowserWPF.UserControls
             string root = @"\\192.168.2.129\web\insta360";
             string url = "https://pilzchen.synology.me/insta360/";
             StringBuilder sb = new StringBuilder();
-            foreach (MediaItem mitem in this.thumblistContainer.SelectedMediaItems.Where(x => x.Width > x.Height && x.Width / x.Height == 2 && x is MediaItemBitmap))
+            foreach (MediaItem mitem in this.thumblistContainer.SelectedMediaItems.Where(x => x.Width > x.Height && x.Width / x.Height == 2 && x is MediaItemBitmap).OrderBy(x => x.Filename))
             {
                 String basePath = Path.Combine(root, Path.GetFileNameWithoutExtension(mitem.Filename));
                 if (!Directory.Exists(basePath))
                 {
                     Directory.CreateDirectory(basePath);
-                }        
+                }
 
-                File.WriteAllText(Path.Combine(basePath, "equirectangular.html"), PhotoSphereViewer.Equirectangular);
-                File.WriteAllText(Path.Combine(basePath, "fisheye.html"), PhotoSphereViewer.Fisheye);
-                File.WriteAllText(Path.Combine(basePath, "original.html"), PhotoSphereViewer.Original);
-                File.WriteAllText(Path.Combine(basePath, "littleplanet.html"), PhotoSphereViewer.Littleplanet);
-                sb.AppendLine("<a target='_blank' href='" + Path.GetFileNameWithoutExtension(mitem.Filename) + "/fisheye.html'><img src='" + Path.GetFileNameWithoutExtension(mitem.Filename) + "/preview.jpg'></a>");
+                String title = mitem.MediaDate.ToString("d. MMM yyyy");
+                File.WriteAllText(Path.Combine(basePath, "equirectangular.html"), PhotoSphereViewer.Equirectangular.Replace("{{title}}", title));
+                File.WriteAllText(Path.Combine(basePath, "fisheye.html"), PhotoSphereViewer.Fisheye.Replace("{{title}}", title));
+                File.WriteAllText(Path.Combine(basePath, "original.html"), PhotoSphereViewer.Original.Replace("{{title}}", title));
+                File.WriteAllText(Path.Combine(basePath, "littleplanet.html"), PhotoSphereViewer.Littleplanet.Replace("{{title}}", title));
+                string altText = mitem.MediaDate.ToLongDateString() + " " + mitem.MediaDate.ToLongTimeString();
+                sb.AppendLine("<a style=\"margin: 2px;\" title='" + HttpUtility.HtmlEncode(altText) + "' target='_blank' href='" + Path.GetFileNameWithoutExtension(mitem.Filename) + "/fisheye.html'><img src='" + Path.GetFileNameWithoutExtension(mitem.Filename) + "/preview.jpg'></a>");
 
                 if (!File.Exists(Path.Combine(basePath, "image.jpg")))
                 {
@@ -1771,11 +1773,11 @@ namespace MediaBrowserWPF.UserControls
                 }
 
                 if (!File.Exists(Path.Combine(basePath, "preview.jpg")))
-                    File.WriteAllBytes(Path.Combine(basePath, "preview.jpg"), mitem.ThumbJpegData);                
+                    File.WriteAllBytes(Path.Combine(basePath, "preview.jpg"), mitem.ThumbJpegData);
             }
             File.WriteAllText(Path.Combine(root, "index.html"), sb.ToString());
             Process.Start(url + "/index.html");
-        
+
         }
 
 
