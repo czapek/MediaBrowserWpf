@@ -9,13 +9,57 @@ namespace MediaBrowserWPF.Utilities
 {
     public static class PhotoSphereViewer
     {
+        public const String EquirectangularVideo = @"<head>
+    <title>5. Okt 2022, 16:45</title>
+    <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"" />
+    <link rel=""stylesheet"" href=""https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/core/index.min.css"" />
+    <link href=""https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"" rel=""stylesheet"">
+</head>
+<div style=""width: 98vw; text-align:center;""><a style=""margin: 1vw;"" href=""equirectangular.html"">Equi</a><a style=""margin: 1vw;"" href=""fisheye.html"">Fisheye</a></div>
+<div id=""viewer"" style=""width: 90vw; height: 85vh; margin:1vw auto;""></div>
+<script type=""importmap"">
+    {
+        ""imports"": {
+            ""three"": ""https://cdn.jsdelivr.net/npm/three/build/three.module.js"",
+            ""@photo-sphere-viewer/core"": ""https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/core/index.module.js"",
+			""@photo-sphere-viewer/gyroscope-plugin"": ""https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/gyroscope-plugin/index.module.js"",
+			""@photo-sphere-viewer/autorotate-plugin"": ""https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/autorotate-plugin/index.module.js"",
+			""@photo-sphere-viewer/video-plugin"": ""https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/video-plugin/index.module.js"",
+			""@photo-sphere-viewer/equirectangular-video-adapter"": ""https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/equirectangular-video-adapter/index.module.js""
+        }
+    }
+</script>
+<script type=""module"">
+    import { Viewer } from '@photo-sphere-viewer/core';
+    import { GyroscopePlugin } from '@photo-sphere-viewer/gyroscope-plugin';
+	import { AutorotatePlugin } from '@photo-sphere-viewer/autorotate-plugin';
+	import { VideoPlugin } from '@photo-sphere-viewer/video-plugin';
+	import { EquirectangularVideoAdapter } from '@photo-sphere-viewer/equirectangular-video-adapter';
+
+    const viewer = new Viewer({
+        container: document.querySelector('#viewer'),
+		adapter: [EquirectangularVideoAdapter, {
+            muted: true,
+        }],
+        plugins: [VideoPlugin, GyroscopePlugin,  
+		  [AutorotatePlugin, {
+            autostartDelay: 5000,
+            autorotateSpeed: '0.3rpm',
+        }]],
+        panorama: {
+            source: 'video.mp4',
+        },
+        fisheye: {{fisheye}},
+    });
+</script>";
+
         public const String Equirectangular = @"<head>
     <title>{{title}}</title>
     <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"" />
     <link rel=""stylesheet"" href=""https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/core/index.min.css"" />
     <link href=""https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"" rel=""stylesheet"">
 </head>
-<div style=""width: 98vw; text-align:center;""><strong><a style=""margin: 1vw;"" href=""equirectangular.html"">Equi</a></strong><a style=""margin: 1vw;"" href=""fisheye.html"">Fisheye</a><a style=""margin: 1vw;"" href=""littleplanet.html"">Littleplanet</a><a style=""margin: 1vw;"" href=""original.html"">Original</a></div>
+<div style=""width: 98vw; text-align:center;""><a style=""margin: 1vw;"" href=""equirectangular.html"">Equi</a><a style=""margin: 1vw;"" href=""fisheye.html"">Fisheye</a><a style=""margin: 1vw;"" href=""littleplanet.html"">Littleplanet</a><a style=""margin: 1vw;"" href=""original.html"">Original</a></div>
 <div id=""viewer"" style=""width: 90vw; height: 85vh; margin:1vw auto;""></div>
 <script type=""importmap"">
     {
@@ -40,45 +84,10 @@ namespace MediaBrowserWPF.Utilities
             autorotateSpeed: '0.3rpm',
         }]],
         panorama: 'image.jpg',
+        fisheye: {{fisheye}},
     });
 </script>";
 
-        public const String Fisheye = @"<head>
-    <title>{{title}}</title>
-    <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"" />
-    <link rel=""stylesheet"" href=""https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/core/index.min.css"" />
-    <link href=""https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"" rel=""stylesheet"">
-</head>
-<div style=""width: 98vw; text-align:center;""><a style=""margin: 1vw;"" href=""equirectangular.html"">Equi</a><strong><a style=""margin: 1vw;"" href=""fisheye.html"">Fisheye</a></strong><a style=""margin: 1vw;"" href=""littleplanet.html"">Littleplanet</a><a style=""margin: 1vw;"" href=""original.html"">Original</a></div>
-<div id=""viewer"" style=""width: 90vw; height: 85vh; margin:1vw auto;""></div>
-<script type=""importmap"">
-    {
-        ""imports"": {
-            ""three"": ""https://cdn.jsdelivr.net/npm/three/build/three.module.js"",
-            ""@photo-sphere-viewer/core"": ""https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/core/index.module.js"",
-			""@photo-sphere-viewer/gyroscope-plugin"": ""https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/gyroscope-plugin/index.module.js"",
-			""@photo-sphere-viewer/autorotate-plugin"": ""https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/autorotate-plugin/index.module.js""
-        }
-    }
-</script>
-<script type=""module"">
-    import { Viewer } from '@photo-sphere-viewer/core';
-    import { GyroscopePlugin } from '@photo-sphere-viewer/gyroscope-plugin';
-	import { AutorotatePlugin } from '@photo-sphere-viewer/autorotate-plugin';
-
-    const viewer = new Viewer({
-        container: document.querySelector('#viewer'),
-        plugins: [GyroscopePlugin,  
-		  [AutorotatePlugin, {
-            autostartDelay: 5000,
-            autorotateSpeed: '0.3rpm',
-        }]],
-        panorama: 'image.jpg',
-		defaultPitch: 0.6,
-        defaultZoomLvl: 20,
-        fisheye: true,
-    });
-</script>";
 
         public const String Littleplanet = @"<head>
     <title>{{title}}</title>
@@ -86,7 +95,7 @@ namespace MediaBrowserWPF.Utilities
     <link rel=""stylesheet"" href=""https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/core/index.min.css"" />
     <link href=""https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"" rel=""stylesheet"">
 </head>
-<div style=""width: 98vw; text-align:center;""><a style=""margin: 1vw;"" href=""equirectangular.html"">Equi</a><a style=""margin: 1vw;"" href=""fisheye.html"">Fisheye</a><strong><a style=""margin: 1vw;"" href=""littleplanet.html"">Littleplanet</a></strong><a style=""margin: 1vw;"" href=""original.html"">Original</a></div>
+<div style=""width: 98vw; text-align:center;""><a style=""margin: 1vw;"" href=""equirectangular.html"">Equi</a><a style=""margin: 1vw;"" href=""fisheye.html"">Fisheye</a><a style=""margin: 1vw;"" href=""littleplanet.html"">Littleplanet</a><a style=""margin: 1vw;"" href=""original.html"">Original</a></div>
 <div id=""viewer"" style=""width: 90vw; height: 85vh; margin:1vw auto;""></div>
 <script type=""importmap"">
     {
@@ -114,7 +123,7 @@ namespace MediaBrowserWPF.Utilities
     <link rel=""stylesheet"" href=""https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/core/index.min.css"" />
     <link href=""https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"" rel=""stylesheet"">
 </head>
-<div style=""width: 98vw; text-align:center;""><a style=""margin: 1vw;"" href=""equirectangular.html"">Equi</a><a style=""margin: 1vw;"" href=""fisheye.html"">Fisheye</a><a style=""margin: 1vw;"" href=""littleplanet.html"">Littleplanet</a><strong><a style=""margin: 1vw;"" href=""original.html"">Original</a></strong></div>
+<div style=""width: 98vw; text-align:center;""><a style=""margin: 1vw;"" href=""equirectangular.html"">Equi</a><a style=""margin: 1vw;"" href=""fisheye.html"">Fisheye</a><a style=""margin: 1vw;"" href=""littleplanet.html"">Littleplanet</a><a style=""margin: 1vw;"" href=""original.html"">Original</a></div>
 <img style=""display: block;; margin:1vw auto; width: 90vw;"" src=""image.jpg"">";
     }
 }

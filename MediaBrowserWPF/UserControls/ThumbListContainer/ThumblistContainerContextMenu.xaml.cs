@@ -1750,7 +1750,7 @@ namespace MediaBrowserWPF.UserControls
             string root = @"\\192.168.2.129\web\insta360";
             string url = "https://pilzchen.synology.me/insta360/";
             StringBuilder sb = new StringBuilder();
-            foreach (MediaItem mitem in this.thumblistContainer.SelectedMediaItems.Where(x => x.Width > x.Height && x.Width / x.Height == 2 && x is MediaItemBitmap).OrderBy(x => x.Filename))
+            foreach (MediaItem mitem in this.thumblistContainer.SelectedMediaItems.Where(x => x.Width > x.Height && x.Width / x.Height == 2 && (x.Filename.EndsWith(".mp4") || x.Filename.EndsWith(".jpg"))).OrderBy(x => x.Filename))
             {
                 String basePath = Path.Combine(root, Path.GetFileNameWithoutExtension(mitem.Filename));
                 if (!Directory.Exists(basePath))
@@ -1759,17 +1759,33 @@ namespace MediaBrowserWPF.UserControls
                 }
 
                 String title = mitem.MediaDate.ToString("d. MMM yyyy") + ", " + mitem.MediaDate.ToShortTimeString();
-                File.WriteAllText(Path.Combine(basePath, "equirectangular.html"), PhotoSphereViewer.Equirectangular.Replace("{{title}}", title));
-                File.WriteAllText(Path.Combine(basePath, "fisheye.html"), PhotoSphereViewer.Fisheye.Replace("{{title}}", title));
-                File.WriteAllText(Path.Combine(basePath, "original.html"), PhotoSphereViewer.Original.Replace("{{title}}", title));
-                File.WriteAllText(Path.Combine(basePath, "littleplanet.html"), PhotoSphereViewer.Littleplanet.Replace("{{title}}", title));
                 string altText = mitem.MediaDate.ToLongDateString() + " " + mitem.MediaDate.ToLongTimeString();
                 sb.AppendLine("<a style=\"margin: 2px;\" title='" + HttpUtility.HtmlEncode(altText) + "' target='_blank' href='" + Path.GetFileNameWithoutExtension(mitem.Filename) + "/fisheye.html'><img src='" + Path.GetFileNameWithoutExtension(mitem.Filename) + "/preview.jpg'></a>");
 
-                if (!File.Exists(Path.Combine(basePath, "image.jpg")))
+                if (mitem is MediaItemBitmap)
                 {
-                    ResizeJpg(mitem, Path.Combine(basePath, "image.jpg"), 10000, 5000);
-                    Process.Start(url + Path.GetFileNameWithoutExtension(mitem.Filename) + "/fisheye.html");
+                    File.WriteAllText(Path.Combine(basePath, "equirectangular.html"), PhotoSphereViewer.Equirectangular.Replace("{{title}}", title).Replace("{{fisheye}}", "false"));
+                    File.WriteAllText(Path.Combine(basePath, "fisheye.html"), PhotoSphereViewer.Equirectangular.Replace("{{title}}", title).Replace("{{fisheye}}", "true"));
+                    File.WriteAllText(Path.Combine(basePath, "original.html"), PhotoSphereViewer.Original.Replace("{{title}}", title));
+                    File.WriteAllText(Path.Combine(basePath, "littleplanet.html"), PhotoSphereViewer.Littleplanet.Replace("{{title}}", title));
+
+                    if (!File.Exists(Path.Combine(basePath, "image.jpg")))
+                    {
+                        ResizeJpg(mitem, Path.Combine(basePath, "image.jpg"), 10000, 5000);
+                        Process.Start(url + Path.GetFileNameWithoutExtension(mitem.Filename) + "/fisheye.html");
+                    }
+                }
+                else
+                {
+                    File.WriteAllText(Path.Combine(basePath, "equirectangular.html"), PhotoSphereViewer.EquirectangularVideo.Replace("{{title}}", title).Replace("{{fisheye}}", "false"));
+                    File.WriteAllText(Path.Combine(basePath, "fisheye.html"), PhotoSphereViewer.EquirectangularVideo.Replace("{{title}}", title).Replace("{{fisheye}}", "true"));
+                    //File.WriteAllText(Path.Combine(basePath, "littleplanet.html"), PhotoSphereViewer.LittleplanetVideo.Replace("{{title}}", title));
+
+                    if (!File.Exists(Path.Combine(basePath, "video.mp4")))
+                    {
+                        mitem.FileObject.CopyTo(Path.Combine(basePath, "video.mp4"));
+                        Process.Start(url + Path.GetFileNameWithoutExtension(mitem.Filename) + "/fisheye.html");
+                    }
                 }
 
                 if (!File.Exists(Path.Combine(basePath, "preview.jpg")))
