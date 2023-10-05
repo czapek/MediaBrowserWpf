@@ -1758,7 +1758,7 @@ namespace MediaBrowserWPF.UserControls
                     Directory.CreateDirectory(basePath);
                 }
 
-                String title = mitem.MediaDate.ToString("d. MMM yyyy");
+                String title = mitem.MediaDate.ToString("d. MMM yyyy") + ", " + mitem.MediaDate.ToShortTimeString();
                 File.WriteAllText(Path.Combine(basePath, "equirectangular.html"), PhotoSphereViewer.Equirectangular.Replace("{{title}}", title));
                 File.WriteAllText(Path.Combine(basePath, "fisheye.html"), PhotoSphereViewer.Fisheye.Replace("{{title}}", title));
                 File.WriteAllText(Path.Combine(basePath, "original.html"), PhotoSphereViewer.Original.Replace("{{title}}", title));
