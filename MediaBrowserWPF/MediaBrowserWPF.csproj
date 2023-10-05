@@ -339,6 +339,7 @@
     <Compile Include="Utilities\ConsoleManager.cs" />
     <Compile Include="Utilities\FilesAndFolders.cs" />
     <Compile Include="Utilities\KeyboardFocus.cs" />
+    <Compile Include="Utilities\PhotoSphereViewer.cs" />
     <Compile Include="Utilities\Rundll32.cs" />
     <Compile Include="Utilities\TakeSnapshot.xaml.cs">
       <DependentUpon>TakeSnapshot.xaml</DependentUpon>

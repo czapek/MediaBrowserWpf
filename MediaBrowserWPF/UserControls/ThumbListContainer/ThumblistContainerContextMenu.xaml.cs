@@ -1741,7 +1741,7 @@ namespace MediaBrowserWPF.UserControls
                 var ici = ImageCodecInfo.GetImageEncoders().FirstOrDefault(ie => ie.MimeType == "image/jpeg");
                 var eps = new EncoderParameters(1);
                 eps.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 95L);
-                result.Save(Path.Combine(path, mItem.Filename), ici, eps);
+                result.Save(path, ici, eps);
             }
         }
 
@@ -1759,37 +1759,18 @@ namespace MediaBrowserWPF.UserControls
                 }
                 Directory.CreateDirectory(basePath);
 
-                ResizeJpg(mitem, basePath, 10000, 5000);
+                if (!File.Exists(Path.Combine(basePath, "image.jpg")))
+                    ResizeJpg(mitem, Path.Combine(basePath, "image.jpg"), 10000, 5000);
 
-                String html = @"<head>
-    <!-- for optimal display on high DPI devices -->
-    <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"" />
-    <link rel=""stylesheet"" href=""https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/core/index.min.css"" />
-</head>
-<!-- the viewer container must have a defined size -->
-<div id=""viewer"" style=""width: 100vw; height: 100vh;""></div>
+                if (!File.Exists(Path.Combine(basePath, "preview.jpg")))
+                    File.WriteAllBytes(Path.Combine(basePath, "preview.jpg"), mitem.ThumbJpegData);
 
-<script type=""importmap"">
-    {
-        ""imports"": {
-            ""three"": ""https://cdn.jsdelivr.net/npm/three/build/three.module.js"",
-            ""@photo-sphere-viewer/core"": ""https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/core/index.module.js""
-        }
-    }
-</script>
-<script type=""module"">
-    import { Viewer } from '@photo-sphere-viewer/core';
-
-    const viewer = new Viewer({
-        container: document.querySelector('#viewer'),
-        panorama: '" + mitem.Filename + @"',
-    });
-</script>";
-
-                File.WriteAllBytes(Path.Combine(basePath, "tn_" + mitem.Filename), mitem.ThumbJpegData);
-                File.WriteAllText(Path.Combine(basePath, "index.html"), html);
-                sb.AppendLine("<a href='" + Path.GetFileNameWithoutExtension(mitem.Filename) + "/index.html'><img src='" + Path.GetFileNameWithoutExtension(mitem.Filename) + "/" + "tn_" + mitem.Filename  + "'></a>");
-                Process.Start(url + Path.GetFileNameWithoutExtension(mitem.Filename) + "/index.html");
+                File.WriteAllText(Path.Combine(basePath, "equirectangular.html"), PhotoSphereViewer.Equirectangular);
+                File.WriteAllText(Path.Combine(basePath, "fisheye.html"), PhotoSphereViewer.Fisheye);
+                File.WriteAllText(Path.Combine(basePath, "original.html"), PhotoSphereViewer.Original);
+                File.WriteAllText(Path.Combine(basePath, "littleplanet.html"), PhotoSphereViewer.Littleplanet);
+                sb.AppendLine("<a target='_blank' href='" + Path.GetFileNameWithoutExtension(mitem.Filename) + "/fisheye.html'><img src='" + Path.GetFileNameWithoutExtension(mitem.Filename) + "/preview.jpg'></a>");
+                Process.Start(url + Path.GetFileNameWithoutExtension(mitem.Filename) + "/fisheye.html");
             }
             File.WriteAllText(Path.Combine(root, "index.html"), sb.ToString());
         }

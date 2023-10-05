@@ -77,7 +77,7 @@
         </MenuItem>
     </MenuItem>
 
-    <MenuItem Header="Geodaten ..." Name="MenuItemGeo">    
+    <MenuItem Header="Geodaten ..." Name="MenuItemGeo">
         <MenuItem Name="MenuItemOpenGeoDay" Header="Geoarchiv Medien Zeitraum" Click="MenuItemOpenGeoDay_Click" />
         <MenuItem Name="MenuItemOpenGeoLast1Day" Header="Geoarchiv heute" Click="MenuItemOpenGeo_Click" />
         <MenuItem Name="MenuItemOpenGeoYesterday" Header="Geoarchiv gestern" Click="MenuItemOpenGeoYesterday_Click" />
@@ -127,7 +127,7 @@
         <MenuItem Name="MenuItemSelectWeekNext" Header="... nach Woche" Click="MenuItemSelectWeekNext_Click"/>
         <MenuItem Name="MenuItemSelectDayNext" Header="... nach Tag" Click="MenuItemSelectDayNext_Click"/>
         <MenuItem Name="MenuItemSelectHourNext" Header="... nach Stunde" Click="MenuItemSelectHourNext_Click"/>
-        <Separator></Separator>      
+        <Separator></Separator>
         <MenuItem Name="MenuItemOneSelectFaceDetection" Header="Selektiere Gesichter" Click="MenuItemFaceDetectionSelect_Click" />
         <MenuItem Header="Auswahl für ... ">
             <MenuItem Name="MenuItemFaceDetectionPortraitBig" StaysOpenOnClick="True" Header="... größeres Portrait" IsChecked="True" IsCheckable="True" />
@@ -186,9 +186,7 @@
         </MenuItem>
         <Separator/>
         <MenuItem Name="MenuItemExportLightbox" Header="Lightbox (1024x768 Pix)" Click="MenuItemExportLigtbox_Click" />
-        <MenuItem Name="MenuItemPhotoSphereViewers" Header="PhotoSphereViewer">
-            <MenuItem Name="MenuItemPhotoSphereViewerEquirectangular" Header="Equirectangular" Click="PhotoSphereViewer_Click" />
-        </MenuItem>
+        <MenuItem Name="MenuItemPhotoSphereViewerEquirectangular" Header="PhotoSphereViewer" Click="PhotoSphereViewer_Click" />
         <Separator/>
         <MenuItem Name="MenuItemFFMpegH264_NoResize" Header="FFMpeg-Skript MP4 (h264/aac)" Click="MenuItemFFMpegH264_NoResize_Click" />
         <MenuItem Name="MenuItemFFMpegH264_1280x720" Header="FFMpeg-Skript MP4 (h264/aac), 1280x720 Pixel" Click="MenuItemFFMpegH264_1280x720_Click" />
@@ -206,7 +204,7 @@
         <!--<MenuItem Name="MenuItemFFMpegMpeg2_720x576" Header="FFMpeg-Skript MPEG2, 720x576 Pixel" Click="MenuItemFFMpegMpeg2_720x57_Click" />-->
         <MenuItem Name="MenuItemFFMpegImage25" Header="FFMpeg-Skript 25 Thumbnails" Click="MenuItemFFMpegImage25_Click" />
         <!--<MenuItem Name="MenuItemFFMpegOgg_NoREsize" Header="FFMpeg-Skript Ogg Theora" Click="MenuItemFFMpegOggTheora_NoResize_Click" />-->
-        
+
         <MenuItem Name="MenuItemFFMpeg_Copy" Header="FFMpeg-Skript in MKV kopieren" Click="MenuItemFFMpeg_Copy_Click" />
         <MenuItem Name="MenuItemMKVMerge_Join" Header="MKVMerge-Skript aneinander fügen" Click="MenuItemMKVMerge_Join_Click" />
         <Separator/>
