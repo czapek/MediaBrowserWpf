@@ -1753,17 +1753,10 @@ namespace MediaBrowserWPF.UserControls
             foreach (MediaItem mitem in this.thumblistContainer.SelectedMediaItems.Where(x => x.Width > x.Height && x.Width / x.Height == 2 && x is MediaItemBitmap))
             {
                 String basePath = Path.Combine(root, Path.GetFileNameWithoutExtension(mitem.Filename));
-                if (Directory.Exists(basePath))
+                if (!Directory.Exists(basePath))
                 {
-                    Directory.Delete(basePath, true);
-                }
-                Directory.CreateDirectory(basePath);
-
-                if (!File.Exists(Path.Combine(basePath, "image.jpg")))
-                    ResizeJpg(mitem, Path.Combine(basePath, "image.jpg"), 10000, 5000);
-
-                if (!File.Exists(Path.Combine(basePath, "preview.jpg")))
-                    File.WriteAllBytes(Path.Combine(basePath, "preview.jpg"), mitem.ThumbJpegData);
+                    Directory.CreateDirectory(basePath);
+                }        
 
                 File.WriteAllText(Path.Combine(basePath, "equirectangular.html"), PhotoSphereViewer.Equirectangular);
                 File.WriteAllText(Path.Combine(basePath, "fisheye.html"), PhotoSphereViewer.Fisheye);
@@ -1772,9 +1765,17 @@ namespace MediaBrowserWPF.UserControls
                 sb.AppendLine("<a target='_blank' href='" + Path.GetFileNameWithoutExtension(mitem.Filename) + "/fisheye.html'><img src='" + Path.GetFileNameWithoutExtension(mitem.Filename) + "/preview.jpg'></a>");
 
                 if (!File.Exists(Path.Combine(basePath, "image.jpg")))
+                {
+                    ResizeJpg(mitem, Path.Combine(basePath, "image.jpg"), 10000, 5000);
                     Process.Start(url + Path.GetFileNameWithoutExtension(mitem.Filename) + "/fisheye.html");
+                }
+
+                if (!File.Exists(Path.Combine(basePath, "preview.jpg")))
+                    File.WriteAllBytes(Path.Combine(basePath, "preview.jpg"), mitem.ThumbJpegData);                
             }
             File.WriteAllText(Path.Combine(root, "index.html"), sb.ToString());
+            Process.Start(url + "/index.html");
+        
         }
 
 
