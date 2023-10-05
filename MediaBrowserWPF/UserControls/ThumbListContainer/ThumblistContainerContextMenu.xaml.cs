@@ -1776,7 +1776,7 @@ namespace MediaBrowserWPF.UserControls
                     File.WriteAllBytes(Path.Combine(basePath, "preview.jpg"), mitem.ThumbJpegData);
             }
             File.WriteAllText(Path.Combine(root, "index.html"), sb.ToString());
-            Process.Start(url + "/index.html");
+            Process.Start(url);
 
         }
 

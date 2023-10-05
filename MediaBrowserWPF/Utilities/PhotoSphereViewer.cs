@@ -22,17 +22,23 @@ namespace MediaBrowserWPF.Utilities
         ""imports"": {
             ""three"": ""https://cdn.jsdelivr.net/npm/three/build/three.module.js"",
             ""@photo-sphere-viewer/core"": ""https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/core/index.module.js"",
-			""@photo-sphere-viewer/gyroscope-plugin"": ""https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/gyroscope-plugin/index.module.js""
+			""@photo-sphere-viewer/gyroscope-plugin"": ""https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/gyroscope-plugin/index.module.js"",
+			""@photo-sphere-viewer/autorotate-plugin"": ""https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/autorotate-plugin/index.module.js""
         }
     }
 </script>
 <script type=""module"">
     import { Viewer } from '@photo-sphere-viewer/core';
     import { GyroscopePlugin } from '@photo-sphere-viewer/gyroscope-plugin';
+	import { AutorotatePlugin } from '@photo-sphere-viewer/autorotate-plugin';
 
     const viewer = new Viewer({
         container: document.querySelector('#viewer'),
-        plugins: [GyroscopePlugin],
+        plugins: [GyroscopePlugin,  
+		  [AutorotatePlugin, {
+            autostartDelay: 5000,
+            autorotateSpeed: '0.3rpm',
+        }]],
         panorama: 'image.jpg',
     });
 </script>";
@@ -50,17 +56,23 @@ namespace MediaBrowserWPF.Utilities
         ""imports"": {
             ""three"": ""https://cdn.jsdelivr.net/npm/three/build/three.module.js"",
             ""@photo-sphere-viewer/core"": ""https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/core/index.module.js"",
-			""@photo-sphere-viewer/gyroscope-plugin"": ""https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/gyroscope-plugin/index.module.js""
+			""@photo-sphere-viewer/gyroscope-plugin"": ""https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/gyroscope-plugin/index.module.js"",
+			""@photo-sphere-viewer/autorotate-plugin"": ""https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/autorotate-plugin/index.module.js""
         }
     }
 </script>
 <script type=""module"">
     import { Viewer } from '@photo-sphere-viewer/core';
     import { GyroscopePlugin } from '@photo-sphere-viewer/gyroscope-plugin';
+	import { AutorotatePlugin } from '@photo-sphere-viewer/autorotate-plugin';
 
     const viewer = new Viewer({
         container: document.querySelector('#viewer'),
-        plugins: [GyroscopePlugin],
+        plugins: [GyroscopePlugin,  
+		  [AutorotatePlugin, {
+            autostartDelay: 5000,
+            autorotateSpeed: '0.3rpm',
+        }]],
         panorama: 'image.jpg',
 		defaultPitch: 0.6,
         defaultZoomLvl: 20,
