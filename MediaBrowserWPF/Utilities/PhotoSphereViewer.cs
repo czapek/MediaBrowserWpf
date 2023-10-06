@@ -9,13 +9,19 @@ namespace MediaBrowserWPF.Utilities
 {
     public static class PhotoSphereViewer
     {
-        public const String EquirectangularVideo = @"<head>
+        public const String ParamVideoFisheye = "fisheye: true,";
+        public const String ParamVideoEquirectangular = "fisheye: false,";
+        public const String HeaderVideoEquirectangular = @"<div style=""width: 98vw; text-align:center;""><strong><a style = ""margin: 1vw;"" href=""equirectangular.html"">Equi</a></strong><a style = ""margin: 1vw;"" href=""fisheye.html"">Fisheye</a></div>;";
+        public const String HeaderVideoFisheye = @"<div style=""width: 98vw; text-align:center;""><a style = ""margin: 1vw;"" href=""equirectangular.html"">Equi</a><strong><a style = ""margin: 1vw;"" href=""fisheye.html"">Fisheye</a></strong></div>;";
+
+
+        public const String Video = @"<head>
     <title>5. Okt 2022, 16:45</title>
     <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"" />
     <link rel=""stylesheet"" href=""https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/core/index.min.css"" />
     <link href=""https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"" rel=""stylesheet"">
 </head>
-<div style=""width: 98vw; text-align:center;""><a style=""margin: 1vw;"" href=""equirectangular.html"">Equi</a><a style=""margin: 1vw;"" href=""fisheye.html"">Fisheye</a></div>
+{{header}}
 <div id=""viewer"" style=""width: 90vw; height: 85vh; margin:1vw auto;""></div>
 <script type=""importmap"">
     {
@@ -47,11 +53,18 @@ namespace MediaBrowserWPF.Utilities
             autorotateSpeed: '0.3rpm',
         }]],
         panorama: {
-            source: 'video.mp4',
+            source: 'video_2k.mp4',
         },
-        fisheye: {{fisheye}},
+        {{param}}
     });
 </script>";
+
+        public const String ParamImageFisheye = "fisheye: true,";
+        public const String ParamImageEquirectangular = "fisheye: false,";
+        public const String HeaderImageEquirectangular = @"<div style=""width: 98vw; text-align:center;""><strong><a style = ""margin: 1vw;"" href=""equirectangular.html"">Equi</a></strong><a style = ""margin: 1vw;"" href=""fisheye.html"">Fisheye</a><a style = ""margin: 1vw;"" href=""littleplanet.html"">Littleplanet</a><a style = ""margin: 1vw;"" href=""original.html"">Original</a></div>";
+        public const String HeaderImageFisheye = @"<div style=""width: 98vw; text-align:center;""><a style = ""margin: 1vw;"" href=""equirectangular.html"">Equi</a><strong><a style = ""margin: 1vw;"" href=""fisheye.html"">Fisheye</a></strong><a style = ""margin: 1vw;"" href=""littleplanet.html"">Littleplanet</a><a style = ""margin: 1vw;"" href=""original.html"">Original</a></div>";
+        public const String HeaderImageLittlePlanet = @"<div style=""width: 98vw; text-align:center;""><a style = ""margin: 1vw;"" href=""equirectangular.html"">Equi</a><a style = ""margin: 1vw;"" href=""fisheye.html"">Fisheye</a><strong><a style = ""margin: 1vw;"" href=""littleplanet.html"">Littleplanet</a></strong><a style = ""margin: 1vw;"" href=""original.html"">Original</a></div>";
+        public const String HeaderImageOriginal = @"<div style=""width: 98vw; text-align:center;""><a style = ""margin: 1vw;"" href=""equirectangular.html"">Equi</a><a style = ""margin: 1vw;"" href=""fisheye.html"">Fisheye</a><a style = ""margin: 1vw;"" href=""littleplanet.html"">Littleplanet</a><strong><a style = ""margin: 1vw;"" href=""original.html"">Original</a></strong></div>";
 
         public const String Equirectangular = @"<head>
     <title>{{title}}</title>
@@ -59,7 +72,7 @@ namespace MediaBrowserWPF.Utilities
     <link rel=""stylesheet"" href=""https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/core/index.min.css"" />
     <link href=""https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"" rel=""stylesheet"">
 </head>
-<div style=""width: 98vw; text-align:center;""><a style=""margin: 1vw;"" href=""equirectangular.html"">Equi</a><a style=""margin: 1vw;"" href=""fisheye.html"">Fisheye</a><a style=""margin: 1vw;"" href=""littleplanet.html"">Littleplanet</a><a style=""margin: 1vw;"" href=""original.html"">Original</a></div>
+{{header}}
 <div id=""viewer"" style=""width: 90vw; height: 85vh; margin:1vw auto;""></div>
 <script type=""importmap"">
     {
@@ -84,7 +97,7 @@ namespace MediaBrowserWPF.Utilities
             autorotateSpeed: '0.3rpm',
         }]],
         panorama: 'image.jpg',
-        fisheye: {{fisheye}},
+        {{param}}
     });
 </script>";
 
@@ -95,7 +108,7 @@ namespace MediaBrowserWPF.Utilities
     <link rel=""stylesheet"" href=""https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/core/index.min.css"" />
     <link href=""https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"" rel=""stylesheet"">
 </head>
-<div style=""width: 98vw; text-align:center;""><a style=""margin: 1vw;"" href=""equirectangular.html"">Equi</a><a style=""margin: 1vw;"" href=""fisheye.html"">Fisheye</a><a style=""margin: 1vw;"" href=""littleplanet.html"">Littleplanet</a><a style=""margin: 1vw;"" href=""original.html"">Original</a></div>
+{{header}}
 <div id=""viewer"" style=""width: 90vw; height: 85vh; margin:1vw auto;""></div>
 <script type=""importmap"">
     {
@@ -123,7 +136,7 @@ namespace MediaBrowserWPF.Utilities
     <link rel=""stylesheet"" href=""https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/core/index.min.css"" />
     <link href=""https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"" rel=""stylesheet"">
 </head>
-<div style=""width: 98vw; text-align:center;""><a style=""margin: 1vw;"" href=""equirectangular.html"">Equi</a><a style=""margin: 1vw;"" href=""fisheye.html"">Fisheye</a><a style=""margin: 1vw;"" href=""littleplanet.html"">Littleplanet</a><a style=""margin: 1vw;"" href=""original.html"">Original</a></div>
+{{header}}
 <img style=""display: block;; margin:1vw auto; width: 90vw;"" src=""image.jpg"">";
     }
 }

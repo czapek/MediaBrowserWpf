@@ -1760,33 +1760,62 @@ namespace MediaBrowserWPF.UserControls
 
                 String title = mitem.MediaDate.ToString("d. MMM yyyy") + ", " + mitem.MediaDate.ToShortTimeString();
                 string altText = mitem.MediaDate.ToLongDateString() + " " + mitem.MediaDate.ToLongTimeString();
-                sb.AppendLine("<a style=\"margin: 2px;\" title='" + HttpUtility.HtmlEncode(altText) + "' target='_blank' href='" + Path.GetFileNameWithoutExtension(mitem.Filename) + "/fisheye.html'><img src='" + Path.GetFileNameWithoutExtension(mitem.Filename) + "/preview.jpg'></a>");
+                string borderColor = "black";
 
                 if (mitem is MediaItemBitmap)
                 {
-                    File.WriteAllText(Path.Combine(basePath, "equirectangular.html"), PhotoSphereViewer.Equirectangular.Replace("{{title}}", title).Replace("{{fisheye}}", "false"));
-                    File.WriteAllText(Path.Combine(basePath, "fisheye.html"), PhotoSphereViewer.Equirectangular.Replace("{{title}}", title).Replace("{{fisheye}}", "true"));
-                    File.WriteAllText(Path.Combine(basePath, "original.html"), PhotoSphereViewer.Original.Replace("{{title}}", title));
-                    File.WriteAllText(Path.Combine(basePath, "littleplanet.html"), PhotoSphereViewer.Littleplanet.Replace("{{title}}", title));
+                    File.WriteAllText(Path.Combine(basePath, "equirectangular.html"), PhotoSphereViewer.Equirectangular
+                        .Replace("{{title}}", title).Replace("{{fisheye}}", "false")
+                        .Replace("{{header}}", PhotoSphereViewer.HeaderImageEquirectangular)
+                        .Replace("{{param}}", PhotoSphereViewer.ParamImageEquirectangular));
+
+                    File.WriteAllText(Path.Combine(basePath, "fisheye.html"), PhotoSphereViewer.Equirectangular
+                        .Replace("{{title}}", title).Replace("{{fisheye}}", "true")
+                        .Replace("{{header}}", PhotoSphereViewer.HeaderImageFisheye)
+                        .Replace("{{param}}", PhotoSphereViewer.ParamImageFisheye));
+
+                    File.WriteAllText(Path.Combine(basePath, "original.html"), PhotoSphereViewer.Original
+                        .Replace("{{title}}", title)
+                        .Replace("{{header}}", PhotoSphereViewer.HeaderImageLittlePlanet));
+
+                    File.WriteAllText(Path.Combine(basePath, "littleplanet.html"), PhotoSphereViewer.Littleplanet
+                        .Replace("{{title}}", title)
+                        .Replace("{{header}}", PhotoSphereViewer.HeaderImageOriginal));
 
                     if (!File.Exists(Path.Combine(basePath, "image.jpg")))
                     {
                         ResizeJpg(mitem, Path.Combine(basePath, "image.jpg"), 10000, 5000);
                         Process.Start(url + Path.GetFileNameWithoutExtension(mitem.Filename) + "/fisheye.html");
                     }
+                    borderColor = "purple";
                 }
                 else
                 {
-                    File.WriteAllText(Path.Combine(basePath, "equirectangular.html"), PhotoSphereViewer.EquirectangularVideo.Replace("{{title}}", title).Replace("{{fisheye}}", "false"));
-                    File.WriteAllText(Path.Combine(basePath, "fisheye.html"), PhotoSphereViewer.EquirectangularVideo.Replace("{{title}}", title).Replace("{{fisheye}}", "true"));
-                    //File.WriteAllText(Path.Combine(basePath, "littleplanet.html"), PhotoSphereViewer.LittleplanetVideo.Replace("{{title}}", title));
+                    File.WriteAllText(Path.Combine(basePath, "equirectangular.html"), PhotoSphereViewer.Video
+                        .Replace("{{title}}", title)
+                        .Replace("{{header}}", PhotoSphereViewer.HeaderVideoEquirectangular)
+                        .Replace("{{param}}", PhotoSphereViewer.ParamVideoEquirectangular));
 
+                    File.WriteAllText(Path.Combine(basePath, "fisheye.html"), PhotoSphereViewer.Video
+                        .Replace("{{title}}", title)
+                        .Replace("{{header}}", PhotoSphereViewer.HeaderVideoFisheye)
+                        .Replace("{{param}}", PhotoSphereViewer.ParamVideoFisheye));
+
+                    //File.WriteAllText(Path.Combine(basePath, "littleplanet.html"), PhotoSphereViewer.LittleplanetVideo.Replace("{{title}}", title));
+                    borderColor = "gold";
                     if (!File.Exists(Path.Combine(basePath, "video.mp4")))
                     {
-                        mitem.FileObject.CopyTo(Path.Combine(basePath, "video.mp4"));
-                        Process.Start(url + Path.GetFileNameWithoutExtension(mitem.Filename) + "/fisheye.html");
+                        //mitem.FileObject.CopyTo(Path.Combine(basePath, "video.mp4"));
+                        //Process.Start(url + Path.GetFileNameWithoutExtension(mitem.Filename) + "/fisheye.html");
+                        File.WriteAllText(Path.Combine(basePath, "empty.mp4"), "");
+                        borderColor = "red";
                     }
                 }
+
+                sb.AppendLine("<a style=\"margin: 2px;\" title='" + HttpUtility.HtmlEncode(altText)
+                    + "' target='_blank' href='" + Path.GetFileNameWithoutExtension(mitem.Filename) + "/fisheye.html'><img  style=\"border: 2px solid "
+                    + borderColor + "\" src='"
+                    + Path.GetFileNameWithoutExtension(mitem.Filename) + "/preview.jpg'></a>");
 
                 if (!File.Exists(Path.Combine(basePath, "preview.jpg")))
                     File.WriteAllBytes(Path.Combine(basePath, "preview.jpg"), mitem.ThumbJpegData);
