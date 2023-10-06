@@ -1750,7 +1750,14 @@ namespace MediaBrowserWPF.UserControls
             string root = @"\\192.168.2.129\web\insta360";
             string url = "https://pilzchen.synology.me/insta360/";
             StringBuilder sb = new StringBuilder();
-            foreach (MediaItem mitem in this.thumblistContainer.SelectedMediaItems.Where(x => x.Width > x.Height && x.Width / x.Height == 2 && (x.Filename.EndsWith(".mp4") || x.Filename.EndsWith(".jpg"))).OrderBy(x => x.Filename))
+            sb.AppendLine(@"<head>
+         <title>Photo Sphere Viewer</title>
+         <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"" />
+         <link href=""https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"" rel=""stylesheet"">
+</head>
+<div style=""margin: 10px;"">");
+            String lastHeader = null;
+            foreach (MediaItem mitem in this.thumblistContainer.SelectedMediaItems.Where(x => x.Width > x.Height && x.Width / x.Height == 2 && (x.Filename.EndsWith(".mp4") || x.Filename.EndsWith(".jpg"))).OrderByDescending(x => x.Filename))
             {
                 String basePath = Path.Combine(root, Path.GetFileNameWithoutExtension(mitem.Filename));
                 if (!Directory.Exists(basePath))
@@ -1812,20 +1819,35 @@ namespace MediaBrowserWPF.UserControls
                     }
                 }
 
-                sb.AppendLine("<a style=\"margin: 2px;\" title='" + HttpUtility.HtmlEncode(altText)
-                    + "' target='_blank' href='" + Path.GetFileNameWithoutExtension(mitem.Filename) + "/fisheye.html'><img  style=\"border: 2px solid "
+
+                if (lastHeader != mitem.MediaDate.ToString("MMMM yyyy"))
+                {
+                    if(lastHeader != null)
+                    {
+                        sb.AppendLine("<br/><br/>");
+                    }
+                    lastHeader = mitem.MediaDate.ToString("MMMM yyyy");
+                    sb.AppendLine("<h1>" + HttpUtility.HtmlEncode(lastHeader) + "</h1>");
+                }
+
+                sb.AppendLine("<a title='" + HttpUtility.HtmlEncode(altText)
+                    + "' target='_blank' href='" + Path.GetFileNameWithoutExtension(mitem.Filename) + "/fisheye.html'><img  style=\"margin: 3px 3px 3px 0px; border: 4px solid "
                     + borderColor + "\" src='"
                     + Path.GetFileNameWithoutExtension(mitem.Filename) + "/preview.jpg'></a>");
 
                 if (!File.Exists(Path.Combine(basePath, "preview.jpg")))
                     File.WriteAllBytes(Path.Combine(basePath, "preview.jpg"), mitem.ThumbJpegData);
             }
-            File.WriteAllText(Path.Combine(root, "index.html"), sb.ToString());
-            Process.Start(url);
+
+            sb.AppendLine("</div>");
+            String indexHtml = Path.GetFileNameWithoutExtension(this.thumblistContainer.SelectedMediaItems[0].Filename) + ".html";
+            if (this.thumblistContainer.SelectedMediaItems.Count > 400 && this.thumblistContainer.SelectedMediaItems.OrderBy(x=>x.Filename).ToList()[0].Filename == "221005-1355-58.mp4")
+            {
+                indexHtml = "full.html";
+            }
+            File.WriteAllText(Path.Combine(root, indexHtml), sb.ToString());
+            Process.Start(url + "/" + indexHtml);
 
         }
-
-
-
     }
 }
