@@ -1764,23 +1764,23 @@ namespace MediaBrowserWPF.UserControls
 
                 if (mitem is MediaItemBitmap)
                 {
-                    File.WriteAllText(Path.Combine(basePath, "equirectangular.html"), PhotoSphereViewer.Equirectangular
+                    File.WriteAllText(Path.Combine(basePath, "equirectangular.html"), PhotoSphereViewer.Image
                         .Replace("{{title}}", title).Replace("{{fisheye}}", "false")
                         .Replace("{{header}}", PhotoSphereViewer.HeaderImageEquirectangular)
                         .Replace("{{param}}", PhotoSphereViewer.ParamImageEquirectangular));
 
-                    File.WriteAllText(Path.Combine(basePath, "fisheye.html"), PhotoSphereViewer.Equirectangular
+                    File.WriteAllText(Path.Combine(basePath, "fisheye.html"), PhotoSphereViewer.Image
                         .Replace("{{title}}", title).Replace("{{fisheye}}", "true")
                         .Replace("{{header}}", PhotoSphereViewer.HeaderImageFisheye)
                         .Replace("{{param}}", PhotoSphereViewer.ParamImageFisheye));
 
                     File.WriteAllText(Path.Combine(basePath, "original.html"), PhotoSphereViewer.Original
                         .Replace("{{title}}", title)
-                        .Replace("{{header}}", PhotoSphereViewer.HeaderImageLittlePlanet));
+                        .Replace("{{header}}", PhotoSphereViewer.HeaderImageOriginal));
 
                     File.WriteAllText(Path.Combine(basePath, "littleplanet.html"), PhotoSphereViewer.Littleplanet
                         .Replace("{{title}}", title)
-                        .Replace("{{header}}", PhotoSphereViewer.HeaderImageOriginal));
+                        .Replace("{{header}}", PhotoSphereViewer.HeaderImageLittlePlanet));
 
                     if (!File.Exists(Path.Combine(basePath, "image.jpg")))
                     {
