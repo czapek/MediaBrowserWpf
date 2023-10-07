@@ -1768,17 +1768,30 @@ namespace MediaBrowserWPF.UserControls
                 String title = mitem.MediaDate.ToString("d. MMM yyyy") + ", " + mitem.MediaDate.ToShortTimeString();
                 string altText = mitem.MediaDate.ToLongDateString() + " " + mitem.MediaDate.ToLongTimeString();
                 string borderColor = "black";
+                
+                string defaultYaw = "0";
+                string defaultPitch = "0";
+                Layer mainFocus = mitem.FindLayer("MAINFOCUS");
+                if(mainFocus != null)
+                {
+                    defaultYaw = ((int)(360 * Double.Parse(mainFocus.Action.Split(' ')[0]) / 100) - 180).ToString();
+                    defaultPitch = (90 - (int)(180 * Double.Parse(mainFocus.Action.Split(' ')[1]) / 100)).ToString();
+                }
 
                 if (mitem is MediaItemBitmap)
                 {
                     File.WriteAllText(Path.Combine(basePath, "equirectangular.html"), PhotoSphereViewer.Image
                         .Replace("{{title}}", title).Replace("{{fisheye}}", "false")
                         .Replace("{{header}}", PhotoSphereViewer.HeaderImageEquirectangular)
+                        .Replace("{{defaultYaw}}", defaultYaw)
+                        .Replace("{{defaultPitch}}", defaultPitch)
                         .Replace("{{param}}", PhotoSphereViewer.ParamImageEquirectangular));
 
                     File.WriteAllText(Path.Combine(basePath, "fisheye.html"), PhotoSphereViewer.Image
                         .Replace("{{title}}", title).Replace("{{fisheye}}", "true")
                         .Replace("{{header}}", PhotoSphereViewer.HeaderImageFisheye)
+                        .Replace("{{defaultYaw}}", defaultYaw)
+                        .Replace("{{defaultPitch}}", defaultPitch)
                         .Replace("{{param}}", PhotoSphereViewer.ParamImageFisheye));
 
                     File.WriteAllText(Path.Combine(basePath, "original.html"), PhotoSphereViewer.Original
@@ -1812,9 +1825,8 @@ namespace MediaBrowserWPF.UserControls
                     borderColor = "gold";
                     if (!File.Exists(Path.Combine(basePath, "video.mp4")))
                     {
-                        //mitem.FileObject.CopyTo(Path.Combine(basePath, "video.mp4"));
-                        //Process.Start(url + Path.GetFileNameWithoutExtension(mitem.Filename) + "/fisheye.html");
-                        File.WriteAllText(Path.Combine(basePath, "empty.mp4"), "");
+                        mitem.FileObject.CopyTo(Path.Combine(basePath, "encode.mp4"));
+                        //Process.Start(url + Path.GetFileNameWithoutExtension(mitem.Filename) + "/fisheye.html");      
                         borderColor = "red";
                     }
                 }
@@ -1822,7 +1834,7 @@ namespace MediaBrowserWPF.UserControls
 
                 if (lastHeader != mitem.MediaDate.ToString("MMMM yyyy"))
                 {
-                    if(lastHeader != null)
+                    if (lastHeader != null)
                     {
                         sb.AppendLine("<br/><br/>");
                     }
@@ -1841,7 +1853,7 @@ namespace MediaBrowserWPF.UserControls
 
             sb.AppendLine("</div>");
             String indexHtml = Path.GetFileNameWithoutExtension(this.thumblistContainer.SelectedMediaItems[0].Filename) + ".html";
-            if (this.thumblistContainer.SelectedMediaItems.Count > 400 && this.thumblistContainer.SelectedMediaItems.OrderBy(x=>x.Filename).ToList()[0].Filename == "221005-1355-58.mp4")
+            if (this.thumblistContainer.SelectedMediaItems.Count > 400 && this.thumblistContainer.SelectedMediaItems.OrderBy(x => x.Filename).ToList()[0].Filename == "221005-1355-58.mp4")
             {
                 indexHtml = "full.html";
             }

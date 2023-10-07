@@ -14,8 +14,9 @@ namespace MediaBrowserWPF.Viewer
         bool HasMagnifier { get; set; }
         bool IsNavigationBar { get; set; }
         bool IsFullscreen { get; set; }
-        string InfoTextToolTip {set;}
+        string InfoTextToolTip { set; }
         void AutoCrop(double relation);
+        void SetMainFocus();
         void Save();
         void Reset();
         void Redraw();

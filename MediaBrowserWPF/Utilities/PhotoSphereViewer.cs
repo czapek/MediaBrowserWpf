@@ -80,7 +80,10 @@ namespace MediaBrowserWPF.Utilities
 					},
 				],
 			}],
-		],       
+		],
+		defaultYaw: '{{defaultYaw}}deg',
+		defaultPitch: '{{defaultPitch}}deg',
+        touchmoveTwoFingers: true,
         {{param}}
     });
 </script>";
@@ -99,7 +102,7 @@ namespace MediaBrowserWPF.Utilities
     <link href=""https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"" rel=""stylesheet"">
 </head>
 {{header}}
-<div id=""viewer"" style=""width: 90vw; height: 85vh; margin:1vw auto;""></div>
+<div id=""viewer"" style=""width: 90vw; height: 82vh; margin:1vw auto;""></div>
 <script type=""importmap"">
     {
         ""imports"": {
@@ -120,10 +123,13 @@ namespace MediaBrowserWPF.Utilities
         caption: '{{title}}',
         plugins: [GyroscopePlugin,  
 		  [AutorotatePlugin, {
-            autostartDelay: 5000,
+            autostartDelay: 10000,
             autorotateSpeed: '0.3rpm',
         }]],
         panorama: 'image.jpg',
+		defaultYaw: '{{defaultYaw}}deg',
+		defaultPitch: '{{defaultPitch}}deg',
+        touchmoveTwoFingers: true,
         {{param}}
     });
 </script>";
@@ -136,7 +142,7 @@ namespace MediaBrowserWPF.Utilities
     <link href=""https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"" rel=""stylesheet"">
 </head>
 {{header}}
-<div id=""viewer"" style=""width: 90vw; height: 85vh; margin:1vw auto;""></div>
+<div id=""viewer"" style=""width: 90vw; height: 82vh; margin:1vw auto;""></div>
 <script type=""importmap"">
     {
         ""imports"": {
@@ -155,6 +161,7 @@ namespace MediaBrowserWPF.Utilities
         container: document.querySelector('#viewer'),
         caption: '{{title}}',
         panorama: 'image.jpg',
+        touchmoveTwoFingers: true,
     });
 </script>";
 

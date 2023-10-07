@@ -34,7 +34,7 @@
             <MenuItem Name="MenuItemSPause" Header="Unterbrechen" InputGestureText="Pause" IsCheckable="true" IsChecked="False" Click="MenuItemSPause_Click" />
             <MenuItem Name="MenuItemNextFrame" Header="Minischritt" InputGestureText="Q und Str+Q" Click="MenuItemNextFrame_Click" />
         </MenuItem>
-        <MenuItem Name="MenuItemOrientate" Header="Ausrichten" InputGestureText="A" ToolTip="Mausgeste nach oben" IsCheckable="true" IsChecked="False" Click="MenuItemOrientate_Click" />
+        <MenuItem Name="MenuItemOrientate" Header="Ausrichten" InputGestureText="A" ToolTip="Mausgeste nach oben" IsCheckable="true" IsChecked="False" Click="MenuItemOrientate_Click" /> 
         <MenuItem Name="MenuItemAspectRatio" Header="Seitenverhältnis" InputGestureText="R" IsCheckable="true" IsChecked="False" Click="MenuItemAspectRatio_Click" />
         <MenuItem Name="MenuItemClip" Header="Passepartout" IsCheckable="true" IsChecked="False" Click="MenuItemClip_Click" />
         <MenuItem Name="MenuItemRotate" Header="Drehen" InputGestureText="D" ToolTip="Mausgeste nach links" IsCheckable="true" IsChecked="False" Click="MenuItemRotate_Click" />
@@ -43,6 +43,8 @@
         <MenuItem Name="MenuItemZoom" Header="Größe und Position" IsCheckable="true" InputGestureText="H" IsChecked="False" Click="MenuItemZoom_Click" />
         <MenuItem Name="MenuItemFlip" Header="Spiegeln" InputGestureText="F" IsCheckable="true" IsChecked="False" Click="MenuItemFlip_Click" />
         <MenuItem Name="MenuItemCrop" Header="Zuschneiden" InputGestureText="Z" ToolTip="Mausgeste nach unten" IsCheckable="true" IsChecked="False" Click="MenuItemCrop_Click" />
+        <Separator></Separator>
+        <MenuItem Name="MenuItemMainFocus" Header="Hauptfokus festlegen" InputGestureText="numpad *" Click="MenuItemMainFocus_Click" />
         <Separator></Separator>
         <MenuItem Name="MenuItemAutoCrop" Header="Automatisch Zuschneiden" InputGestureText="F4" ToolTip="Stellt das Seitenverhältnis entsprechend der Optionen ein" Click="MenuItemAutoCrop_Click"  />
         <MenuItem Name="MenuItemAutoCropOption" Header="Optionen">

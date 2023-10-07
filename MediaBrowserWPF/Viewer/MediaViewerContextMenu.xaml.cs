@@ -705,6 +705,11 @@ namespace MediaBrowserWPF.Viewer
             this.SetEditState(sender, ViewerState.Orientate);
         }
 
+        private void MenuItemMainFocus_Click(object sender, RoutedEventArgs e)
+        {
+            this.mediaViewer.SetMainFocus();
+        }
+
         private void MenuItemZoom_Click(object sender, RoutedEventArgs e)
         {
             this.SetEditState(sender, ViewerState.Zoom);

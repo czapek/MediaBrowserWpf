@@ -25,6 +25,7 @@ using MediaBrowserWPF.UserControls.CategoryContainer;
 using System.Globalization;
 using MediaBrowserWPF.UserControls.Video;
 using Microsoft.Windows.Controls;
+using Newtonsoft.Json.Linq;
 
 namespace MediaBrowserWPF.Viewer
 {
@@ -1865,6 +1866,10 @@ namespace MediaBrowserWPF.Viewer
                     this.EffectSkewAnimation();
                     break;
 
+                case Key.Multiply:
+                    this.SetMainFocus();
+                    break;
+
                 case Key.Tab:
                     if (Keyboard.Modifiers == ModifierKeys.Control)
                     {
@@ -2029,7 +2034,7 @@ namespace MediaBrowserWPF.Viewer
                         this.Close();
                     break;
 
-                case Key.Pause:      
+                case Key.Pause:
                     this.mediaViewerContextMenu.IsPause = !this.mediaViewerContextMenu.IsPause;
                     if (this.mediaViewerContextMenu.IsPause)
                         this.Pause();
@@ -2620,8 +2625,8 @@ namespace MediaBrowserWPF.Viewer
             }
             else
             {
-                this.VisibleMediaItem.AddDefaultLayer("PANO", 0);                
-            }            
+                this.VisibleMediaItem.AddDefaultLayer("PANO", 0);
+            }
             this.InfoTextToolTip = "360° Viewer: " + (this.VisibleMediaItem.FindLayer("PANO") != null ? "an" : "aus");
             ViewMediaItem();
         }
@@ -4067,12 +4072,13 @@ namespace MediaBrowserWPF.Viewer
         }
 
         Point lastMousePosition;
+        Point nowPosition;
         private void Window_MouseMove(object sender, MouseEventArgs e)
         {
             this.Activate();
             this.slideshowTimeStopWatch.Restart();
 
-            Point nowPosition = e.GetPosition(this);
+            nowPosition = e.GetPosition(this);
 
             double moveX = lastMousePosition.X - nowPosition.X;
             double moveY = lastMousePosition.Y - nowPosition.Y;
@@ -4207,6 +4213,28 @@ namespace MediaBrowserWPF.Viewer
         private void Window_ManipulationStarted(object sender, ManipulationStartedEventArgs e)
         {
 
+        }
+
+        public void SetMainFocus()
+        {
+            if (this.VisibleMediaItem != null)
+            {
+                double x = nowPosition.X - this.MediaControl.MediaRenderSize.Left;
+                double y = nowPosition.Y - this.MediaControl.MediaRenderSize.Top;
+
+                int relX = (int)(100 * (x / this.MediaControl.MediaRenderSize.Width));
+                int relY = (int)(100 * (y / this.MediaControl.MediaRenderSize.Height));
+
+                if (relX >= 0 && relY >= 0 && relX <= 100 && relY <= 100)
+                {
+                    Layer layer = new Layer("MAINFOCUS", relX + " " + relY, 0);                    
+                    this.InfoTextToolTip = "Hauptfokus: X=" + relX + "% Y=" + relY + "%";
+
+                    this.VisibleMediaItem.RemoveLayer("MAINFOCUS");
+                    this.VisibleMediaItem.Layers.Add(layer);
+                }
+
+            }
         }
     }
 }
