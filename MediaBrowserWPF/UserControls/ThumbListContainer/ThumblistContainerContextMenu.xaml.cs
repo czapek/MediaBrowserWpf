@@ -1852,7 +1852,7 @@ namespace MediaBrowserWPF.UserControls
                     + Path.GetFileNameWithoutExtension(mitem.Filename) + "/preview.jpg'></a>");
 
                 sbVr.AppendLine("<a title='" + HttpUtility.HtmlEncode(altText)
-                    + "' target='_blank' href='" + Path.GetFileNameWithoutExtension(mitem.Filename) + "/vr.html'><img  style=\"margin: 3px 3px 3px 0px; border: 4px solid "
+                    + "' href='" + Path.GetFileNameWithoutExtension(mitem.Filename) + "/vr.html'><img  style=\"margin: 3px 3px 3px 0px; border: 4px solid "
                     + borderColor + "\" src='"
                     + Path.GetFileNameWithoutExtension(mitem.Filename) + "/preview.jpg'></a>");
 
