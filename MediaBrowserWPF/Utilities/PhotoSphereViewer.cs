@@ -11,12 +11,12 @@ namespace MediaBrowserWPF.Utilities
     {
         public const String ParamVideoFisheye = "fisheye: 1.5, maxFov: 160, defaultZoomLvl: 80,";
         public const String ParamVideoEquirectangular = "fisheye: false,";
-        public const String HeaderVideoEquirectangular = @"<div style=""width: 98vw; text-align:center;""><strong><a style = ""margin: 1vw;"" href=""equirectangular.html"">Equi</a></strong><a style = ""margin: 1vw;"" href=""fisheye.html"">Fisheye</a></div>;";
-        public const String HeaderVideoFisheye = @"<div style=""width: 98vw; text-align:center;""><a style = ""margin: 1vw;"" href=""equirectangular.html"">Equi</a><strong><a style = ""margin: 1vw;"" href=""fisheye.html"">Fisheye</a></strong></div>;";
+        public const String HeaderVideoEquirectangular = @"<div style=""width: 98vw; text-align:center;""><strong><a style = ""margin: 1vw;"" href=""equirectangular.html"">Equi</a></strong><a style = ""margin: 1vw;"" href=""fisheye.html"">Fisheye</a><a style = ""margin: 1vw;"" href=""vr.html"">VR</a></div>;";
+        public const String HeaderVideoFisheye = @"<div style=""width: 98vw; text-align:center;""><a style = ""margin: 1vw;"" href=""equirectangular.html"">Equi</a><strong><a style = ""margin: 1vw;"" href=""fisheye.html"">Fisheye</a></strong><a style = ""margin: 1vw;"" href=""vr.html"">VR</a></div>;";
 
 
         public const String Video = @"<head>
-    <title>5. Okt 2022, 16:45</title>
+    <title>{{title}}</title>
     <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"" />
     <link rel=""stylesheet"" href=""https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/core/index.min.css"" />
     <link href=""https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"" rel=""stylesheet"">
@@ -173,5 +173,114 @@ namespace MediaBrowserWPF.Utilities
 </head>
 {{header}}
 <img style=""display: block;; margin:1vw auto; width: 90vw;"" src=""image.jpg"">";
+
+
+        public const string VideoVr = @"<!DOCTYPE html>
+<html lang=""en"">
+	<head>
+		 <title>{{title}}</title>
+		<meta charset=""utf-8"">
+		<meta name=""viewport"" content=""width=device-width, initial-scale=1.0, user-scalable=no"">
+		<link type=""text/css"" rel=""stylesheet"" href=""../treejs/main.css"">
+	</head>
+	<body>
+		<div id=""container""></div>
+
+		<video id=""video"" loop muted crossOrigin=""anonymous"" playsinline style=""display:none"">
+			<source src=""video.mp4"">
+		</video>
+
+		<script type=""importmap"">
+			{
+				""imports"": {
+					""three"": ""../treejs/three.module.js"",
+					""three/addons/"": ""../treejs/jsm/""
+				}
+			}
+		</script>
+
+		<script type=""module"">
+
+			import * as THREE from 'three';
+			import { VRButton } from 'three/addons/webxr/VRButton.js';
+
+			let camera, scene, renderer;
+
+			init();
+			animate();
+
+			function init() {
+
+				const container = document.getElementById( 'container' );
+				container.addEventListener( 'click', function () {
+					video.muted = false;
+					video.isPlaying = true;
+					video.play();
+				    
+				} );
+
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera.layers.enable( 1 ); 
+		
+
+				const video = document.getElementById( 'video' );
+				video.muted = false;
+				video.isPlaying = true;
+				video.play();
+				
+
+				const texture = new THREE.VideoTexture( video );
+				texture.colorSpace = THREE.SRGBColorSpace;
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x101010 );
+
+				const geometry1 = new THREE.SphereGeometry( 500, 100, 60 );
+				geometry1.scale( - 1, 1, 1 );
+
+
+				const material1 = new THREE.MeshBasicMaterial( { map: texture } );
+				const mesh1 = new THREE.Mesh( geometry1, material1 );
+				scene.add( mesh1 );
+	
+				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.xr.enabled = true;
+				renderer.xr.setReferenceSpaceType( 'local' );
+				container.appendChild( renderer.domElement );
+
+				document.body.appendChild( VRButton.createButton( renderer ) );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				renderer.setAnimationLoop( render );
+
+			}
+
+			function render() {
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>";
     }
 }

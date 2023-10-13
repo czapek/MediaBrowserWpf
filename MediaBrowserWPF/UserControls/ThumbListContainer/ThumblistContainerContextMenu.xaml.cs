@@ -1821,7 +1821,7 @@ namespace MediaBrowserWPF.UserControls
                         .Replace("{{header}}", PhotoSphereViewer.HeaderVideoFisheye)
                         .Replace("{{param}}", PhotoSphereViewer.ParamVideoFisheye));
 
-                    //File.WriteAllText(Path.Combine(basePath, "littleplanet.html"), PhotoSphereViewer.LittleplanetVideo.Replace("{{title}}", title));
+                    File.WriteAllText(Path.Combine(basePath, "vr.html"), PhotoSphereViewer.VideoVr.Replace("{{title}}", title));
                     borderColor = "gold";
                     if (!File.Exists(Path.Combine(basePath, "video.mp4")))
                     {
