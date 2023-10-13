@@ -81,9 +81,7 @@ namespace MediaBrowserWPF.Utilities
 				],
 			}],
 		],
-		defaultYaw: '{{defaultYaw}}deg',
-		defaultPitch: '{{defaultPitch}}deg',
-        touchmoveTwoFingers: true,
+        touchmoveTwoFingers: false,
         {{param}}
     });
 </script>";
@@ -129,7 +127,7 @@ namespace MediaBrowserWPF.Utilities
         panorama: 'image.jpg',
 		defaultYaw: '{{defaultYaw}}deg',
 		defaultPitch: '{{defaultPitch}}deg',
-        touchmoveTwoFingers: true,
+        touchmoveTwoFingers: false,
         {{param}}
     });
 </script>";
@@ -161,7 +159,7 @@ namespace MediaBrowserWPF.Utilities
         container: document.querySelector('#viewer'),
         caption: '{{title}}',
         panorama: 'image.jpg',
-        touchmoveTwoFingers: true,
+        touchmoveTwoFingers: false,
     });
 </script>";
 
