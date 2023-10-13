@@ -88,10 +88,10 @@ namespace MediaBrowserWPF.Utilities
 
         public const String ParamImageFisheye = "fisheye: 1.5, maxFov: 160, defaultZoomLvl: 80,";
         public const String ParamImageEquirectangular = "fisheye: false,";
-        public const String HeaderImageEquirectangular = @"<div style=""width: 98vw; text-align:center;""><strong><a style = ""margin: 1vw;"" href=""equirectangular.html"">Equi</a></strong><a style = ""margin: 1vw;"" href=""fisheye.html"">Fisheye</a><a style = ""margin: 1vw;"" href=""littleplanet.html"">Littleplanet</a><a style = ""margin: 1vw;"" href=""original.html"">Original</a></div>";
-        public const String HeaderImageFisheye = @"<div style=""width: 98vw; text-align:center;""><a style = ""margin: 1vw;"" href=""equirectangular.html"">Equi</a><strong><a style = ""margin: 1vw;"" href=""fisheye.html"">Fisheye</a></strong><a style = ""margin: 1vw;"" href=""littleplanet.html"">Littleplanet</a><a style = ""margin: 1vw;"" href=""original.html"">Original</a></div>";
-        public const String HeaderImageLittlePlanet = @"<div style=""width: 98vw; text-align:center;""><a style = ""margin: 1vw;"" href=""equirectangular.html"">Equi</a><a style = ""margin: 1vw;"" href=""fisheye.html"">Fisheye</a><strong><a style = ""margin: 1vw;"" href=""littleplanet.html"">Littleplanet</a></strong><a style = ""margin: 1vw;"" href=""original.html"">Original</a></div>";
-        public const String HeaderImageOriginal = @"<div style=""width: 98vw; text-align:center;""><a style = ""margin: 1vw;"" href=""equirectangular.html"">Equi</a><a style = ""margin: 1vw;"" href=""fisheye.html"">Fisheye</a><a style = ""margin: 1vw;"" href=""littleplanet.html"">Littleplanet</a><strong><a style = ""margin: 1vw;"" href=""original.html"">Original</a></strong></div>";
+        public const String HeaderImageEquirectangular = @"<div style=""width: 98vw; text-align:center;""><strong><a style = ""margin: 1vw;"" href=""equirectangular.html"">Equi</a></strong><a style = ""margin: 1vw;"" href=""fisheye.html"">Fisheye</a><a style = ""margin: 1vw;"" href=""littleplanet.html"">Littleplanet</a><a style = ""margin: 1vw;"" href=""original.html"">Original</a><a style = ""margin: 1vw;"" href=""vr.html"">VR</a></div>";
+        public const String HeaderImageFisheye = @"<div style=""width: 98vw; text-align:center;""><a style = ""margin: 1vw;"" href=""equirectangular.html"">Equi</a><strong><a style = ""margin: 1vw;"" href=""fisheye.html"">Fisheye</a></strong><a style = ""margin: 1vw;"" href=""littleplanet.html"">Littleplanet</a><a style = ""margin: 1vw;"" href=""original.html"">Original</a><a style = ""margin: 1vw;"" href=""vr.html"">VR</a></div>";
+        public const String HeaderImageLittlePlanet = @"<div style=""width: 98vw; text-align:center;""><a style = ""margin: 1vw;"" href=""equirectangular.html"">Equi</a><a style = ""margin: 1vw;"" href=""fisheye.html"">Fisheye</a><strong><a style = ""margin: 1vw;"" href=""littleplanet.html"">Littleplanet</a></strong><a style = ""margin: 1vw;"" href=""original.html"">Original</a><a style = ""margin: 1vw;"" href=""vr.html"">VR</a></div>";
+        public const String HeaderImageOriginal = @"<div style=""width: 98vw; text-align:center;""><a style = ""margin: 1vw;"" href=""equirectangular.html"">Equi</a><a style = ""margin: 1vw;"" href=""fisheye.html"">Fisheye</a><a style = ""margin: 1vw;"" href=""littleplanet.html"">Littleplanet</a><strong><a style = ""margin: 1vw;"" href=""original.html"">Original</a></strong><a style = ""margin: 1vw;"" href=""vr.html"">VR</a></div>";
 
         public const String Image = @"<head>
     <title>{{title}}</title>
@@ -172,6 +172,107 @@ namespace MediaBrowserWPF.Utilities
 {{header}}
 <img style=""display: block;; margin:1vw auto; width: 90vw;"" src=""image.jpg"">";
 
+		public const string ImageVr = @"<!DOCTYPE html>
+<html lang=""en"">
+	<head>
+		<title>{{title}}</title>
+		<meta charset=""utf-8"">
+		<meta name=""viewport"" content=""width=device-width, initial-scale=1.0, user-scalable=no"">
+		<link type=""text/css"" rel=""stylesheet"" href=""main.css"">
+	</head>
+	<body style=""margin: 0;"">
+		<div id=""container""></div>
+		
+		<script type=""importmap"">
+			{
+				""imports"": {
+					""three"": ""../treejs/three.module.js"",
+					""three/addons/"": ""../treejs/jsm/""
+				}
+			}
+		</script>
+
+		<script type=""module"">
+
+			import * as THREE from 'three';
+			import { VRButton } from 'three/addons/webxr/VRButton.js';
+
+			let camera, scene, renderer, sphere, clock;
+
+			init();
+			animate();
+
+			function init() {
+
+				const container = document.getElementById( 'container' );
+
+				clock = new THREE.Clock();
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x101010 );
+
+				const light = new THREE.AmbientLight( 0xffffff, 3 );
+				scene.add( light );
+
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 2000 );
+				scene.add( camera );
+
+				const panoSphereGeo = new THREE.SphereGeometry( 500, 100, 60 );		
+				const panoSphereMat = new THREE.MeshStandardMaterial( {
+					side: THREE.BackSide
+				} );
+
+				sphere = new THREE.Mesh( panoSphereGeo, panoSphereMat );
+			    const manager = new THREE.LoadingManager();
+				const loader = new THREE.TextureLoader( manager );
+
+				loader.load( 'image.jpg', function ( texture ) {
+					texture.colorSpace = THREE.SRGBColorSpace;
+					texture.minFilter = THREE.NearestFilter;
+					texture.generateMipmaps = false;
+					sphere.material.map = texture;
+				} );
+
+	     		manager.onLoad = function () {
+					scene.add( sphere );
+				};
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.xr.enabled = true;
+				renderer.xr.setReferenceSpaceType( 'local' );
+				container.appendChild( renderer.domElement );
+
+				document.body.appendChild( VRButton.createButton( renderer ) );
+
+				window.addEventListener( 'resize', onWindowResize );
+			}
+
+			function onWindowResize() {
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+			}
+
+			function animate() {
+				renderer.setAnimationLoop( render );
+			}
+
+			function render() {
+				if ( renderer.xr.isPresenting === false ) {
+					const time = clock.getElapsedTime();
+					sphere.rotation.y += 0.0005;
+					sphere.position.x = Math.sin( time ) * 0.2;
+					sphere.position.z = Math.cos( time ) * 0.2;
+				}
+
+				renderer.render( scene, camera );
+			}
+
+		</script>
+	</body>
+</html>";
 
         public const string VideoVr = @"<!DOCTYPE html>
 <html lang=""en"">
@@ -181,7 +282,7 @@ namespace MediaBrowserWPF.Utilities
 		<meta name=""viewport"" content=""width=device-width, initial-scale=1.0, user-scalable=no"">
 		<link type=""text/css"" rel=""stylesheet"" href=""../treejs/main.css"">
 	</head>
-	<body>
+	<body style=""margin: 0;"">
 		<div id=""container""></div>
 
 		<video id=""video"" loop muted crossOrigin=""anonymous"" playsinline style=""display:none"">
