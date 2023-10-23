@@ -1768,18 +1768,18 @@ namespace MediaBrowserWPF.UserControls
 
                 if (i == 0)
                 {
-                    nextMitem = medialist[medialist.Count - 1];
-                    prevMitem = medialist[i + 1];
+                    prevMitem = medialist[medialist.Count - 1];
+                    nextMitem = medialist[i + 1];
                 }
                 else if (i == medialist.Count - 1)
                 {
-                    nextMitem = medialist[i - 1];
-                    prevMitem = medialist[0];
+                    prevMitem = medialist[i - 1];
+                    nextMitem = medialist[0];
                 }
                 else
                 {
-                    nextMitem = medialist[i - 1];
-                    prevMitem = medialist[i + 1];
+                    prevMitem = medialist[i - 1];
+                    nextMitem = medialist[i + 1];
                 }
 
 
@@ -1834,7 +1834,10 @@ namespace MediaBrowserWPF.UserControls
                         .Replace("{{next}}", Path.GetFileNameWithoutExtension(prevMitem.Filename))
                         .Replace("{{header}}", PhotoSphereViewer.HeaderImageLittlePlanet));
 
-                    File.WriteAllText(Path.Combine(basePath, "vr.html"), PhotoSphereViewer.ImageVr.Replace("{{title}}", title));
+                    File.WriteAllText(Path.Combine(basePath, "vr.html"), PhotoSphereViewer.ImageVr
+                        .Replace("{{prev}}", Path.GetFileNameWithoutExtension(nextMitem.Filename))
+                        .Replace("{{next}}", Path.GetFileNameWithoutExtension(prevMitem.Filename))
+                        .Replace("{{title}}", title));
                     if (!File.Exists(Path.Combine(basePath, "image.jpg")))
                     {
                         ResizeJpg(mitem, Path.Combine(basePath, "image.jpg"), 10000, 5000);
@@ -1862,6 +1865,7 @@ namespace MediaBrowserWPF.UserControls
                         .Replace("{{prev}}", Path.GetFileNameWithoutExtension(nextMitem.Filename))
                         .Replace("{{next}}", Path.GetFileNameWithoutExtension(prevMitem.Filename))
                         .Replace("{{title}}", title));
+
                     borderColor = "gold";
                     if (!File.Exists(Path.Combine(basePath, "video.mp4")))
                     {
