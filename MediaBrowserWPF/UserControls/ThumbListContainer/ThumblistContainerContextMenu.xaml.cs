@@ -1759,8 +1759,30 @@ namespace MediaBrowserWPF.UserControls
 <div style=""margin: 10px;"">");
             sbVr.Append(sb.ToString());
             String lastHeader = null;
-            foreach (MediaItem mitem in this.thumblistContainer.SelectedMediaItems.Where(x => x.Width > x.Height && x.Width / x.Height == 2 && (x.Filename.EndsWith(".mp4") || x.Filename.EndsWith(".jpg"))).OrderByDescending(x => x.Filename))
+            var medialist = this.thumblistContainer.SelectedMediaItems.Where(x => x.Width > x.Height && x.Width / x.Height == 2 && (x.Filename.EndsWith(".mp4") || x.Filename.EndsWith(".jpg"))).OrderByDescending(x => x.Filename).ToList();
+            for (int i = 0; i < medialist.Count; i++)
             {
+                MediaItem mitem = medialist[i];
+                MediaItem prevMitem = null;
+                MediaItem nextMitem = null;
+
+                if (i == 0)
+                {
+                    nextMitem = medialist[medialist.Count - 1];
+                    prevMitem = medialist[i + 1];
+                }
+                else if (i == medialist.Count - 1)
+                {
+                    nextMitem = medialist[i - 1];
+                    prevMitem = medialist[0];
+                }
+                else
+                {
+                    nextMitem = medialist[i - 1];
+                    prevMitem = medialist[i + 1];
+                }
+
+
                 String basePath = Path.Combine(root, Path.GetFileNameWithoutExtension(mitem.Filename));
                 if (!Directory.Exists(basePath))
                 {
@@ -1770,11 +1792,11 @@ namespace MediaBrowserWPF.UserControls
                 String title = mitem.MediaDate.ToString("d. MMM yyyy") + ", " + mitem.MediaDate.ToShortTimeString();
                 string altText = mitem.MediaDate.ToLongDateString() + " " + mitem.MediaDate.ToLongTimeString();
                 string borderColor = "black";
-                
+
                 string defaultYaw = "0";
                 string defaultPitch = "0";
                 Layer mainFocus = mitem.FindLayer("MAINFOCUS");
-                if(mainFocus != null)
+                if (mainFocus != null)
                 {
                     defaultYaw = ((int)(360 * Double.Parse(mainFocus.Action.Split(' ')[0]) / 100) - 180).ToString();
                     defaultPitch = (90 - (int)(180 * Double.Parse(mainFocus.Action.Split(' ')[1]) / 100)).ToString();
@@ -1786,6 +1808,8 @@ namespace MediaBrowserWPF.UserControls
                         .Replace("{{title}}", title).Replace("{{fisheye}}", "false")
                         .Replace("{{header}}", PhotoSphereViewer.HeaderImageEquirectangular)
                         .Replace("{{defaultYaw}}", defaultYaw)
+                        .Replace("{{prev}}", Path.GetFileNameWithoutExtension(nextMitem.Filename))
+                        .Replace("{{next}}", Path.GetFileNameWithoutExtension(prevMitem.Filename))
                         .Replace("{{defaultPitch}}", defaultPitch)
                         .Replace("{{param}}", PhotoSphereViewer.ParamImageEquirectangular));
 
@@ -1794,14 +1818,20 @@ namespace MediaBrowserWPF.UserControls
                         .Replace("{{header}}", PhotoSphereViewer.HeaderImageFisheye)
                         .Replace("{{defaultYaw}}", defaultYaw)
                         .Replace("{{defaultPitch}}", defaultPitch)
+                        .Replace("{{prev}}", Path.GetFileNameWithoutExtension(nextMitem.Filename))
+                        .Replace("{{next}}", Path.GetFileNameWithoutExtension(prevMitem.Filename))
                         .Replace("{{param}}", PhotoSphereViewer.ParamImageFisheye));
 
                     File.WriteAllText(Path.Combine(basePath, "original.html"), PhotoSphereViewer.Original
                         .Replace("{{title}}", title)
+                        .Replace("{{prev}}", Path.GetFileNameWithoutExtension(nextMitem.Filename))
+                        .Replace("{{next}}", Path.GetFileNameWithoutExtension(prevMitem.Filename))
                         .Replace("{{header}}", PhotoSphereViewer.HeaderImageOriginal));
 
                     File.WriteAllText(Path.Combine(basePath, "littleplanet.html"), PhotoSphereViewer.Littleplanet
                         .Replace("{{title}}", title)
+                        .Replace("{{prev}}", Path.GetFileNameWithoutExtension(nextMitem.Filename))
+                        .Replace("{{next}}", Path.GetFileNameWithoutExtension(prevMitem.Filename))
                         .Replace("{{header}}", PhotoSphereViewer.HeaderImageLittlePlanet));
 
                     File.WriteAllText(Path.Combine(basePath, "vr.html"), PhotoSphereViewer.ImageVr.Replace("{{title}}", title));
@@ -1817,14 +1847,21 @@ namespace MediaBrowserWPF.UserControls
                     File.WriteAllText(Path.Combine(basePath, "equirectangular.html"), PhotoSphereViewer.Video
                         .Replace("{{title}}", title)
                         .Replace("{{header}}", PhotoSphereViewer.HeaderVideoEquirectangular)
+                        .Replace("{{prev}}", Path.GetFileNameWithoutExtension(nextMitem.Filename))
+                        .Replace("{{next}}", Path.GetFileNameWithoutExtension(prevMitem.Filename))
                         .Replace("{{param}}", PhotoSphereViewer.ParamVideoEquirectangular));
 
                     File.WriteAllText(Path.Combine(basePath, "fisheye.html"), PhotoSphereViewer.Video
                         .Replace("{{title}}", title)
                         .Replace("{{header}}", PhotoSphereViewer.HeaderVideoFisheye)
+                        .Replace("{{prev}}", Path.GetFileNameWithoutExtension(nextMitem.Filename))
+                        .Replace("{{next}}", Path.GetFileNameWithoutExtension(prevMitem.Filename))
                         .Replace("{{param}}", PhotoSphereViewer.ParamVideoFisheye));
 
-                    File.WriteAllText(Path.Combine(basePath, "vr.html"), PhotoSphereViewer.VideoVr.Replace("{{title}}", title));
+                    File.WriteAllText(Path.Combine(basePath, "vr.html"), PhotoSphereViewer.VideoVr
+                        .Replace("{{prev}}", Path.GetFileNameWithoutExtension(nextMitem.Filename))
+                        .Replace("{{next}}", Path.GetFileNameWithoutExtension(prevMitem.Filename))
+                        .Replace("{{title}}", title));
                     borderColor = "gold";
                     if (!File.Exists(Path.Combine(basePath, "video.mp4")))
                     {

@@ -47,6 +47,9 @@ namespace MediaBrowserWPF.Utilities
 	import { ResolutionPlugin } from '@photo-sphere-viewer/resolution-plugin';
 	import { SettingsPlugin } from '@photo-sphere-viewer/settings-plugin';
 
+	const prev = ""{{prev}}"";
+	const next = ""{{next}}"";
+
     const viewer = new Viewer({
         container: document.querySelector('#viewer'),
         caption: '{{title}}',
@@ -116,6 +119,9 @@ namespace MediaBrowserWPF.Utilities
     import { GyroscopePlugin } from '@photo-sphere-viewer/gyroscope-plugin';
 	import { AutorotatePlugin } from '@photo-sphere-viewer/autorotate-plugin';
 
+	const prev = ""{{prev}}"";
+	const next = ""{{next}}"";
+
     const viewer = new Viewer({
         container: document.querySelector('#viewer'),
         caption: '{{title}}',
@@ -153,6 +159,8 @@ namespace MediaBrowserWPF.Utilities
 <script type=""module"">
     import { Viewer } from '@photo-sphere-viewer/core';
     import { LittlePlanetAdapter } from '@photo-sphere-viewer/little-planet-adapter';
+	const prev = ""{{prev}}"";
+	const next = ""{{next}}"";
 
     const viewer = new Viewer({
 	    adapter: LittlePlanetAdapter,
@@ -198,6 +206,8 @@ namespace MediaBrowserWPF.Utilities
 			import { VRButton } from 'three/addons/webxr/VRButton.js';
 
 			let camera, scene, renderer, sphere, clock;
+			const prev = ""{{prev}}"";
+			const next = ""{{next}}"";
 
 			init();
 			animate();
@@ -230,6 +240,8 @@ namespace MediaBrowserWPF.Utilities
 					texture.colorSpace = THREE.SRGBColorSpace;
 					texture.minFilter = THREE.NearestFilter;
 					texture.generateMipmaps = false;
+					texture.wrapS = THREE.RepeatWrapping;
+					texture.repeat.x = - 1;
 					sphere.material.map = texture;
 				} );
 
@@ -304,6 +316,8 @@ namespace MediaBrowserWPF.Utilities
 			import { VRButton } from 'three/addons/webxr/VRButton.js';
 
 			let camera, scene, renderer;
+			const prev = ""{{prev}}"";
+			const next = ""{{next}}"";
 
 			init();
 			animate();
