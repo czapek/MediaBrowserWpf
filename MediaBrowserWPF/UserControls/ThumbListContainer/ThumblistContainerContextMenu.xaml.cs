@@ -1748,6 +1748,12 @@ namespace MediaBrowserWPF.UserControls
         private void PhotoSphereViewer_Click(object sender, RoutedEventArgs e)
         {
             string root = @"\\192.168.2.129\web\insta360";
+
+            if (!Directory.Exists(root))
+            {
+                root = @"C:\temp\insta\panorama";
+            }
+
             string url = "https://pilzchen.synology.me/insta360/";
             StringBuilder sb = new StringBuilder();
             StringBuilder sbVr = new StringBuilder();
@@ -1867,7 +1873,7 @@ namespace MediaBrowserWPF.UserControls
                         .Replace("{{title}}", title));
 
                     borderColor = "gold";
-                    if (!File.Exists(Path.Combine(basePath, "video.mp4")))
+                    if (!File.Exists(Path.Combine(basePath, "video.mp4")) && !File.Exists(Path.Combine(basePath, "encode.mp4")))
                     {
                         mitem.FileObject.CopyTo(Path.Combine(basePath, "encode.mp4"));
                         //Process.Start(url + Path.GetFileNameWithoutExtension(mitem.Filename) + "/fisheye.html");      
