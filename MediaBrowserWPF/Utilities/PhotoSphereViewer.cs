@@ -11,8 +11,8 @@ namespace MediaBrowserWPF.Utilities
     {
         public const String ParamVideoFisheye = "fisheye: 1.5, maxFov: 160, defaultZoomLvl: 80,";
         public const String ParamVideoEquirectangular = "fisheye: false,";
-        public const String HeaderVideoEquirectangular = @"<div style=""width: 98vw; text-align:center;""><strong><a style = ""margin: 1vw;"" href=""equirectangular.html"">Equi</a></strong><a style = ""margin: 1vw;"" href=""fisheye.html"">Fisheye</a><a style = ""margin: 1vw;"" href=""vr.html"">VR</a></div>;";
-        public const String HeaderVideoFisheye = @"<div style=""width: 98vw; text-align:center;""><a style = ""margin: 1vw;"" href=""equirectangular.html"">Equi</a><strong><a style = ""margin: 1vw;"" href=""fisheye.html"">Fisheye</a></strong><a style = ""margin: 1vw;"" href=""vr.html"">VR</a></div>;";
+        public const String HeaderVideoEquirectangular = @"<div style=""width: 98vw; text-align:center;""><a style = ""margin: 1vw;"" href=""../{{prev}}/equirectangular.html"">Prev</a><strong><a style = ""margin: 1vw;"" href=""equirectangular.html"">Equi</a></strong><a style = ""margin: 1vw;"" href=""fisheye.html"">Fisheye</a><a style = ""margin: 1vw;"" href=""../{{next}}/equirectangular.html"">Next</a></div>;";
+        public const String HeaderVideoFisheye = @"<div style=""width: 98vw; text-align:center;""><a style = ""margin: 1vw;"" href=""../{{prev}}/fisheye.html"">Prev</a><a style = ""margin: 1vw;"" href=""../{{next}}/fisheye.html"">Next</a></div>;";
 
 
         public const String Video = @"<head>
@@ -91,10 +91,10 @@ namespace MediaBrowserWPF.Utilities
 
         public const String ParamImageFisheye = "fisheye: 1.5, maxFov: 160, defaultZoomLvl: 80,";
         public const String ParamImageEquirectangular = "fisheye: false,";
-        public const String HeaderImageEquirectangular = @"<div style=""width: 98vw; text-align:center;""><strong><a style = ""margin: 1vw;"" href=""equirectangular.html"">Equi</a></strong><a style = ""margin: 1vw;"" href=""fisheye.html"">Fisheye</a><a style = ""margin: 1vw;"" href=""littleplanet.html"">Littleplanet</a><a style = ""margin: 1vw;"" href=""original.html"">Original</a><a style = ""margin: 1vw;"" href=""vr.html"">VR</a></div>";
-        public const String HeaderImageFisheye = @"<div style=""width: 98vw; text-align:center;""><a style = ""margin: 1vw;"" href=""equirectangular.html"">Equi</a><strong><a style = ""margin: 1vw;"" href=""fisheye.html"">Fisheye</a></strong><a style = ""margin: 1vw;"" href=""littleplanet.html"">Littleplanet</a><a style = ""margin: 1vw;"" href=""original.html"">Original</a><a style = ""margin: 1vw;"" href=""vr.html"">VR</a></div>";
-        public const String HeaderImageLittlePlanet = @"<div style=""width: 98vw; text-align:center;""><a style = ""margin: 1vw;"" href=""equirectangular.html"">Equi</a><a style = ""margin: 1vw;"" href=""fisheye.html"">Fisheye</a><strong><a style = ""margin: 1vw;"" href=""littleplanet.html"">Littleplanet</a></strong><a style = ""margin: 1vw;"" href=""original.html"">Original</a><a style = ""margin: 1vw;"" href=""vr.html"">VR</a></div>";
-        public const String HeaderImageOriginal = @"<div style=""width: 98vw; text-align:center;""><a style = ""margin: 1vw;"" href=""equirectangular.html"">Equi</a><a style = ""margin: 1vw;"" href=""fisheye.html"">Fisheye</a><a style = ""margin: 1vw;"" href=""littleplanet.html"">Littleplanet</a><strong><a style = ""margin: 1vw;"" href=""original.html"">Original</a></strong><a style = ""margin: 1vw;"" href=""vr.html"">VR</a></div>";
+        public const String HeaderImageEquirectangular = @"<div style=""width: 98vw; text-align:center;""><a style = ""margin: 1vw;"" href=""../{{prev}}/equirectangular.html"">Prev</a><strong><a style = ""margin: 1vw;"" href=""equirectangular.html"">Equi</a></strong><a style = ""margin: 1vw;"" href=""fisheye.html"">Fisheye</a><a style = ""margin: 1vw;"" href=""littleplanet.html"">Littleplanet</a><a style = ""margin: 1vw;"" href=""original.html"">Original</a><a style = ""margin: 1vw;"" href=""../{{next}}/equirectangular.html"">Next</a></div>";
+        public const String HeaderImageFisheye = @"<div style=""width: 98vw; text-align:center;""><a style = ""margin: 1vw;"" href=""../{{prev}}/fisheye.html"">Prev</a><strong><a style = ""margin: 1vw;"" href=""fisheye.html"">Fisheye</a></strong><a style = ""margin: 1vw;"" href=""littleplanet.html"">Littleplanet</a><a style = ""margin: 1vw;"" href=""original.html"">Original</a><a style = ""margin: 1vw;"" href=""../{{next}}/fisheye.html"">Next</a></div>";
+        public const String HeaderImageLittlePlanet = @"<div style=""width: 98vw; text-align:center;""><a style = ""margin: 1vw;"" href=""../{{prev}}/littleplanet.html"">Prev</a><a style = ""margin: 1vw;"" href=""fisheye.html"">Fisheye</a><strong><a style = ""margin: 1vw;"" href=""littleplanet.html"">Littleplanet</a></strong><a style = ""margin: 1vw;"" href=""original.html"">Original</a><a style = ""margin: 1vw;"" href=""../{{next}}/littleplanet.html"">Next</a></div>";
+        public const String HeaderImageOriginal = @"<div style=""width: 98vw; text-align:center;""><a style = ""margin: 1vw;"" href=""../{{prev}}/original.html"">Prev</a><a style = ""margin: 1vw;"" href=""fisheye.html"">Fisheye</a><a style = ""margin: 1vw;"" href=""littleplanet.html"">Littleplanet</a><strong><a style = ""margin: 1vw;"" href=""original.html"">Original</a></strong><a style = ""margin: 1vw;"" href=""../{{next}}/original.html"">Next</a></div>";
 
         public const String Image = @"<head>
     <title>{{title}}</title>
@@ -189,6 +189,9 @@ namespace MediaBrowserWPF.Utilities
 		<link type=""text/css"" rel=""stylesheet"" href=""main.css"">
 	</head>
 	<body style=""margin: 0;"">
+		<div style=""width: 98vw; text-align: center"">
+		  <a style=""margin: 1vw"" href=""../{{prev}}/vr.html"">Prev</a><a style=""margin: 1vw"" href=""../{{next}}/vr.html"">Next</a>
+		</div>
 		<div id=""container""></div>
 		
 		<script type=""importmap"">
@@ -295,6 +298,9 @@ namespace MediaBrowserWPF.Utilities
 		<link type=""text/css"" rel=""stylesheet"" href=""../treejs/main.css"">
 	</head>
 	<body style=""margin: 0;"">
+		<div style=""width: 98vw; text-align: center"">
+		  <a style=""margin: 1vw"" href=""../{{prev}}/vr.html"">Prev</a><a style=""margin: 1vw"" href=""../{{next}}/vr.html"">Next</a>
+		</div>
 		<div id=""container""></div>
 
 		<video id=""video"" loop muted crossOrigin=""anonymous"" playsinline style=""display:none"">

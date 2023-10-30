@@ -1830,15 +1830,15 @@ namespace MediaBrowserWPF.UserControls
 
                     File.WriteAllText(Path.Combine(basePath, "original.html"), PhotoSphereViewer.Original
                         .Replace("{{title}}", title)
+                        .Replace("{{header}}", PhotoSphereViewer.HeaderImageOriginal)
                         .Replace("{{prev}}", Path.GetFileNameWithoutExtension(nextMitem.Filename))
-                        .Replace("{{next}}", Path.GetFileNameWithoutExtension(prevMitem.Filename))
-                        .Replace("{{header}}", PhotoSphereViewer.HeaderImageOriginal));
+                        .Replace("{{next}}", Path.GetFileNameWithoutExtension(prevMitem.Filename)));
 
                     File.WriteAllText(Path.Combine(basePath, "littleplanet.html"), PhotoSphereViewer.Littleplanet
-                        .Replace("{{title}}", title)
+                        .Replace("{{title}}", title)             
+                        .Replace("{{header}}", PhotoSphereViewer.HeaderImageLittlePlanet)
                         .Replace("{{prev}}", Path.GetFileNameWithoutExtension(nextMitem.Filename))
-                        .Replace("{{next}}", Path.GetFileNameWithoutExtension(prevMitem.Filename))
-                        .Replace("{{header}}", PhotoSphereViewer.HeaderImageLittlePlanet));
+                        .Replace("{{next}}", Path.GetFileNameWithoutExtension(prevMitem.Filename)));
 
                     File.WriteAllText(Path.Combine(basePath, "vr.html"), PhotoSphereViewer.ImageVr
                         .Replace("{{prev}}", Path.GetFileNameWithoutExtension(nextMitem.Filename))
@@ -1873,10 +1873,12 @@ namespace MediaBrowserWPF.UserControls
                         .Replace("{{title}}", title));
 
                     borderColor = "gold";
-                    if (!File.Exists(Path.Combine(basePath, "video.mp4")) && !File.Exists(Path.Combine(basePath, "encode.mp4")))
+                    if (!File.Exists(Path.Combine(basePath, "video.mp4")))
                     {
-                        mitem.FileObject.CopyTo(Path.Combine(basePath, "encode.mp4"));
-                        //Process.Start(url + Path.GetFileNameWithoutExtension(mitem.Filename) + "/fisheye.html");      
+                        if (!File.Exists(Path.Combine(basePath, "encode.mp4")))
+                        {
+                            mitem.FileObject.CopyTo(Path.Combine(basePath, "encode.mp4"));
+                        }   
                         borderColor = "red";
                     }
                 }
