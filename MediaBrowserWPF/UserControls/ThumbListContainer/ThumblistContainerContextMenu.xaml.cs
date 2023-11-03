@@ -1745,6 +1745,25 @@ namespace MediaBrowserWPF.UserControls
             }
         }
 
+        public static int addToList(int list, int i, int add, bool desc)
+        {
+            if (desc)
+            {
+                add *= -1;
+            }
+
+            add = add % list;
+            int pos = (i + add) % list;
+            if (pos < 0)
+            {
+                return list + pos;
+            }
+            else
+            {
+                return pos;
+            }
+        }
+
         private void PhotoSphereViewer_Click(object sender, RoutedEventArgs e)
         {
             string root = @"\\192.168.2.129\web\insta360";
@@ -1769,25 +1788,12 @@ namespace MediaBrowserWPF.UserControls
             for (int i = 0; i < medialist.Count; i++)
             {
                 MediaItem mitem = medialist[i];
-                MediaItem prevMitem = null;
-                MediaItem nextMitem = null;
-
-                if (i == 0)
-                {
-                    prevMitem = medialist[medialist.Count - 1];
-                    nextMitem = medialist[i + 1];
-                }
-                else if (i == medialist.Count - 1)
-                {
-                    prevMitem = medialist[i - 1];
-                    nextMitem = medialist[0];
-                }
-                else
-                {
-                    prevMitem = medialist[i - 1];
-                    nextMitem = medialist[i + 1];
-                }
-
+                MediaItem prevMitem = medialist[addToList(medialist.Count, i, 1, true)];
+                MediaItem nextMitem = medialist[addToList(medialist.Count, i, -1, true)];
+                MediaItem prev10Mitem = medialist[addToList(medialist.Count, i, 10, true)];
+                MediaItem next10Mitem = medialist[addToList(medialist.Count, i, -10, true)];
+                MediaItem prev50Mitem = medialist[addToList(medialist.Count, i, 50, true)];
+                MediaItem next50Mitem = medialist[addToList(medialist.Count, i, -50, true)];
 
                 String basePath = Path.Combine(root, Path.GetFileNameWithoutExtension(mitem.Filename));
                 if (!Directory.Exists(basePath))
@@ -1816,6 +1822,8 @@ namespace MediaBrowserWPF.UserControls
                         .Replace("{{defaultYaw}}", defaultYaw)
                         .Replace("{{prev}}", Path.GetFileNameWithoutExtension(nextMitem.Filename))
                         .Replace("{{next}}", Path.GetFileNameWithoutExtension(prevMitem.Filename))
+                        .Replace("{{prev10}}", Path.GetFileNameWithoutExtension(next10Mitem.Filename))
+                        .Replace("{{next10}}", Path.GetFileNameWithoutExtension(prev10Mitem.Filename))
                         .Replace("{{defaultPitch}}", defaultPitch)
                         .Replace("{{param}}", PhotoSphereViewer.ParamImageEquirectangular));
 
@@ -1826,23 +1834,33 @@ namespace MediaBrowserWPF.UserControls
                         .Replace("{{defaultPitch}}", defaultPitch)
                         .Replace("{{prev}}", Path.GetFileNameWithoutExtension(nextMitem.Filename))
                         .Replace("{{next}}", Path.GetFileNameWithoutExtension(prevMitem.Filename))
+                        .Replace("{{prev10}}", Path.GetFileNameWithoutExtension(next10Mitem.Filename))
+                        .Replace("{{next10}}", Path.GetFileNameWithoutExtension(prev10Mitem.Filename))
                         .Replace("{{param}}", PhotoSphereViewer.ParamImageFisheye));
 
                     File.WriteAllText(Path.Combine(basePath, "original.html"), PhotoSphereViewer.Original
                         .Replace("{{title}}", title)
                         .Replace("{{header}}", PhotoSphereViewer.HeaderImageOriginal)
                         .Replace("{{prev}}", Path.GetFileNameWithoutExtension(nextMitem.Filename))
-                        .Replace("{{next}}", Path.GetFileNameWithoutExtension(prevMitem.Filename)));
+                        .Replace("{{next}}", Path.GetFileNameWithoutExtension(prevMitem.Filename))
+                        .Replace("{{prev10}}", Path.GetFileNameWithoutExtension(next10Mitem.Filename))
+                        .Replace("{{next10}}", Path.GetFileNameWithoutExtension(prev10Mitem.Filename)));
 
                     File.WriteAllText(Path.Combine(basePath, "littleplanet.html"), PhotoSphereViewer.Littleplanet
                         .Replace("{{title}}", title)             
                         .Replace("{{header}}", PhotoSphereViewer.HeaderImageLittlePlanet)
                         .Replace("{{prev}}", Path.GetFileNameWithoutExtension(nextMitem.Filename))
-                        .Replace("{{next}}", Path.GetFileNameWithoutExtension(prevMitem.Filename)));
+                        .Replace("{{next}}", Path.GetFileNameWithoutExtension(prevMitem.Filename))
+                        .Replace("{{prev10}}", Path.GetFileNameWithoutExtension(next10Mitem.Filename))
+                        .Replace("{{next10}}", Path.GetFileNameWithoutExtension(prev10Mitem.Filename)));
 
                     File.WriteAllText(Path.Combine(basePath, "vr.html"), PhotoSphereViewer.ImageVr
                         .Replace("{{prev}}", Path.GetFileNameWithoutExtension(nextMitem.Filename))
                         .Replace("{{next}}", Path.GetFileNameWithoutExtension(prevMitem.Filename))
+                        .Replace("{{prev10}}", Path.GetFileNameWithoutExtension(next10Mitem.Filename))
+                        .Replace("{{next10}}", Path.GetFileNameWithoutExtension(prev10Mitem.Filename))
+                        .Replace("{{prev50}}", Path.GetFileNameWithoutExtension(next50Mitem.Filename))
+                        .Replace("{{next50}}", Path.GetFileNameWithoutExtension(prev50Mitem.Filename))
                         .Replace("{{title}}", title));
                     if (!File.Exists(Path.Combine(basePath, "image.jpg")))
                     {
@@ -1858,6 +1876,8 @@ namespace MediaBrowserWPF.UserControls
                         .Replace("{{header}}", PhotoSphereViewer.HeaderVideoEquirectangular)
                         .Replace("{{prev}}", Path.GetFileNameWithoutExtension(nextMitem.Filename))
                         .Replace("{{next}}", Path.GetFileNameWithoutExtension(prevMitem.Filename))
+                        .Replace("{{prev10}}", Path.GetFileNameWithoutExtension(next10Mitem.Filename))
+                        .Replace("{{next10}}", Path.GetFileNameWithoutExtension(prev10Mitem.Filename))
                         .Replace("{{param}}", PhotoSphereViewer.ParamVideoEquirectangular));
 
                     File.WriteAllText(Path.Combine(basePath, "fisheye.html"), PhotoSphereViewer.Video
@@ -1865,11 +1885,17 @@ namespace MediaBrowserWPF.UserControls
                         .Replace("{{header}}", PhotoSphereViewer.HeaderVideoFisheye)
                         .Replace("{{prev}}", Path.GetFileNameWithoutExtension(nextMitem.Filename))
                         .Replace("{{next}}", Path.GetFileNameWithoutExtension(prevMitem.Filename))
+                        .Replace("{{prev10}}", Path.GetFileNameWithoutExtension(next10Mitem.Filename))
+                        .Replace("{{next10}}", Path.GetFileNameWithoutExtension(prev10Mitem.Filename))
                         .Replace("{{param}}", PhotoSphereViewer.ParamVideoFisheye));
 
                     File.WriteAllText(Path.Combine(basePath, "vr.html"), PhotoSphereViewer.VideoVr
                         .Replace("{{prev}}", Path.GetFileNameWithoutExtension(nextMitem.Filename))
                         .Replace("{{next}}", Path.GetFileNameWithoutExtension(prevMitem.Filename))
+                        .Replace("{{prev10}}", Path.GetFileNameWithoutExtension(next10Mitem.Filename))
+                        .Replace("{{next10}}", Path.GetFileNameWithoutExtension(prev10Mitem.Filename))
+                        .Replace("{{prev50}}", Path.GetFileNameWithoutExtension(next50Mitem.Filename))
+                        .Replace("{{next50}}", Path.GetFileNameWithoutExtension(prev50Mitem.Filename))
                         .Replace("{{title}}", title));
 
                     borderColor = "gold";

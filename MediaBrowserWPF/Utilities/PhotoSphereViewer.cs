@@ -187,10 +187,16 @@ namespace MediaBrowserWPF.Utilities
 		<meta charset=""utf-8"">
 		<meta name=""viewport"" content=""width=device-width, initial-scale=1.0, user-scalable=no"">
 		<link type=""text/css"" rel=""stylesheet"" href=""main.css"">
+        <link href=""https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"" rel=""stylesheet"">
 	</head>
 	<body style=""margin: 0;"">
 		<div style=""width: 98vw; text-align: center"">
-		  <a style=""margin: 1vw"" href=""../{{prev}}/vr.html"">Prev</a><a style=""margin: 1vw"" href=""../{{next}}/vr.html"">Next</a>
+             <a class=""btn btn-primary"" role=""button"" style=""margin: 1vw"" href=""../{{prev50}}/vr.html"">Prev 50</a>
+			 <a class=""btn btn-primary"" role=""button"" style=""margin: 1vw"" href=""../{{prev10}}/vr.html"">Prev 10</a>
+			 <a class=""btn btn-primary"" role=""button"" style=""margin: 1vw"" href=""../{{prev}}/vr.html"">Prev</a>
+			 <a class=""btn btn-primary"" role=""button"" style=""margin: 1vw"" href=""../{{next}}/vr.html"">Next</a>
+			 <a class=""btn btn-primary"" role=""button"" style=""margin: 1vw"" href=""../{{next10}}/vr.html"">Next 10</a>          
+             <a class=""btn btn-primary"" role=""button"" style=""margin: 1vw"" href=""../{{next50}}/vr.html"">Next 50</a>   
 		</div>
 		<div id=""container""></div>
 		
@@ -296,10 +302,16 @@ namespace MediaBrowserWPF.Utilities
 		<meta charset=""utf-8"">
 		<meta name=""viewport"" content=""width=device-width, initial-scale=1.0, user-scalable=no"">
 		<link type=""text/css"" rel=""stylesheet"" href=""../treejs/main.css"">
+        <link href=""https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"" rel=""stylesheet"">
 	</head>
 	<body style=""margin: 0;"">
-		<div style=""width: 98vw; text-align: center"">
-		  <a style=""margin: 1vw"" href=""../{{prev}}/vr.html"">Prev</a><a style=""margin: 1vw"" href=""../{{next}}/vr.html"">Next</a>
+		<div style=""width: 98vw; text-align: center"">	  
+             <a class=""btn btn-primary"" role=""button"" style=""margin: 1vw"" href=""../{{prev50}}/vr.html"">Prev 50</a>
+			 <a class=""btn btn-primary"" role=""button"" style=""margin: 1vw"" href=""../{{prev10}}/vr.html"">Prev 10</a>
+			 <a class=""btn btn-primary"" role=""button"" style=""margin: 1vw"" href=""../{{prev}}/vr.html"">Prev</a>
+			 <a class=""btn btn-primary"" role=""button"" style=""margin: 1vw"" href=""../{{next}}/vr.html"">Next</a>
+			 <a class=""btn btn-primary"" role=""button"" style=""margin: 1vw"" href=""../{{next10}}/vr.html"">Next 10</a>          
+             <a class=""btn btn-primary"" role=""button"" style=""margin: 1vw"" href=""../{{next50}}/vr.html"">Next 50</a>  
 		</div>
 		<div id=""container""></div>
 
