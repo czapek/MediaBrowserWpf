@@ -171,6 +171,22 @@ namespace MediaBrowserWPF.Utilities
     });
 </script>";
 
+		public const String vrHeader = @"        <div style=""width: 98vw; text-align: center"">	 
+             <strong>Prev +50</strong>
+             <a href=""../{{prev50}}/vr.html""><img alt=""Prev 50"" style=""margin: 3px 30px 3px 3px; border: 4px solid black"" src=""../{{prev50}}/preview.jpg""></a>
+             <strong>Prev +10</strong>
+			 <a href=""../{{prev10}}/vr.html""><img alt=""Prev 10"" style=""margin: 3px 30px 3px 3px; border: 4px solid black"" src=""../{{prev10}}/preview.jpg""></a>
+             <strong>Prev</strong>
+			 <a href=""../{{prev}}/vr.html""><img alt=""Prev"" style=""margin: 3px 30px 3px 3px; border: 4px solid black"" src=""../{{prev}}/preview.jpg""></a>
+             <strong>{{title}}</strong>
+			 <a href=""../{{next}}/vr.html""><img alt=""Next"" style=""margin: 3px 3px 3px 30px; border: 4px solid black"" src=""../{{next}}/preview.jpg""></a>
+             <strong>Next</strong>
+			 <a href=""../{{next10}}/vr.html""><img alt=""Next 10"" style=""margin: 3px 3px 3px 30px; border: 4px solid black"" src=""../{{next10}}/preview.jpg""></a>    
+             <strong>Next +10</strong>
+             <a href=""../{{next50}}/vr.html""><img alt=""Next 50"" style=""margin: 3px 3px 3px 30px; border: 4px solid black"" src=""../{{next50}}/preview.jpg""></a>   
+             <strong>Next + 50</strong>
+		</div>";
+
         public const String Original = @"<head>
     <title>{{title}}</title>
     <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"" />
@@ -190,14 +206,7 @@ namespace MediaBrowserWPF.Utilities
         <link href=""https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"" rel=""stylesheet"">
 	</head>
 	<body style=""margin: 0;"">
-		<div style=""width: 98vw; text-align: center"">
-             <a class=""btn btn-primary"" role=""button"" style=""margin: 1vw"" href=""../{{prev50}}/vr.html"">Prev 50</a>
-			 <a class=""btn btn-primary"" role=""button"" style=""margin: 1vw"" href=""../{{prev10}}/vr.html"">Prev 10</a>
-			 <a class=""btn btn-primary"" role=""button"" style=""margin: 1vw"" href=""../{{prev}}/vr.html"">Prev</a>
-			 <a class=""btn btn-primary"" role=""button"" style=""margin: 1vw"" href=""../{{next}}/vr.html"">Next</a>
-			 <a class=""btn btn-primary"" role=""button"" style=""margin: 1vw"" href=""../{{next10}}/vr.html"">Next 10</a>          
-             <a class=""btn btn-primary"" role=""button"" style=""margin: 1vw"" href=""../{{next50}}/vr.html"">Next 50</a>   
-		</div>
+ " + vrHeader + @"
 		<div id=""container""></div>
 		
 		<script type=""importmap"">
@@ -305,14 +314,7 @@ namespace MediaBrowserWPF.Utilities
         <link href=""https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"" rel=""stylesheet"">
 	</head>
 	<body style=""margin: 0;"">
-		<div style=""width: 98vw; text-align: center"">	  
-             <a class=""btn btn-primary"" role=""button"" style=""margin: 1vw"" href=""../{{prev50}}/vr.html"">Prev 50</a>
-			 <a class=""btn btn-primary"" role=""button"" style=""margin: 1vw"" href=""../{{prev10}}/vr.html"">Prev 10</a>
-			 <a class=""btn btn-primary"" role=""button"" style=""margin: 1vw"" href=""../{{prev}}/vr.html"">Prev</a>
-			 <a class=""btn btn-primary"" role=""button"" style=""margin: 1vw"" href=""../{{next}}/vr.html"">Next</a>
-			 <a class=""btn btn-primary"" role=""button"" style=""margin: 1vw"" href=""../{{next10}}/vr.html"">Next 10</a>          
-             <a class=""btn btn-primary"" role=""button"" style=""margin: 1vw"" href=""../{{next50}}/vr.html"">Next 50</a>  
-		</div>
+ " + vrHeader + @"
 		<div id=""container""></div>
 
 		<video id=""video"" loop muted crossOrigin=""anonymous"" playsinline style=""display:none"">
