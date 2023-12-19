@@ -172,8 +172,6 @@ namespace MediaBrowserWPF.Utilities
 </script>";
 
 		public const String vrHeader = @"        <div style=""width: 98vw; text-align: center"">	 
-             <strong>Prev +50</strong>
-             <a href=""../{{prev50}}/vr.html""><img alt=""Prev 50"" style=""margin: 3px 30px 3px 3px; border: 4px solid black"" src=""../{{prev50}}/preview.jpg""></a>
              <strong>Prev +10</strong>
 			 <a href=""../{{prev10}}/vr.html""><img alt=""Prev 10"" style=""margin: 3px 30px 3px 3px; border: 4px solid black"" src=""../{{prev10}}/preview.jpg""></a>
              <strong>Prev</strong>
@@ -182,9 +180,7 @@ namespace MediaBrowserWPF.Utilities
 			 <a href=""../{{next}}/vr.html""><img alt=""Next"" style=""margin: 3px 3px 3px 30px; border: 4px solid black"" src=""../{{next}}/preview.jpg""></a>
              <strong>Next</strong>
 			 <a href=""../{{next10}}/vr.html""><img alt=""Next 10"" style=""margin: 3px 3px 3px 30px; border: 4px solid black"" src=""../{{next10}}/preview.jpg""></a>    
-             <strong>Next +10</strong>
-             <a href=""../{{next50}}/vr.html""><img alt=""Next 50"" style=""margin: 3px 3px 3px 30px; border: 4px solid black"" src=""../{{next50}}/preview.jpg""></a>   
-             <strong>Next + 50</strong>
+             <strong>Next +10</strong>             
 		</div>";
 
         public const String Original = @"<head>

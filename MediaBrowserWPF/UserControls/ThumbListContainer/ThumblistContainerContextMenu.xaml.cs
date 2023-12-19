@@ -1937,14 +1937,12 @@ namespace MediaBrowserWPF.UserControls
 
             sb.AppendLine("</div>");
             sbVr.AppendLine("</div>");
-            String indexHtml = Path.GetFileNameWithoutExtension(this.thumblistContainer.SelectedMediaItems[0].Filename) + ".html";
-            if (this.thumblistContainer.SelectedMediaItems.Count > 400 && this.thumblistContainer.SelectedMediaItems.OrderBy(x => x.Filename).ToList()[0].Filename == "221005-1355-58.mp4")
-            {
-                indexHtml = "full.html";
-            }
+            String firstElement = medialist.OrderBy(x => x.Filename).ToList()[0].Filename;
+            String indexHtml = Path.GetFileNameWithoutExtension(firstElement) + ".html";
+            
             File.WriteAllText(Path.Combine(root, indexHtml), sb.ToString());
             File.WriteAllText(Path.Combine(root, "vr" + indexHtml), sbVr.ToString());
-            Process.Start(url + "/" + indexHtml);
+            Process.Start(url + indexHtml);
 
         }
     }
