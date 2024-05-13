@@ -952,7 +952,7 @@ namespace MediaBrowser4.Objects
 
             string tempPath = GetCacheFolder();
 
-            String filename = MediaBrowserContext.DBGuid + "_" + this.Id + "." + System.IO.Path.GetExtension(this.FullName);
+            String filename = this.MediaDate.ToString("yyyyMMdd-HHmmss-fff") + "_" + this.Md5Value + System.IO.Path.GetExtension(this.FullName);
             String cachePath = System.IO.Path.Combine(tempPath, filename);
             if (!File.Exists(cachePath))
                 File.Copy(this.FileObject.FullName, cachePath);

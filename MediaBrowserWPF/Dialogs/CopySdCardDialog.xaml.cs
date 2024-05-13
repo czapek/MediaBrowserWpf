@@ -538,7 +538,7 @@ namespace MediaBrowserWPF.Dialogs
                     string folderIdentifier = "_" + this.FolderCnt.ToString().PadLeft(4, '0');
 
 
-                    if (System.IO.Path.GetExtension(source).ToLower() == ".jpg")
+                    if (System.IO.Path.GetExtension(source).ToLower() == ".jpg" || System.IO.Path.GetExtension(source).ToLower() == ".jpeg" || System.IO.Path.GetExtension(source).ToLower() == ".png")
                     {
                         string wav = System.IO.Path.GetDirectoryName(source) + "\\" + System.IO.Path.GetFileNameWithoutExtension(source).Replace("IMG", "SND") + ".WAV";
                         if (File.Exists(wav))
