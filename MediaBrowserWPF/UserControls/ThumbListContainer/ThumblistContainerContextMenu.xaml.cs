@@ -1945,5 +1945,13 @@ namespace MediaBrowserWPF.UserControls
             Process.Start(url + indexHtml);
 
         }
+
+        private void MenuItemExportApi_Click(object sender, RoutedEventArgs e)
+        {
+            foreach (MediaItem mItem in this.thumblistContainer.SelectedMediaItems)
+            {
+                MediaBrowser4.DB.API.MediafileInsert.insert(mItem);
+            }
+        }
     }
 }
