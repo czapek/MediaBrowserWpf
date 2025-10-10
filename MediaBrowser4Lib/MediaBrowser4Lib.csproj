@@ -168,6 +168,10 @@
     <Compile Include="API\MediaFileApiClient.cs" />
     <Compile Include="API\MediafileInsert.cs" />
     <Compile Include="API\MediafileInsertDto.cs" />
+    <Compile Include="DB\Maria\CommandHelper.cs" />
+    <Compile Include="DB\Maria\MariaDbProvider.cs" />
+    <Compile Include="DB\Maria\SimpleConnection.cs" />
+    <Compile Include="DB\Maria\Transaction.cs" />
     <Compile Include="DB\SQLite\CommandHelper.cs" />
     <Compile Include="DB\ICommandHelper.cs" />
     <Compile Include="DB\IConnectionManager.cs" />
