@@ -21,6 +21,7 @@ using System.Threading;
 using System.Globalization;
 using System.Windows.Threading;
 using MediaBrowser4.Utilities;
+using MediaBrowser4.DB.Maria;
 using MediaProcessing.FaceDetection;
 using MapControl;
 
@@ -83,7 +84,16 @@ namespace MediaBrowserWPF
 
             if (MediaBrowser4.MediaBrowserContext.MainDBProvider != null)
             {
-                this.SetDatabaseMenu(MediaBrowser4.MediaBrowserContext.MainDBProvider.DBName);
+                if (MediaBrowser4.MediaBrowserContext.MainDBProvider is MariaDbProvider)
+                {
+                    this.DatabasesInFolder.Items.Clear();
+                    this.DatabasesInFolder.IsEnabled = false;
+                }
+                else
+                {
+                    this.SetDatabaseMenu(MediaBrowser4.MediaBrowserContext.MainDBProvider.DBName);
+                }
+
                 this.StatusBarTextblock.Text = MediaBrowser4.MediaBrowserContext.MainDBProvider.DBName;
             }
 
@@ -609,6 +619,13 @@ namespace MediaBrowserWPF
 
         private void NewDatabase()
         {
+            if (MediaBrowserContext.MainDBProvider is MariaDbProvider)
+            {
+                MessageBox.Show(MainWindow.MainWindowStatic,
+                    "Im MariaDB-Modus kann keine dateibasierte Datenbank geöffnet werden. Starten Sie das Programm mit den MariaDB-Verbindungsargumenten.");
+                return;
+            }
+
             System.Windows.Forms.OpenFileDialog openFileDialog = new System.Windows.Forms.OpenFileDialog();
 
             openFileDialog.Filter = "Mediabrowser4 DB (*.mb4)|*.mb4";
@@ -640,6 +657,13 @@ namespace MediaBrowserWPF
 
         private void SetDbPath(string filepath)
         {
+            if (MediaBrowserContext.MainDBProvider is MariaDbProvider)
+            {
+                MessageBox.Show(MainWindow.MainWindowStatic,
+                    "Im MariaDB-Modus kann keine dateibasierte Datenbank geöffnet werden. Starten Sie das Programm mit den MariaDB-Verbindungsargumenten.");
+                return;
+            }
+
             if ((MediaBrowserContext.DBPath == null || !MediaBrowserContext.DBPath.Equals(filepath, StringComparison.InvariantCultureIgnoreCase))
                 && MediaBrowserContext.Init(filepath))
             {

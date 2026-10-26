@@ -20,6 +20,10 @@ namespace MediaBrowser4.DB
         public abstract string DBName { get; set; }
         public abstract string User { get; set; }
         public abstract string Host { get; set; }
+        public virtual string DBPath
+        {
+            get { return null; }
+        }
 
 
         public abstract int DeleteGpsFile(DateTime fileTime);

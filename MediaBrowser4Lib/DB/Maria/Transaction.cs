@@ -1,119 +1,128 @@
-﻿using MySqlConnector;
+﻿using System;
 using System.Data;
 using System.Data.Common;
+using MySqlConnector;
 
 namespace MediaBrowser4.DB.Maria
 {
-    public class Transaction : ITransaction
+    public sealed class Transaction : CommandHelper, ITransaction
     {
-        private readonly IConnectionManager _connectionManager;
-        private readonly IDbTransaction _transaction;
+        private bool doRollback;
 
         public Transaction(IConnectionManager connectionManager)
+            : base(connectionManager)
         {
-            _connectionManager = connectionManager;
-            _connectionManager.Open();
-            _transaction = _connectionManager.Connection.BeginTransaction();
+            this.command.Transaction = this.command.Connection.BeginTransaction();
         }
 
-        public void Dispose()
+        public override int ExecuteNonQuery(string commandText, CommandType commandType)
         {
-            _transaction.Dispose();
-            _connectionManager.Dispose();
+            try
+            {
+                if (!this.doRollback)
+                {
+                    return base.ExecuteNonQuery(commandText, commandType);
+                }
+            }
+            catch (MySqlException exception)
+            {
+                this.lastError = exception;
+                this.Rollback();
+            }
+
+            return 0;
         }
 
-        public void Commit()
+        public override object ExecuteScalar(string commandText, CommandType commandType)
         {
-            _transaction.Commit();
+            try
+            {
+                if (!this.doRollback)
+                {
+                    return base.ExecuteScalar(commandText, commandType);
+                }
+            }
+            catch (MySqlException exception)
+            {
+                this.lastError = exception;
+                this.Rollback();
+            }
+
+            return DBNull.Value;
+        }
+
+        public override T ExecuteScalar<T>(string commandText, CommandType commandType)
+        {
+            try
+            {
+                if (!this.doRollback)
+                {
+                    return base.ExecuteScalar<T>(commandText, commandType);
+                }
+            }
+            catch (MySqlException exception)
+            {
+                this.lastError = exception;
+                this.Rollback();
+            }
+
+            return default(T);
+        }
+
+        public override DbDataReader ExecuteReader(string commandText, CommandType commandType)
+        {
+            try
+            {
+                if (!this.doRollback)
+                {
+                    return base.ExecuteReader(commandText, commandType);
+                }
+            }
+            catch (MySqlException exception)
+            {
+                this.lastError = exception;
+                this.Rollback();
+            }
+
+            return null;
         }
 
         public void Rollback()
         {
-            _transaction.Rollback();
+            this.doRollback = true;
         }
 
-        public IDbCommand CreateCommand(string sql)
+        protected override void Dispose(bool disposing)
         {
-            var cmd = new MySqlCommand(sql, (MySqlConnection)_connectionManager.Connection)
+            if (!disposing)
             {
-                Transaction = (MySqlTransaction)_transaction
-            };
-            return cmd;
-        }
+                base.Dispose(false);
+                return;
+            }
 
-        public int ExecuteNonQuery(string commandText, CommandType commandType)
-        {
-            throw new System.NotImplementedException();
-        }
+            if (this.command != null && this.command.Transaction != null)
+            {
+                try
+                {
+                    if (this.doRollback || this.lastError != null)
+                    {
+                        this.command.Transaction.Rollback();
+                    }
+                    else
+                    {
+                        this.command.Transaction.Commit();
+                    }
+                }
+                catch (Exception exception)
+                {
+                    if (this.lastError == null)
+                    {
+                        this.lastError = exception;
+                    }
+                }
+            }
 
-        public DbDataReader ExecuteReader(string commandText, CommandType commandType)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public T ExecuteScalar<T>(string commandText, CommandType commandType)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public object ExecuteScalar(string commandText, CommandType commandType)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public int ExecuteNonQuery(string commandText)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public DbDataReader ExecuteReader(string commandText)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public object ExecuteScalar(string commandText)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public T ExecuteScalar<T>(string commandText)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public DataTable GetDataTable(string commandText)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public DbParameter GetParameter(string parameterName, bool throwException)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public DbParameter GetParameter(string parameterName)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public T GetParameterValue<T>(string parameterName)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public void SetParameter(DbParameter parameter)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public void SetParameter(string name, string value)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public void SetParameter(string name, object value, DbType type)
-        {
-            throw new System.NotImplementedException();
+            base.Dispose(true);
         }
     }
 }

@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SQLite;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using MediaBrowser4.DB;
 
 namespace MediaBrowser4.Objects
 {
@@ -32,15 +29,15 @@ namespace MediaBrowser4.Objects
         }
 
         private List<Tuple<String, object>> TupelParameterList { get; set; }
-        
-        public List<SQLiteParameter> ParameterList
+
+        public List<SqlParameterInfo> ParameterList
         {
             set
             {
                 if (value != null)
                 {
                     TupelParameterList = new List<Tuple<string, object>>();
-                    foreach (SQLiteParameter parameter in value)
+                    foreach (SqlParameterInfo parameter in value)
                     {
                         Tuple<string, object> tupel = new Tuple<string, object>(parameter.ParameterName, parameter.Value);
                         TupelParameterList.Add(tupel);
@@ -50,11 +47,11 @@ namespace MediaBrowser4.Objects
 
             get
             {
-                List<SQLiteParameter> parameterList = new List<SQLiteParameter>();
+                List<SqlParameterInfo> parameterList = new List<SqlParameterInfo>();
                 TupelParameterList = TupelParameterList ?? new List<Tuple<string, object>>();
                 foreach (Tuple<string, object> tupel in TupelParameterList)
                 {
-                    SQLiteParameter parameter = new SQLiteParameter()
+                    SqlParameterInfo parameter = new SqlParameterInfo()
                     {
                         ParameterName = tupel.Item1,
                         Value = tupel.Item2
@@ -71,7 +68,7 @@ namespace MediaBrowser4.Objects
             get; set;
         }
 
-        public MediaItemSqlRequest(string sql, List<System.Data.SQLite.SQLiteParameter> parameterList, string sortString, int limtRequest)
+        public MediaItemSqlRequest(string sql, List<SqlParameterInfo> parameterList, string sortString, int limtRequest)
         {
             this.Sql = sql;
             this.ParameterList = parameterList;

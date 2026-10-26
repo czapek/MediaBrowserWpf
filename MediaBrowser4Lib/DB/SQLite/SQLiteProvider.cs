@@ -28,7 +28,7 @@ namespace MediaBrowser4.DB.SQLite
         {
         }
 
-        internal string DBPath
+        public override string DBPath
         {
             get
             {
@@ -53,7 +53,7 @@ namespace MediaBrowser4.DB.SQLite
         }
         public override MediaItemSqlRequest GetSqlRequest(List<MediaBrowser4.Objects.MediaItem> mediaItemList)
         {
-            return mediaItemList != null && mediaItemList.Count > 0 ? new MediaItemSqlRequest($"FROM MEDIAFILES INNER JOIN FOLDERS ON FOLDERS.ID = MEDIAFILES.FOLDERS_FK WHERE MEDIAFILES.ID IN ({String.Join(",", mediaItemList.Select(x => x.Id))}) AND HISTORYVERSION = 0", new List<SQLiteParameter>(), String.Empty, MediaBrowserContext.LimitRequest) : null;
+            return mediaItemList != null && mediaItemList.Count > 0 ? new MediaItemSqlRequest($"FROM MEDIAFILES INNER JOIN FOLDERS ON FOLDERS.ID = MEDIAFILES.FOLDERS_FK WHERE MEDIAFILES.ID IN ({String.Join(",", mediaItemList.Select(x => x.Id))}) AND HISTORYVERSION = 0", new List<SqlParameterInfo>(), String.Empty, MediaBrowserContext.LimitRequest) : null;
         }
 
         public override List<MediaBrowser4.Objects.MediaItem> GetMediaItems(MediaItemRequest request)
@@ -197,9 +197,9 @@ INNER JOIN CATEGORIZE ON CATEGORIZE.VARIATIONS_FK=VARIATIONS.ID"
                 {
                     if (searchTokenSql.ParameterList != null)
                     {
-                        foreach (SQLiteParameter param in searchTokenSql.ParameterList)
+                        foreach (SqlParameterInfo param in searchTokenSql.ParameterList)
                         {
-                            cmd.SetParameter(param);
+                            cmd.SetParameter(param.ToSQLiteParameter());
                         }
                     }
 
@@ -644,8 +644,8 @@ INNER JOIN CATEGORIZE ON CATEGORIZE.VARIATIONS_FK=VARIATIONS.ID"
 
         public override List<MediaItem> GetMediaItemsFromChecksum(string checksum)
         {
-            List<SQLiteParameter> paramList = new List<SQLiteParameter>();
-            paramList.Add(new SQLiteParameter("@MD5VALUE", DbType.String) { Value = Path.GetFileName(checksum).ToLower().Trim() });
+            List<SqlParameterInfo> paramList = new List<SqlParameterInfo>();
+            paramList.Add(new SqlParameterInfo("@MD5VALUE", Path.GetFileName(checksum).ToLower().Trim(), DbType.String));
             List<MediaItem> result = LoadMediaItems("FROM MEDIAFILES, FOLDERS WHERE FOLDERS.ID = MEDIAFILES.FOLDERS_FK AND MD5VALUE=LOWER(@MD5VALUE) AND HISTORYVERSION=0 ", paramList, String.Empty, 1, null);
 
             return result;
@@ -653,8 +653,8 @@ INNER JOIN CATEGORIZE ON CATEGORIZE.VARIATIONS_FK=VARIATIONS.ID"
 
         public override List<MediaItem> GetMediaItemsFromFileName(string filename)
         {
-            List<SQLiteParameter> paramList = new List<SQLiteParameter>();
-            paramList.Add(new SQLiteParameter("@FILENAME", DbType.String) { Value = Path.GetFileName(filename).ToLower().Trim() });
+            List<SqlParameterInfo> paramList = new List<SqlParameterInfo>();
+            paramList.Add(new SqlParameterInfo("@FILENAME", Path.GetFileName(filename).ToLower().Trim(), DbType.String));
             List<MediaItem> result = LoadMediaItems("FROM MEDIAFILES, FOLDERS WHERE FOLDERS.ID = MEDIAFILES.FOLDERS_FK AND FILENAME=LOWER(@FILENAME) AND HISTORYVERSION=0 ", paramList, String.Empty, 1, null);
 
             return result;
@@ -662,9 +662,9 @@ INNER JOIN CATEGORIZE ON CATEGORIZE.VARIATIONS_FK=VARIATIONS.ID"
 
         public override MediaItem GetMediaItemFromFile(string filename)
         {
-            List<SQLiteParameter> paramList = new List<SQLiteParameter>();
-            paramList.Add(new SQLiteParameter("@FOLDERNAME", DbType.String) { Value = MediaBrowserContext.MapPathRootReverse(Path.GetDirectoryName(filename)) });
-            paramList.Add(new SQLiteParameter("@FILENAME", DbType.String) { Value = Path.GetFileName(filename) });
+            List<SqlParameterInfo> paramList = new List<SqlParameterInfo>();
+            paramList.Add(new SqlParameterInfo("@FOLDERNAME", MediaBrowserContext.MapPathRootReverse(Path.GetDirectoryName(filename)), DbType.String));
+            paramList.Add(new SqlParameterInfo("@FILENAME", Path.GetFileName(filename), DbType.String));
 
             List<MediaItem> result = LoadMediaItems(
                 "FROM MEDIAFILES, FOLDERS WHERE FOLDERS.ID = MEDIAFILES.FOLDERS_FK AND FOLDERNAME=@FOLDERNAME AND FILENAME=@FILENAME AND HISTORYVERSION=0 ",
@@ -3044,7 +3044,7 @@ LIMIT 10"
             return LoadMediaItems(mediaItemSqlRequest.Sql, mediaItemSqlRequest.ParameterList, mediaItemSqlRequest.SortString, mediaItemSqlRequest.LimitRequest, mediaItemSqlRequest);
         }
 
-        private List<MediaBrowser4.Objects.MediaItem> LoadMediaItems(string sql, List<SQLiteParameter> parameterList, string sortString, int limtRequest, MediaItemRequest mediaItemRequest)
+        private List<MediaBrowser4.Objects.MediaItem> LoadMediaItems(string sql, List<SqlParameterInfo> parameterList, string sortString, int limtRequest, MediaItemRequest mediaItemRequest)
         {
             long requestTicket = DateTime.Now.Ticks;
             List<MediaBrowser4.Objects.MediaItem> mediaItemList = new List<MediaBrowser4.Objects.MediaItem>();
@@ -3060,9 +3060,9 @@ LIMIT 10"
                     {
                         if (parameterList != null)
                         {
-                            foreach (SQLiteParameter param in parameterList)
+                            foreach (SqlParameterInfo param in parameterList)
                             {
-                                com.SetParameter(param);
+                                com.SetParameter(param.ToSQLiteParameter());
                             }
                         }
 
@@ -3583,15 +3583,19 @@ LIMIT 10"
             {
                 using (MediaBrowser4.DB.ICommandHelper com = this.MBCommand)
                 {
-                    List<System.Data.SQLite.SQLiteParameter> parameterList = null;
+                    List<SqlParameterInfo> parameterList = null;
 
-                    foreach (System.Data.SQLite.SQLiteParameter param in searchTokenSql.ParameterList)
+                    foreach (SqlParameterInfo param in searchTokenSql.ParameterList)
                     {
-                        com.SetParameter(param);
+                        com.SetParameter(param.ToSQLiteParameter());
 
                         if (mediaItemRequest != null)
                         {
-                            parameterList = new List<SQLiteParameter>();
+                            if (parameterList == null)
+                            {
+                                parameterList = new List<SqlParameterInfo>();
+                            }
+
                             parameterList.Add(param);
                         }
                     }

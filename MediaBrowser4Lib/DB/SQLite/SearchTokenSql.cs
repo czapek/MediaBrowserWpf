@@ -1,16 +1,16 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using MediaBrowser4.Objects;
-using System.Data.SQLite;
+using MediaBrowser4.DB;
 using System.Data;
 
-namespace MediaBrowser4.DB.SQLite
+namespace MediaBrowser4.DB
 {
     public class SearchTokenSql
     {
-        public List<SQLiteParameter> ParameterList { get; private set; }
+        public List<SqlParameterInfo> ParameterList { get; private set; }
         public string WhereSql { get; private set; }
         public bool SearchCategories { get; private set; }
         public bool SearchMetaData { get; private set; }
@@ -88,7 +88,7 @@ namespace MediaBrowser4.DB.SQLite
 
         private void Init(SearchToken searchToken)
         {
-            this.ParameterList = new List<SQLiteParameter>();
+            this.ParameterList = new List<SqlParameterInfo>();
             List<string> sqlWhere = new List<string>();
 
             if (!String.IsNullOrWhiteSpace(searchToken.SearchText1)
@@ -110,7 +110,7 @@ namespace MediaBrowser4.DB.SQLite
                 }
 
                 string textParameter = "@Searchtext1";
-                SQLiteParameter param = new SQLiteParameter(textParameter, DbType.String);
+                SqlParameterInfo param = new SqlParameterInfo(textParameter, DbType.String);
 
                 param.Value = name;
                 this.ParameterList.Add(param);
@@ -176,7 +176,7 @@ namespace MediaBrowser4.DB.SQLite
                 }
 
                 string textParameter = "@Searchtext2";
-                SQLiteParameter param = new SQLiteParameter(textParameter, DbType.String);
+                SqlParameterInfo param = new SqlParameterInfo(textParameter, DbType.String);
 
                 param.Value = name;
                 this.ParameterList.Add(param);
@@ -226,7 +226,7 @@ namespace MediaBrowser4.DB.SQLite
 
             if (searchToken.DateFromEnabled)
             {
-                SQLiteParameter param = new SQLiteParameter("@SearchdateFrom", DbType.DateTime);
+                SqlParameterInfo param = new SqlParameterInfo("@SearchdateFrom", DbType.DateTime);
                 param.Value = searchToken.DateFrom;
                 sqlWhere.Add("MEDIADATE >= @SearchdateFrom");
                 this.ParameterList.Add(param);
@@ -234,7 +234,7 @@ namespace MediaBrowser4.DB.SQLite
 
             if (searchToken.DateToEnabled)
             {
-                SQLiteParameter param = new SQLiteParameter("@SearchdateTo", DbType.DateTime);
+                SqlParameterInfo param = new SqlParameterInfo("@SearchdateTo", DbType.DateTime);
                 param.Value = searchToken.DateTo;
                 sqlWhere.Add("MEDIADATE <= @SearchdateTo");
                 this.ParameterList.Add(param);
@@ -242,7 +242,7 @@ namespace MediaBrowser4.DB.SQLite
 
             if (searchToken.LengthFrom > 0)
             {
-                SQLiteParameter param = new SQLiteParameter("@SearchlengthA", DbType.Double);
+                SqlParameterInfo param = new SqlParameterInfo("@SearchlengthA", DbType.Double);
                 param.Value = searchToken.LengthFrom * 1024;
                 sqlWhere.Add("LENGTH >= @SearchlengthA");
                 this.ParameterList.Add(param);
@@ -250,7 +250,7 @@ namespace MediaBrowser4.DB.SQLite
 
             if (searchToken.LengthTo > 0)
             {
-                SQLiteParameter param = new SQLiteParameter("@SearchlengthB", DbType.Double);
+                SqlParameterInfo param = new SqlParameterInfo("@SearchlengthB", DbType.Double);
                 param.Value = searchToken.LengthTo * 1024;
                 sqlWhere.Add("LENGTH <= @SearchlengthB");
                 this.ParameterList.Add(param);
@@ -258,7 +258,7 @@ namespace MediaBrowser4.DB.SQLite
 
             if (searchToken.DurationFrom > 0)
             {
-                SQLiteParameter param = new SQLiteParameter("@SearchdurationA", DbType.Double);
+                SqlParameterInfo param = new SqlParameterInfo("@SearchdurationA", DbType.Double);
                 param.Value = searchToken.DurationFrom;
                 sqlWhere.Add("DURATION >= @SearchdurationA"); // AND MEDIAFILES.TYPE='dsh'");
                 this.ParameterList.Add(param);
@@ -266,7 +266,7 @@ namespace MediaBrowser4.DB.SQLite
 
             if (searchToken.DurationTo > 0)
             {
-                SQLiteParameter param = new SQLiteParameter("@SearchdurationB", DbType.Double);
+                SqlParameterInfo param = new SqlParameterInfo("@SearchdurationB", DbType.Double);
                 param.Value = searchToken.DurationTo;
                 sqlWhere.Add("DURATION <= @SearchdurationB"); //  AND MEDIAFILES.TYPE='dsh'");
                 this.ParameterList.Add(param);
@@ -284,7 +284,7 @@ namespace MediaBrowser4.DB.SQLite
 
             if (searchToken.Relation.From != searchToken.Relation.To)
             {
-                SQLiteParameter param = new SQLiteParameter("@SearchrelationA", DbType.Double);
+                SqlParameterInfo param = new SqlParameterInfo("@SearchrelationA", DbType.Double);
                 param.Value = searchToken.Relation.From;
 
                 sqlWhere.Add("(CASE WHEN (ORIENTATION = 0 OR ORIENTATION = 2) THEN (CAST(WIDTH AS float) / CAST(HEIGHT AS float)) "
@@ -296,7 +296,7 @@ namespace MediaBrowser4.DB.SQLite
             if (searchToken.Relation.From != searchToken.Relation.To &&
                 searchToken.Relation.From < searchToken.Relation.To)
             {
-                SQLiteParameter param = new SQLiteParameter("@SearchrelationB", DbType.Double);
+                SqlParameterInfo param = new SqlParameterInfo("@SearchrelationB", DbType.Double);
                 param.Value = searchToken.Relation.To;
 
                 sqlWhere.Add("(CASE WHEN (ORIENTATION = 0 OR ORIENTATION = 2) THEN (CAST(WIDTH AS float) / CAST(HEIGHT AS float)) "
@@ -326,7 +326,7 @@ namespace MediaBrowser4.DB.SQLite
 
             if (!String.IsNullOrWhiteSpace(searchToken.MetaDataKey))
             {
-                SQLiteParameter param = new SQLiteParameter("@SearchMetaName", DbType.String);
+                SqlParameterInfo param = new SqlParameterInfo("@SearchMetaName", DbType.String);
                 string name = searchToken.MetaDataKey.Replace('*', '%').ToLower();
                 param.Value = name;
                 this.ParameterList.Add(param);
@@ -337,7 +337,7 @@ namespace MediaBrowser4.DB.SQLite
 
             if (!String.IsNullOrWhiteSpace(searchToken.MetaDataValue))
             {
-                SQLiteParameter param = new SQLiteParameter("@SearchMetaData", DbType.String);
+                SqlParameterInfo param = new SqlParameterInfo("@SearchMetaData", DbType.String);
                 string name = searchToken.MetaDataValue.Replace('*', '%').ToLower();
                 param.Value = name;
                 this.ParameterList.Add(param);

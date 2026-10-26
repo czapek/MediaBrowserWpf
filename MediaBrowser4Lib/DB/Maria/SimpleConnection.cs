@@ -1,50 +1,57 @@
-﻿using MySqlConnector;
-using System;
+﻿using System;
 using System.Data;
 using System.Data.Common;
 using System.Threading;
+using MySqlConnector;
 
 namespace MediaBrowser4.DB.Maria
 {
     public class SimpleConnection : IConnectionManager
     {
-        private readonly string _connectionString;
-        private MySqlConnection _connection;
+        private readonly string connectionString;
+        private MySqlConnection connection;
 
         public SimpleConnection(string connectionString)
         {
-            _connectionString = connectionString;
+            this.connectionString = connectionString;
         }
 
-        public IDbConnection Connection
+        public DbConnection Connection
         {
             get
             {
-                if (_connection == null)
+                if (this.connection == null)
                 {
-                    _connection = new MySqlConnection(_connectionString);
+                    this.connection = new MySqlConnection(this.connectionString);
                 }
-                return _connection;
+
+                if (this.connection.State != ConnectionState.Open)
+                {
+                    this.connection.Open();
+                }
+
+                return this.connection;
             }
         }
-
-        DbConnection IConnectionManager.Connection => throw new NotImplementedException();
 
         public void Open()
         {
             int retries = 5;
+
             while (true)
             {
                 try
                 {
-                    if (_connection.State != ConnectionState.Open)
-                        _connection.Open();
+                    this.Connection.ToString();
                     return;
                 }
-                catch (Exception e)
+                catch (Exception exception)
                 {
                     if (retries-- == 0)
-                        throw new Exception("Failed to connect to the database.", e);
+                    {
+                        throw new Exception("Failed to connect to the MariaDB database.", exception);
+                    }
+
                     Thread.Sleep(100);
                 }
             }
@@ -52,22 +59,22 @@ namespace MediaBrowser4.DB.Maria
 
         public void Dispose()
         {
-            if (_connection == null)
+            if (this.connection == null)
+            {
                 return;
+            }
 
             try
             {
-                if (_connection.State != ConnectionState.Closed)
-                    _connection.Close();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
+                if (this.connection.State != ConnectionState.Closed)
+                {
+                    this.connection.Close();
+                }
             }
             finally
             {
-                _connection.Dispose();
-                _connection = null;
+                this.connection.Dispose();
+                this.connection = null;
             }
         }
 

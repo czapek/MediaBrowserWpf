@@ -6,9 +6,12 @@ using System.Linq;
 using System.Windows;
 using MediaBrowser4;
 using System.IO;
+using MediaBrowser4.DB.Maria;
 using MediaBrowser4.Utilities;
 using System.Windows.Markup;
 using System.Globalization;
+using System.Runtime.InteropServices;
+using MySqlConnector;
 
 namespace MediaBrowserWPF
 {
@@ -17,40 +20,112 @@ namespace MediaBrowserWPF
     /// </summary>
     public partial class App : Application
     {
+        private static readonly string UsageText =
+            "Aufruf:" + Environment.NewLine +
+            "  MediaBrowserWPF.exe [<db.mb4>] [<init-folder>]" + Environment.NewLine +
+            "  MediaBrowserWPF.exe [<init-folder>]" + Environment.NewLine +
+            "  MediaBrowserWPF.exe --provider sqlite [--db-file <db.mb4>] [--update]" + Environment.NewLine +
+            "  MediaBrowserWPF.exe --provider mariadb --db-host <host> [--db-port <port>] " +
+            "--db-name <database> --db-user <user> [--db-password <password> | " +
+            "--db-password-env <ENV_NAME> | --db-password-file <path>] " +
+            "[--db-ssl-mode None|Preferred|Required|VerifyCA|VerifyFull] [--update] [<init-folder>]";
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern bool AttachConsole(uint dwProcessId);
+
+        private static void EnableConsoleOutput()
+        {
+            try
+            {
+                AttachConsole(0xFFFFFFFF);
+            }
+            catch
+            {
+            }
+        }
+
+        private static void WriteUpdateProgress(string message)
+        {
+            try
+            {
+                Console.WriteLine("[" + DateTime.Now.ToString("HH:mm:ss") + "] " + message);
+                Console.Out.Flush();
+            }
+            catch
+            {
+            }
+        }
+
         private void Application_Startup(object sender, StartupEventArgs e)
         {
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+
             SplashScreen ss = new SplashScreen("Images\\Splash.jpg");
             ss.Show(true, true);
 
-            string dbPath = null;
-            string initPath = null;
-            string initFolder = null;
-            if (e.Args.Length > 0 && File.Exists(e.Args[0]))
-            {
-                dbPath = e.Args[0];
+            StartupArguments arguments;
 
-                if (e.Args.Length == 2 && Directory.Exists(e.Args[1]))
-                {
-                    initFolder = e.Args[1];
-                }
-            }
-            else if (e.Args.Length == 1 && Directory.Exists(e.Args[0]))
+            try
             {
-                initPath = e.Args[0];
+                arguments = ParseArguments(e.Args);
+            }
+            catch (Exception ex)
+            {
+                ShowStartupError(ex.Message);
+                return;
+            }
+
+            if (arguments.Help)
+            {
+                MessageBox.Show(UsageText, "MediaBrowserWPF");
+                Shutdown();
+                return;
+            }
+
+            Action<string> progress = null;
+
+            if (arguments.Provider == "mariadb" && arguments.Update)
+            {
+                EnableConsoleOutput();
+                progress = WriteUpdateProgress;
+                progress("MediaBrowser MariaDB-Update gestartet.");
+            }
+
+            bool initialized;
+
+            if (arguments.Provider == "mariadb")
+            {
+                initialized = MediaBrowserContext.Init(arguments.MariaDb, arguments.Update, progress);
             }
             else
             {
-                foreach (string part in MediaBrowserWPF.Properties.Settings.Default.DBPath.Split(';'))
-                {
-                    if (File.Exists(part))
-                    {
-                        dbPath = part;
-                        break;
-                    }
-                }
+                initialized = MediaBrowserContext.Init(arguments.SqlitePath);
             }
 
-            MediaBrowserContext.Init(dbPath);
+            if (!initialized)
+            {
+                string errorMessage =
+                    "Die Datenbank konnte nicht ge�ffnet werden." + Environment.NewLine + Environment.NewLine +
+                    (String.IsNullOrWhiteSpace(MediaBrowserContext.LastInitError)
+                        ? (arguments.Provider == "mariadb"
+                            ? "Pr�fen Sie die Verbindungsdaten. Bei einer neuen oder unvollst�ndigen Datenbank starten Sie mit --update."
+                            : "Pr�fen Sie den Pfad zur SQLite-Datenbank.")
+                        : MediaBrowserContext.LastInitError);
+
+                if (progress != null)
+                {
+                    progress("FEHLER: " + errorMessage);
+                }
+
+                ShowStartupError(errorMessage);
+                return;
+            }
+
+            if (progress != null)
+            {
+                progress("Update erfolgreich abgeschlossen.");
+                progress("MediaBrowser wird gestartet...");
+            }
 
             MediaBrowser4.MediaBrowserContext.SetDirectShowExtensions
                 = MediaBrowserWPF.Properties.Settings.Default.DirectShowExtensions;
@@ -62,9 +137,320 @@ namespace MediaBrowserWPF
                 = MediaBrowserWPF.Properties.Settings.Default.AudioExtraFiles;
 
             MainWindow mainWindow = new MainWindow();
-            mainWindow.InitPath = initPath;
-            mainWindow.InitFolder = initFolder;
+            mainWindow.InitPath = arguments.InitPath;
+            mainWindow.InitFolder = arguments.InitFolder;
             mainWindow.Show();
+        }
+
+        private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            try
+            {
+                Exception exception = e.ExceptionObject as Exception;
+
+                if (exception != null)
+                {
+                    Log.Exception(exception, "AppDomain.UnhandledException");
+                }
+            }
+            catch
+            {
+            }
+        }
+
+        private static void ShowStartupError(string message)
+        {
+            MessageBox.Show(message, "MediaBrowserWPF");
+            Application.Current.Shutdown();
+        }
+
+        private static StartupArguments ParseArguments(string[] args)
+        {
+            StartupArguments result = new StartupArguments();
+            List<string> positional = new List<string>();
+            int passwordSourceCount = 0;
+
+            for (int i = 0; i < args.Length; i++)
+            {
+                string argument = args[i] ?? String.Empty;
+
+                switch (argument.ToLowerInvariant())
+                {
+                    case "--provider":
+                        result.Provider = RequiredValue(args, ref i, argument).ToLowerInvariant();
+                        result.ProviderSpecified = true;
+                        break;
+                    case "--db-file":
+                        result.DbFile = RequiredValue(args, ref i, argument);
+                        break;
+                    case "--db-host":
+                        result.DbHost = RequiredValue(args, ref i, argument);
+                        break;
+                    case "--db-port":
+                        uint port;
+                        string portValue = RequiredValue(args, ref i, argument);
+
+                        if (!uint.TryParse(portValue, out port) || port == 0 || port > 65535)
+                        {
+                            throw new ArgumentException("Ungültiger Port: " + portValue);
+                        }
+
+                        result.DbPort = port;
+                        break;
+                    case "--db-name":
+                        result.DbName = RequiredValue(args, ref i, argument);
+                        break;
+                    case "--db-user":
+                        result.DbUser = RequiredValue(args, ref i, argument);
+                        break;
+                    case "--db-password":
+                        result.DbPassword = RequiredValue(args, ref i, argument);
+                        passwordSourceCount++;
+                        break;
+                    case "--db-password-env":
+                        result.DbPasswordEnv = RequiredValue(args, ref i, argument);
+                        passwordSourceCount++;
+                        break;
+                    case "--db-password-file":
+                        result.DbPasswordFile = RequiredValue(args, ref i, argument);
+                        passwordSourceCount++;
+                        break;
+                    case "--db-ssl-mode":
+                        MySqlSslMode sslMode;
+                        string sslModeValue = RequiredValue(args, ref i, argument);
+
+                        if (!Enum.TryParse<MySqlSslMode>(sslModeValue, true, out sslMode))
+                        {
+                            throw new ArgumentException("Ungültiger SSL-Modus: " + sslModeValue);
+                        }
+
+                        result.DbSslMode = sslMode;
+                        break;
+                    case "--update":
+                        result.Update = true;
+                        break;
+                    case "--help":
+                    case "-h":
+                    case "-?":
+                        result.Help = true;
+                        break;
+                    default:
+                        if (argument.StartsWith("-", StringComparison.Ordinal))
+                        {
+                            throw new ArgumentException("Unbekanntes Argument: " + argument);
+                        }
+
+                        positional.Add(argument);
+                        break;
+                }
+            }
+
+            if (passwordSourceCount > 1)
+            {
+                throw new ArgumentException("Es darf nur eine Passwortquelle angegeben werden.");
+            }
+
+            if (result.Provider != "sqlite" && result.Provider != "mariadb")
+            {
+                throw new ArgumentException("Unbekannter Provider: " + result.Provider);
+            }
+
+            if (result.Help)
+            {
+                return result;
+            }
+
+            if (result.Provider == "mariadb")
+            {
+                ParseMariaDbArguments(result, positional, passwordSourceCount);
+            }
+            else
+            {
+                ParseSqliteArguments(result, positional);
+            }
+
+            return result;
+        }
+
+        private static void ParseMariaDbArguments(StartupArguments result, List<string> positional,
+            int passwordSourceCount)
+        {
+            if (String.IsNullOrWhiteSpace(result.DbHost))
+            {
+                throw new ArgumentException("--db-host ist erforderlich.");
+            }
+
+            if (String.IsNullOrWhiteSpace(result.DbName))
+            {
+                throw new ArgumentException("--db-name ist erforderlich.");
+            }
+
+            if (String.IsNullOrWhiteSpace(result.DbUser))
+            {
+                throw new ArgumentException("--db-user ist erforderlich.");
+            }
+
+            if (result.DbFile != null)
+            {
+                throw new ArgumentException("--db-file ist nur für --provider sqlite gültig.");
+            }
+
+            string password = null;
+
+            if (passwordSourceCount == 0)
+            {
+                password = Environment.GetEnvironmentVariable("MEDIABROWSER_DB_PASSWORD");
+            }
+            else if (result.DbPasswordEnv != null)
+            {
+                password = Environment.GetEnvironmentVariable(result.DbPasswordEnv);
+
+                if (password == null)
+                {
+                    throw new ArgumentException("Die Umgebungsvariable " + result.DbPasswordEnv + " ist nicht gesetzt.");
+                }
+            }
+            else if (result.DbPasswordFile != null)
+            {
+                if (!File.Exists(result.DbPasswordFile))
+                {
+                    throw new ArgumentException("Passwortdatei nicht gefunden: " + result.DbPasswordFile);
+                }
+
+                password = File.ReadAllText(result.DbPasswordFile).TrimEnd('\r', '\n');
+            }
+            else
+            {
+                password = result.DbPassword;
+            }
+
+            if (positional.Count > 1)
+            {
+                throw new ArgumentException("Zu viele Argumente für MariaDB.");
+            }
+
+            if (positional.Count == 1)
+            {
+                if (!Directory.Exists(positional[0]))
+                {
+                    throw new ArgumentException("Init-Ordner nicht gefunden: " + positional[0]);
+                }
+
+                result.InitFolder = positional[0];
+            }
+
+            result.MariaDb = new MariaDbConnectionOptions
+            {
+                Host = result.DbHost,
+                Port = result.DbPort,
+                Database = result.DbName,
+                User = result.DbUser,
+                Password = password,
+                SslMode = result.DbSslMode
+            };
+        }
+
+        private static void ParseSqliteArguments(StartupArguments result, List<string> positional)
+        {
+            if (positional.Count > 2)
+            {
+                throw new ArgumentException("Zu viele Argumente für SQLite.");
+            }
+
+            if (result.DbFile != null)
+            {
+                result.SqlitePath = result.DbFile;
+
+                if (positional.Count == 1)
+                {
+                    if (!Directory.Exists(positional[0]))
+                    {
+                        throw new ArgumentException("Init-Ordner nicht gefunden: " + positional[0]);
+                    }
+
+                    result.InitFolder = positional[0];
+                }
+
+                return;
+            }
+
+            if (positional.Count == 0)
+            {
+                foreach (string part in MediaBrowserWPF.Properties.Settings.Default.DBPath.Split(';'))
+                {
+                    if (File.Exists(part))
+                    {
+                        result.SqlitePath = part;
+                        break;
+                    }
+                }
+
+                return;
+            }
+
+            if (File.Exists(positional[0]))
+            {
+                result.SqlitePath = positional[0];
+
+                if (positional.Count == 2)
+                {
+                    if (!Directory.Exists(positional[1]))
+                    {
+                        throw new ArgumentException("Init-Ordner nicht gefunden: " + positional[1]);
+                    }
+
+                    result.InitFolder = positional[1];
+                }
+            }
+            else if (Directory.Exists(positional[0]))
+            {
+                if (positional.Count == 2)
+                {
+                    throw new ArgumentException("Zu viele Argumente für SQLite.");
+                }
+
+                result.InitPath = positional[0];
+            }
+            else if (result.ProviderSpecified)
+            {
+                result.SqlitePath = positional[0];
+            }
+            else
+            {
+                throw new ArgumentException("Pfad nicht gefunden: " + positional[0]);
+            }
+        }
+
+        private static string RequiredValue(string[] args, ref int index, string option)
+        {
+            if (index + 1 >= args.Length)
+            {
+                throw new ArgumentException("Für " + option + " fehlt ein Wert.");
+            }
+
+            index++;
+            return args[index];
+        }
+
+        private class StartupArguments
+        {
+            public string Provider = "sqlite";
+            public bool ProviderSpecified;
+            public string SqlitePath;
+            public string InitPath;
+            public string InitFolder;
+            public string DbFile;
+            public string DbHost;
+            public uint DbPort = 3306;
+            public string DbName;
+            public string DbUser;
+            public string DbPassword;
+            public string DbPasswordEnv;
+            public string DbPasswordFile;
+            public MySqlSslMode DbSslMode = MySqlSslMode.Preferred;
+            public bool Update;
+            public bool Help;
+            public MariaDbConnectionOptions MariaDb;
         }
 
         protected override void OnStartup(StartupEventArgs e)

@@ -340,8 +340,18 @@ namespace MediaBrowser4.DB.SQLite
                     throw this.LastError;
             }
         }
-
-
         #endregion
+
+
+    }
+
+    internal static class SqlParameterInfoExtensions
+    {
+        internal static SQLiteParameter ToSQLiteParameter(this SqlParameterInfo parameterInfo)
+        {
+            SQLiteParameter parameter = new SQLiteParameter(parameterInfo.ParameterName, parameterInfo.EffectiveDbType);
+            parameter.Value = parameterInfo.Value ?? DBNull.Value;
+            return parameter;
+        }
     }
 }

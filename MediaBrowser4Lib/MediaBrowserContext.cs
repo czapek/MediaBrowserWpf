@@ -6,6 +6,7 @@ using System.Text;
 
 using MediaBrowser4.DB;
 using MediaBrowser4.Objects;
+using MediaBrowser4.DB.Maria;
 using MediaBrowser4.DB.SQLite;
 using System.Collections.ObjectModel;
 using System.Xml;
@@ -38,6 +39,7 @@ namespace MediaBrowser4
 
         public static CopyItemProperties CopyItemProperties = new CopyItemProperties();
         public static SearchToken SearchTokenGlobal;
+        public static string LastInitError { get; private set; }
         private static System.Drawing.Size previewSize = new System.Drawing.Size(1024, 600);
         public static int PreviewJpegQuality = 65;
         //private static System.Drawing.Size previewSize = new System.Drawing.Size(1920, 1080);
@@ -196,6 +198,8 @@ namespace MediaBrowser4
         /// <returns></returns>
         public static bool Init(string dbPath)
         {
+            LastInitError = null;
+
             try
             {
                 if (dbPath == null || !Directory.Exists(Path.GetDirectoryName(dbPath)))
@@ -213,15 +217,13 @@ namespace MediaBrowser4
 
                 SQLiteProvider sqliteProvider = new SQLiteProvider(dbPath);
 
-                if (sqliteProvider.ValidateDB())
+                if (!sqliteProvider.ValidateDB())
                 {
-                    MainDBProvider = sqliteProvider;
-                }
-                else
-                {
-                    MediaBrowser4.MediaBrowserContext.MainDBProvider = null;
+                    MainDBProvider = null;
                     return false;
                 }
+
+                MainDBProvider = sqliteProvider;
 
                 if (!dbPath.ToLower().StartsWith("d:\\")
                     && !dbPath.ToLower().StartsWith("l:\\")
@@ -230,31 +232,85 @@ namespace MediaBrowser4
                     DriveMappingLetter = Path.GetPathRoot(dbPath);
                 }
 
-                propertyTable = null;
-
-                CheckSumMaxLength = Convert.ToInt32(GetDBProperty("CheckSumMaxLength"));
-                CommitInsertSeconds = Convert.ToInt32(GetDBProperty("CommitInsertSeconds"));
-                DefaultRoleID = Convert.ToInt32(GetDBProperty("DefaultRoleID"));
-                ThumbnailJPEGQuality = Convert.ToInt32(GetDBProperty("ThumbnailJPEGQuality"));
-                ThumbnailSize = Convert.ToInt32(GetDBProperty("ThumbnailSize"));
-                AutoCategorizeDate = GetDBProperty("AutoCategorizeDate") == "1";
-                
-                if (Directory.Exists(GPSLoggerPath))
-                {
-                    List<GpsFile> fileList = GetGpsFileList();
-                    List<GeoPoint> gpsList = KmlHelper.ParseFolder(GPSLoggerPath, fileList);
-                    HasGeodata = fileList.Count > 0 || gpsList.Count > 0;
-                    InsertGpsPoints(gpsList);
-                }
-
-                return true;
+                return InitProviderContext();
             }
             catch (Exception ex)
             {
+                LastInitError = ex.Message;
                 Log.Exception(ex);
             }
 
             return false;
+        }
+
+        public static bool Init(MariaDbConnectionOptions options, bool update)
+        {
+            return Init(options, update, null);
+        }
+
+        public static bool Init(MariaDbConnectionOptions options, bool update, Action<string> progress)
+        {
+            LastInitError = null;
+
+            try
+            {
+                if (options == null)
+                {
+                    LastInitError = "Es wurden keine MariaDB-Verbindungsdaten angegeben.";
+                    return false;
+                }
+
+                MariaDbProvider mariaDbProvider = new MariaDbProvider(options);
+
+                if (update)
+                {
+                    if (progress != null) progress("Starte MariaDB-Update...");
+                    mariaDbProvider.CreateDB(progress);
+                }
+
+                if (progress != null) progress("Validiere Datenbankschema...");
+
+                if (!mariaDbProvider.ValidateDB())
+                {
+                    LastInitError = mariaDbProvider.LastValidationError;
+                    MainDBProvider = null;
+                    return false;
+                }
+
+                DriveMappingLetter = null;
+                MainDBProvider = mariaDbProvider;
+
+                return InitProviderContext();
+            }
+            catch (Exception ex)
+            {
+                LastInitError = ex.Message;
+                Log.Exception(ex);
+            }
+
+            return false;
+        }
+
+        private static bool InitProviderContext()
+        {
+            propertyTable = null;
+
+            CheckSumMaxLength = Convert.ToInt32(GetDBProperty("CheckSumMaxLength"));
+            CommitInsertSeconds = Convert.ToInt32(GetDBProperty("CommitInsertSeconds"));
+            DefaultRoleID = Convert.ToInt32(GetDBProperty("DefaultRoleID"));
+            ThumbnailJPEGQuality = Convert.ToInt32(GetDBProperty("ThumbnailJPEGQuality"));
+            ThumbnailSize = Convert.ToInt32(GetDBProperty("ThumbnailSize"));
+            AutoCategorizeDate = GetDBProperty("AutoCategorizeDate") == "1";
+
+            if (Directory.Exists(GPSLoggerPath))
+            {
+                List<GpsFile> fileList = GetGpsFileList();
+                List<GeoPoint> gpsList = KmlHelper.ParseFolder(GPSLoggerPath, fileList);
+                HasGeodata = fileList.Count > 0 || gpsList.Count > 0;
+                InsertGpsPoints(gpsList);
+            }
+
+            return true;
         }
 
         public static string GPSLoggerPath
@@ -830,7 +886,7 @@ namespace MediaBrowser4
             get
             {
                 if (mainDBProvider != null)
-                    return ((MediaBrowser4.DB.SQLite.SQLiteProvider)mainDBProvider).DBPath;
+                    return mainDBProvider.DBPath;
                 else
                     return null;
             }
@@ -860,6 +916,11 @@ namespace MediaBrowser4
         {
             get
             {
+                if (mainDBProvider == null || mainDBProvider is MariaDbProvider)
+                {
+                    return null;
+                }
+
                 return DBAdministration.GetThumbNailDBPath(DBPath, previewSize);
             }
         }
@@ -908,6 +969,26 @@ namespace MediaBrowser4
                     }
                     catch { }
 
+                }
+                else if (mainDBProvider is MariaDbProvider)
+                {
+                    string tempName = mainDBProvider.DBName ?? "default";
+
+                    foreach (char invalidChar in System.IO.Path.GetInvalidFileNameChars())
+                    {
+                        tempName = tempName.Replace(invalidChar, '_');
+                    }
+
+                    string tmp = System.IO.Path.Combine(
+                        System.IO.Path.GetTempPath(), "MediaBrowserWpf", tempName);
+
+                    try
+                    {
+                        if (!System.IO.Directory.Exists(tmp))
+                            System.IO.Directory.CreateDirectory(tmp);
+                        path = tmp;
+                    }
+                    catch { }
                 }
                 return path;
             }
@@ -1578,7 +1659,7 @@ namespace MediaBrowser4
             using (MediaBrowser4.DB.ICommandHelper com = MainDBProvider.MBCommand)
             {
                 System.Data.DataTable table
-                    = com.GetDataTable("SELECT KEY, VALUE FROM DBPROPERTIES");
+                    = com.GetDataTable("SELECT `KEY`, `VALUE` FROM DBPROPERTIES");
 
                 foreach (System.Data.DataRow row in table.Rows)
                 {

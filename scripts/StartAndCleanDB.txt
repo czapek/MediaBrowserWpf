@@ -1,0 +1,29 @@
+CREATE DATABASE `mediabrowser-new` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+GRANT ALL PRIVILEGES ON `mediabrowser-new`.* TO 'mediabrowser-new'@'%' IDENTIFIED BY 'Mediabrowser!2027';
+
+user: mediabrowser-new
+pass: Mediabrowser!2027
+jdbc:mariadb://mariadb:3306/mediabrowser-new
+
+
+
+cd C:\Users\SebastianCzapek\workspace\MediaBrowserWpf
+$env:MEDIABROWSER_DB_PASSWORD = 'Mediabrowser!2027'
+.\scripts\Drop-All-MariaDbTables.ps1
+
+
+
+cd C:\Users\SebastianCzapek\workspace\MediaBrowserWpf\MediaBrowserWPF\bin\Debug
+$env:MEDIABROWSER_DB_PASSWORD = 'Mediabrowser!2027'
+
+# Erster Start / Schema anlegen oder aktualisieren:
+.\MediaBrowserWPF.exe --provider mariadb --db-host 192.168.2.129 --db-port 3306 --db-name mediabrowser-new --db-user mediabrowser-new --update
+
+# Danach ohne --update:
+.\MediaBrowserWPF.exe --provider mariadb --db-host 192.168.2.129 --db-port 3306 --db-name mediabrowser-new --db-user mediabrowser-new
+Alternativ das Passwort direkt übergeben (erscheint aber in der Prozessliste):
+
+.\MediaBrowserWPF.exe --provider mariadb --db-host 192.168.2.129 --db-port 3306 --db-name mediabrowser-new --db-user mediabrowser-new --db-password 'Mediabrowser!2027'
+SQLite weiterhin z. B. mit:
+
+.\MediaBrowserWPF.exe --provider sqlite --db-file "C:\Pfad\zur\MediaBrowser4DB.mb4"
