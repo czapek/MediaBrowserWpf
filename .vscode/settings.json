@@ -1,3 +1,5 @@
 {
-  "dotnet.preferCSharpExtension": true
+  "dotnet.preferCSharpExtension": true,
+  "dotnet.server.useOmnisharp": true,
+  "omnisharp.useModernNet": false
 }

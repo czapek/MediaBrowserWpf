@@ -1,0 +1,71 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "MediaBrowserWPF (MariaDB)",
+      "type": "clr",
+      "request": "launch",
+      "preLaunchTask": "build",
+      "program": "${workspaceFolder}\\MediaBrowserWPF\\bin\\Debug\\MediaBrowserWPF.exe",
+      "cwd": "${workspaceFolder}\\MediaBrowserWPF\\bin\\Debug",
+      "args": [
+        "--provider",
+        "mariadb",
+        "--db-host",
+        "192.168.2.129",
+        "--db-port",
+        "3306",
+        "--db-name",
+        "mediabrowser-new",
+        "--db-user",
+        "mediabrowser-new"
+      ],
+      "envFile": "${workspaceFolder}\\.vscode\\db.env",
+      "console": "internalConsole",
+      "stopAtEntry": false,
+      "justMyCode": true
+    },
+    {
+      "name": "MediaBrowserWPF (MariaDB, Update)",
+      "type": "clr",
+      "request": "launch",
+      "preLaunchTask": "build",
+      "program": "${workspaceFolder}\\MediaBrowserWPF\\bin\\Debug\\MediaBrowserWPF.exe",
+      "cwd": "${workspaceFolder}\\MediaBrowserWPF\\bin\\Debug",
+      "args": [
+        "--provider",
+        "mariadb",
+        "--db-host",
+        "192.168.2.129",
+        "--db-port",
+        "3306",
+        "--db-name",
+        "mediabrowser-new",
+        "--db-user",
+        "mediabrowser-new",
+        "--update"
+      ],
+      "envFile": "${workspaceFolder}\\.vscode\\db.env",
+      "console": "internalConsole",
+      "stopAtEntry": false,
+      "justMyCode": true
+    },
+    {
+      "name": "MediaBrowserWPF (SQLite)",
+      "type": "clr",
+      "request": "launch",
+      "preLaunchTask": "build",
+      "program": "${workspaceFolder}\\MediaBrowserWPF\\bin\\Debug\\MediaBrowserWPF.exe",
+      "cwd": "${workspaceFolder}\\MediaBrowserWPF\\bin\\Debug",
+      "args": [
+        "--provider",
+        "sqlite",
+        "--db-file",
+        "C:\\Users\\SebastianCzapek\\OneDrive - Deutsche Bahn\\Dokumente\\MediaBrowserWpf\\MediaBrowser4DB2.mb4"
+      ],
+      "console": "internalConsole",
+      "stopAtEntry": false,
+      "justMyCode": true
+    }
+  ]
+}
