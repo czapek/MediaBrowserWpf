@@ -102,6 +102,8 @@ namespace MediaBrowser4.DB.Maria
                 this.CreateTables(connection);
                 this.Report("Pruefe Spalten und Indizes...");
                 this.EnsureColumnsAndIndexes(connection);
+                this.Report("Pruefe Spaltenbreiten...");
+                this.EnsureColumnCapacities(connection);
                 this.Report("Erstelle Trigger...");
                 this.CreateTriggers(connection);
                 this.Report("Pruefe Standarddaten...");
@@ -170,9 +172,71 @@ namespace MediaBrowser4.DB.Maria
             }
         }
 
-        private HashSet<string> GetExistingColumns(MySqlConnection connection, string tableName)
+        private void EnsureColumnCapacities(MySqlConnection connection)
         {
-            HashSet<string> result = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            string dataType;
+            long maxLength;
+
+            if (TryGetColumnInfo(connection, "LAYERS", "EDIT", out dataType, out maxLength)
+                && !IsTextType(dataType)
+                && !((String.Equals(dataType, "varchar", StringComparison.OrdinalIgnoreCase)
+                    || String.Equals(dataType, "char", StringComparison.OrdinalIgnoreCase))
+                    && maxLength >= 64))
+            {
+                this.Execute(connection,
+                    "ALTER TABLE " + QuoteIdentifier("LAYERS") + " MODIFY COLUMN "
+                    + QuoteIdentifier("EDIT") + " VARCHAR(64) NULL");
+            }
+
+            if (TryGetColumnInfo(connection, "METADATA", "VALUE", out dataType, out maxLength)
+                && !IsTextType(dataType))
+            {
+                this.Execute(connection,
+                    "ALTER TABLE " + QuoteIdentifier("METADATA") + " MODIFY COLUMN "
+                    + QuoteIdentifier("VALUE") + " TEXT NULL");
+            }
+        }
+
+        private bool TryGetColumnInfo(MySqlConnection connection, string tableName, string columnName,
+            out string dataType, out long maxLength)
+        {
+            dataType = null;
+            maxLength = 0;
+
+            using (MySqlCommand command = connection.CreateCommand())
+            {
+                command.CommandText =
+                    "SELECT DATA_TYPE, CHARACTER_MAXIMUM_LENGTH FROM INFORMATION_SCHEMA.COLUMNS " +
+                    "WHERE TABLE_SCHEMA = @schema AND TABLE_NAME = @table AND COLUMN_NAME = @column";
+                command.Parameters.AddWithValue("@schema", this.options.Database);
+                command.Parameters.AddWithValue("@table", tableName);
+                command.Parameters.AddWithValue("@column", columnName);
+
+                using (MySqlDataReader reader = command.ExecuteReader())
+                {
+                    if (!reader.Read())
+                        return false;
+
+                    dataType = reader.GetString(0);
+
+                    if (!reader.IsDBNull(1))
+                        maxLength = Convert.ToInt64(reader.GetValue(1));
+
+                    return true;
+                }
+            }
+        }
+
+        private static bool IsTextType(string dataType)
+        {
+            return String.Equals(dataType, "tinytext", StringComparison.OrdinalIgnoreCase)
+                || String.Equals(dataType, "text", StringComparison.OrdinalIgnoreCase)
+                || String.Equals(dataType, "mediumtext", StringComparison.OrdinalIgnoreCase)
+                || String.Equals(dataType, "longtext", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private HashSet<string> GetExistingColumns(MySqlConnection connection, string tableName)
+        {            HashSet<string> result = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
             using (MySqlCommand command = connection.CreateCommand())
             {
@@ -467,6 +531,7 @@ namespace MediaBrowser4.DB.Maria
                 "MEDIAFILES_FK BIGINT NOT NULL, " +
                 "`POSITION` INT NOT NULL DEFAULT 1, " +
                 "NAME VARCHAR(50) NULL, " +
+                "DESCRIPTION VARCHAR(512) NULL, " +
                 "THUMB LONGBLOB NULL, " +
                 "PRIMARY KEY (ID), " +
                 "KEY idx_variations_mediafiles (MEDIAFILES_FK)" +
@@ -485,7 +550,7 @@ namespace MediaBrowser4.DB.Maria
                 "ID BIGINT NOT NULL AUTO_INCREMENT, " +
                 "VARIATIONS_FK BIGINT NOT NULL, " +
                 "`POSITION` INT NOT NULL, " +
-                "EDIT CHAR(4) NULL, " +
+                "EDIT VARCHAR(64) NULL, " +
                 "ACTION VARCHAR(512) NULL, " +
                 "PRIMARY KEY (ID), " +
                 "KEY idx_layers_variations (VARIATIONS_FK)" +
@@ -542,6 +607,7 @@ namespace MediaBrowser4.DB.Maria
                 "CREATE TABLE IF NOT EXISTS CATEGORIZE (" +
                 "CATEGORY_FK BIGINT NOT NULL, " +
                 "VARIATIONS_FK BIGINT NOT NULL, " +
+                "USERDEFINED BOOLEAN NOT NULL DEFAULT TRUE, " +
                 "PRIMARY KEY (CATEGORY_FK, VARIATIONS_FK), " +
                 "KEY idx_categorize_variations (VARIATIONS_FK), " +
                 "KEY idx_categorize_category (CATEGORY_FK)" +
@@ -562,7 +628,7 @@ namespace MediaBrowser4.DB.Maria
                 "CREATE TABLE IF NOT EXISTS METADATA (" +
                 "MEDIAFILES_FK BIGINT NOT NULL, " +
                 "METANAME_FK BIGINT NOT NULL, " +
-                "`VALUE` VARCHAR(255) NULL, " +
+                "`VALUE` TEXT NULL, " +
                 "KEY idx_metadata_mediafiles (MEDIAFILES_FK), " +
                 "KEY idx_metadata_metaname (METANAME_FK)" +
                 ") " + TableOptions);
@@ -734,6 +800,15 @@ namespace MediaBrowser4.DB.Maria
             }
         }
 
+        public void ApplyDefaults()
+        {
+            using (MySqlConnection connection = new MySqlConnection(this.options.BuildConnectionString(this.options.Database)))
+            {
+                connection.Open();
+                this.Seed(connection);
+            }
+        }
+
         private void Seed(MySqlConnection connection)
         {
             this.SetProperty(connection, "DBVersion", UpdateDb.DbVersion);
@@ -760,12 +835,24 @@ namespace MediaBrowser4.DB.Maria
             this.Execute(connection, "INSERT IGNORE INTO ROLES (`ROLE`) VALUES ('PUBLIC')");
             this.Execute(connection, "INSERT IGNORE INTO ROLES (`ROLE`) VALUES ('PRIVATE')");
 
-            this.InsertCategoryIfMissing(connection, "Tagebuch", "Tagebuch", "00002",
-                "Für jeden Tag wird eine Kategorie angelegt", 1, 1, 0);
-            this.InsertCategoryIfMissing(connection, "Orte", "Orte", "00001",
-                "Kategorien die geographisch zuordenbar sind", 1, 0, 1);
-            this.InsertCategoryIfMissing(connection, "Verschlagwortung", "Verschlagwortung", "00000",
-                "Über die schnelle Verschlagwortung angelegte Kategorien", 0, 0, 0);
+            if (GetCategoryCount(connection) == 0)
+            {
+                this.InsertCategoryIfMissing(connection, "Tagebuch", "Tagebuch", "00002",
+                    "Für jeden Tag wird eine Kategorie angelegt", 1, 1, 0);
+                this.InsertCategoryIfMissing(connection, "Orte", "Orte", "00001",
+                    "Kategorien die geographisch zuordenbar sind", 1, 0, 1);
+                this.InsertCategoryIfMissing(connection, "Verschlagwortung", "Verschlagwortung", "00000",
+                    "Über die schnelle Verschlagwortung angelegte Kategorien", 0, 0, 0);
+            }
+        }
+
+        private static long GetCategoryCount(MySqlConnection connection)
+        {
+            using (MySqlCommand command = connection.CreateCommand())
+            {
+                command.CommandText = "SELECT COUNT(*) FROM CATEGORY";
+                return Convert.ToInt64(command.ExecuteScalar());
+            }
         }
 
         private void SetProperty(MySqlConnection connection, string key, string value)

@@ -62,6 +62,10 @@
                         <MenuItem Header="Geodaten (*.kml)" ToolTip="Lese KML-Dateien aus Ordner ein" Click="MenuItemImportGeoData_Click"/>
                     </MenuItem>
                     <MenuItem Name="MenuItemOpenFromList" Header="Aus Liste öffnen" ToolTip="Sucht Medien anhand der Dateinamen einer Liste." Click="MenuItemOpenFromList_Click"  />
+                    <Separator />
+                    <MenuItem Name="MenuItemMigrateSqliteToMariaDb" Header="SQLite-Datenbank nach MariaDB migrieren..."
+                              ToolTip="Migriert eine bestehende SQLite-Datenbank inklusive Thumbnail-Datenbank in die aktuelle MariaDB-Datenbank. Die Zieldatenbank wird vorher geleert."
+                              IsEnabled="False" Click="MenuItemMigrateSqliteToMariaDb_Click" />
                     <!--<MenuItem  Header="Metadaten" >
                         <MenuItem Header="Freetec Datalogger" Click="FreetecDatalogger_Click" />
                     </MenuItem>

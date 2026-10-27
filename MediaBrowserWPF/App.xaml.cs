@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
+using System.Diagnostics;
 using System.Linq;
+using System.Text;
 using System.Windows;
 using MediaBrowser4;
 using System.IO;
@@ -29,6 +31,10 @@ namespace MediaBrowserWPF
             "--db-name <database> --db-user <user> [--db-password <password> | " +
             "--db-password-env <ENV_NAME> | --db-password-file <path>] " +
             "[--db-ssl-mode None|Preferred|Required|VerifyCA|VerifyFull] [--update] [<init-folder>]";
+
+        private static string[] startupArguments = new string[0];
+
+        internal static bool SuppressPropertySaveOnExit { get; set; }
 
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern bool AttachConsole(uint dwProcessId);
@@ -59,6 +65,7 @@ namespace MediaBrowserWPF
         private void Application_Startup(object sender, StartupEventArgs e)
         {
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+            startupArguments = e.Args ?? new string[0];
 
             SplashScreen ss = new SplashScreen("Images\\Splash.jpg");
             ss.Show(true, true);
@@ -162,6 +169,77 @@ namespace MediaBrowserWPF
         {
             MessageBox.Show(message, "MediaBrowserWPF");
             Application.Current.Shutdown();
+        }
+
+        internal static void RestartApplication()
+        {
+            SuppressPropertySaveOnExit = true;
+
+            try
+            {
+                string executablePath = Process.GetCurrentProcess().MainModule.FileName;
+                string arguments = String.Join(" ", startupArguments.Select(QuoteArgument));
+
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = executablePath,
+                    Arguments = arguments,
+                    WorkingDirectory = Environment.CurrentDirectory,
+                    UseShellExecute = false
+                });
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    "MediaBrowser konnte nicht automatisch neu gestartet werden." + Environment.NewLine +
+                    Environment.NewLine + ex.Message,
+                    "Neustart fehlgeschlagen");
+
+                return;
+            }
+
+            Application.Current.Shutdown();
+        }
+
+        private static string QuoteArgument(string argument)
+        {
+            if (String.IsNullOrEmpty(argument))
+                return "\"\"";
+
+            if (argument.IndexOfAny(new[] { ' ', '\t', '\n', '\v', '"' }) < 0)
+                return argument;
+
+            StringBuilder builder = new StringBuilder();
+            builder.Append('"');
+            int backslashes = 0;
+
+            foreach (char c in argument)
+            {
+                if (c == '\\')
+                {
+                    backslashes++;
+                }
+                else if (c == '"')
+                {
+                    builder.Append('\\', backslashes * 2 + 1);
+                    builder.Append('"');
+                    backslashes = 0;
+                }
+                else
+                {
+                    if (backslashes > 0)
+                        builder.Append('\\', backslashes);
+
+                    builder.Append(c);
+                    backslashes = 0;
+                }
+            }
+
+            if (backslashes > 0)
+                builder.Append('\\', backslashes * 2);
+
+            builder.Append('"');
+            return builder.ToString();
         }
 
         private static StartupArguments ParseArguments(string[] args)
@@ -466,7 +544,10 @@ namespace MediaBrowserWPF
         private void Application_Exit(object sender, ExitEventArgs e)
         {
             MediaBrowserWPF.Properties.Settings.Default.Save();
-            MediaBrowserContext.SaveDBProperties();
+
+            if (!SuppressPropertySaveOnExit)
+                MediaBrowserContext.SaveDBProperties();
+
             MediaBrowserContext.RealeaseWriteprotection();
 
             //aufräumen

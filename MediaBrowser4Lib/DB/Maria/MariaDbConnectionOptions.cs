@@ -11,6 +11,7 @@ namespace MediaBrowser4.DB.Maria
         public string Password { get; set; }
         public MySqlSslMode SslMode { get; set; }
         public uint ConnectionTimeout { get; set; }
+        public bool AllowLoadLocalInfile { get; set; }
 
         public MariaDbConnectionOptions()
         {
@@ -37,7 +38,8 @@ namespace MediaBrowser4.DB.Maria
                 ConnectionTimeout = this.ConnectionTimeout,
                 ConvertZeroDateTime = true,
                 TreatTinyAsBoolean = true,
-                AllowUserVariables = false
+                AllowUserVariables = false,
+                AllowLoadLocalInfile = this.AllowLoadLocalInfile
             };
 
             return builder.ConnectionString;

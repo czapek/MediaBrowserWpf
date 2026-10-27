@@ -88,6 +88,7 @@ namespace MediaBrowserWPF
                 {
                     this.DatabasesInFolder.Items.Clear();
                     this.DatabasesInFolder.IsEnabled = false;
+                    this.MenuItemMigrateSqliteToMariaDb.IsEnabled = true;
                 }
                 else
                 {
@@ -1379,6 +1380,21 @@ namespace MediaBrowserWPF
                     this.imageViewer.Title = "Kein Vorschaubild vorhanden";
                 }
             }
+        }
+
+        private void MenuItemMigrateSqliteToMariaDb_Click(object sender, RoutedEventArgs e)
+        {
+            MariaDbProvider provider = MediaBrowserContext.MainDBProvider as MariaDbProvider;
+
+            if (provider == null)
+                return;
+
+            SqliteToMariaDbMigrationDialog dialog = new SqliteToMariaDbMigrationDialog(provider.Options)
+            {
+                Owner = this
+            };
+
+            dialog.ShowDialog();
         }
 
         private void MenuItemImportMetadata_Click(object sender, RoutedEventArgs e)

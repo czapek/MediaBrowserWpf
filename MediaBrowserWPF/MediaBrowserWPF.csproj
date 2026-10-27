@@ -213,6 +213,9 @@
       <DependentUpon>TagEditor.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\TagEditorSingleton.cs" />
+    <Compile Include="Dialogs\SqliteToMariaDbMigrationDialog.xaml.cs">
+      <DependentUpon>SqliteToMariaDbMigrationDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\VariationDialog.xaml.cs">
       <DependentUpon>VariationDialog.xaml</DependentUpon>
     </Compile>
@@ -413,6 +416,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\Tag.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\SqliteToMariaDbMigrationDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
