@@ -209,9 +209,14 @@ Die Migration:
 - leert die MariaDB-Zieldatenbank vor dem Import,
 - übernimmt Katalogdaten, Variationen, Metadaten, Kategorien, GPS-/Meteorologiedaten und Thumbnails,
 - übernimmt `VARIATIONS.DESCRIPTION` und `CATEGORIZE.USERDEFINED`,
+- legt die Haupt-Thumbnails als `THUMBS`-Einträge mit `PREVIEW_WIDTH=0` und `PREVIEW_HEIGHT=0` ab,
 - setzt `CATEGORY.DATE`-Werte vor `1000-01-01` auf `NULL` (typischerweise `0001-01-01`),
 - übernimmt keine verwaisten Datensätze,
 - validiert am Ende die Zeilenzahlen und startet die Anwendung neu.
+
+Die Spalte `VARIATIONS.THUMB` wird vom MariaDB-Provider nicht für die normale
+Thumbnail-Anzeige verwendet. Maßgeblich sind die Einträge in `THUMBS` mit
+`PREVIEW_WIDTH=0` und `PREVIEW_HEIGHT=0`.
 
 Verwaiste Datensätze werden nicht importiert. Dazu zählen insbesondere:
 

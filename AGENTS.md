@@ -182,6 +182,8 @@ Verhalten, das beibehalten werden muss:
 - Quelldatenbanken werden nur lesend geöffnet.
 - Die Zieldatenbank wird vor dem Import vollständig geleert.
 - `VARIATIONS.DESCRIPTION` und `CATEGORIZE.USERDEFINED` werden übernommen.
+- Haupt-Thumbnails werden in `THUMBS` mit `PREVIEW_WIDTH=0` und `PREVIEW_HEIGHT=0` abgelegt.
+  `VARIATIONS.THUMB` wird vom MariaDB-Provider nicht für die normale Thumbnail-Anzeige verwendet.
 - `CATEGORY.DATE`-Werte vor `1000-01-01` werden auf `NULL` gesetzt.
 - Verwaiste Datensätze werden nicht importiert:
   - `VARIATIONS` ohne gültige `MEDIAFILES`-Referenz

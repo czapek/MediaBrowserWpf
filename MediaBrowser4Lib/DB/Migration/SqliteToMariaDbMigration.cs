@@ -1571,7 +1571,7 @@ namespace MediaBrowser4.DB.Migration
                 new[] { "POSITION", "EDIT", "ACTION", "VARIATIONS_FK" }));
 
             tables.Add(new MigrationTable("THUMBS", true,
-                "SELECT VARIATIONS_FK, 150, 150, ISOUTDATED, THUMB, 'jpg', " +
+                "SELECT VARIATIONS_FK, 0, 0, ISOUTDATED, THUMB, 'jpg', " +
                 "CAST(NULL AS INTEGER), CAST(NULL AS INTEGER) FROM THUMBS " +
                 "WHERE EXISTS (SELECT 1 FROM _validvariations v WHERE v.ID = THUMBS.VARIATIONS_FK)",
                 new[]
