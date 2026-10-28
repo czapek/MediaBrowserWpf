@@ -1,0 +1,1993 @@
+openapi: 3.0.3
+info:
+  title: MediaBrowser Spring API
+  version: 1.0.0
+  description: >
+    REST-Vertrag für das Spring-Boot-Backend des MediaBrowserWpf-ApiProviders.
+    Die API verwendet JSON (UTF-8). Binärdaten wie Thumbnails werden als
+    Base64-Byte-Arrays übertragen, ausgenommen der direkte Thumbnail-Download.
+
+servers:
+  - url: /api/v1
+
+security:
+  - bearerAuth: []
+
+tags:
+  - name: auth
+  - name: catalog
+  - name: folders
+  - name: categories
+  - name: mediafiles
+  - name: variations
+  - name: previews
+  - name: metadata
+  - name: descriptions
+  - name: attachments
+  - name: roles
+  - name: gps
+  - name: meteorology
+  - name: requests
+  - name: duplicates
+  - name: maintenance
+
+paths:
+  /auth/login:
+    post:
+      tags: [auth]
+      operationId: login
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Access- und Refresh-Token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        '401':
+          description: Ungültige Zugangsdaten
+  /auth/refresh:
+    post:
+      tags: [auth]
+      operationId: refreshToken
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshRequest'
+      responses:
+        '200':
+          description: Neuer Access-Token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        '401':
+          description: Refresh-Token ungültig oder abgelaufen
+  /auth/logout:
+    post:
+      tags: [auth]
+      operationId: logout
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshRequest'
+      responses:
+        '204':
+          description: Refresh-Token widerrufen
+
+  /catalog/validate:
+    get:
+      tags: [catalog]
+      operationId: validateCatalog
+      responses:
+        '200':
+          description: Katalogstatus
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CatalogInfo'
+  /catalog/create:
+    post:
+      tags: [catalog]
+      operationId: createCatalog
+      responses:
+        '204':
+          description: Katalog wurde angelegt
+  /catalog/properties:
+    get:
+      tags: [catalog]
+      operationId: getCatalogProperties
+      responses:
+        '200':
+          description: Katalogweite Eigenschaften
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+    put:
+      tags: [catalog]
+      operationId: saveCatalogProperties
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties:
+                type: string
+      responses:
+        '204':
+          description: Eigenschaften gespeichert
+  /catalog/last-folders:
+    get:
+      tags: [catalog]
+      operationId: getLastAddedFolders
+      responses:
+        '200':
+          description: Zuletzt hinzugefügte Ordner
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+                  format: date-time
+
+  /folders:
+    get:
+      tags: [folders]
+      operationId: getFolders
+      responses:
+        '200':
+          description: Ordnerliste
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Folder'
+  /folders/ensure:
+    post:
+      tags: [folders]
+      operationId: ensureFolder
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Folder'
+      responses:
+        '200':
+          description: Angelegter oder bestehender Ordner
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Folder'
+  /folders/{id}:
+    delete:
+      tags: [folders]
+      operationId: deleteFolder
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '204':
+          description: Ordner gelöscht
+  /folders/{id}/count:
+    get:
+      tags: [folders]
+      operationId: countFolderItems
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Anzahl der Medien im Ordner
+          content:
+            application/json:
+              schema:
+                type: integer
+
+  /categories/tree:
+    get:
+      tags: [categories]
+      operationId: getCategoryTree
+      responses:
+        '200':
+          description: Flache Kategorienliste mit Parent-Beziehungen
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Category'
+  /categories:
+    get:
+      tags: [categories]
+      operationId: getCategoriesForVariation
+      parameters:
+        - name: variationId
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Kategorien einer Variation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Category'
+    post:
+      tags: [categories]
+      operationId: saveCategory
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Category'
+      responses:
+        '200':
+          description: Gespeicherte Kategorie
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+  /categories/by-path:
+    post:
+      tags: [categories]
+      operationId: saveCategoryByPath
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PathRequest'
+      responses:
+        '200':
+          description: Kategorie anhand des Pfads
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+  /categories/{id}:
+    delete:
+      tags: [categories]
+      operationId: deleteCategory
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '204':
+          description: Kategorie gelöscht
+  /categories/geo:
+    get:
+      tags: [categories]
+      operationId: getGeoCategories
+      parameters:
+        - name: kind
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [diary, location]
+        - name: longitude
+          in: query
+          schema:
+            type: number
+        - name: width
+          in: query
+          schema:
+            type: number
+        - name: latitude
+          in: query
+          schema:
+            type: number
+        - name: height
+          in: query
+          schema:
+            type: number
+      responses:
+        '200':
+          description: Kategorien im Geodatenbereich
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Category'
+  /categories/from-media:
+    post:
+      tags: [categories]
+      operationId: getCategoriesFromMedia
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: integer
+      responses:
+        '200':
+          description: Kategorien mit Anzahl pro Variation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CategoryCount'
+  /categories/identifiers/{variationId}:
+    get:
+      tags: [categories]
+      operationId: getCategoryIdentifiers
+      parameters:
+        - $ref: '#/components/parameters/VariationId'
+      responses:
+        '200':
+          description: Kategorie-IDs einer Variation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: integer
+
+  /mediafiles/query:
+    post:
+      tags: [mediafiles]
+      operationId: queryMediaFiles
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MediaQuery'
+      responses:
+        '200':
+          description: Gefundene Medien
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MediaItem'
+  /mediafiles/sql-query:
+    post:
+      tags: [mediafiles]
+      operationId: executeSqlQuery
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SqlQuery'
+      responses:
+        '200':
+          description: Medien aus SQL-Abfrage
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MediaItem'
+  /mediafiles/sql-request:
+    get:
+      tags: [mediafiles]
+      operationId: getSqlRequest
+      parameters:
+        - name: mediaItemIds
+          in: query
+          required: true
+          schema:
+            type: string
+            example: 1,2,3
+      responses:
+        '200':
+          description: SQL-Anfrage für eine Medienliste
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SqlQuery'
+  /mediafiles/insert:
+    post:
+      tags: [mediafiles]
+      operationId: insertMediaFile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MediaInsert'
+      responses:
+        '200':
+          description: Ergebnis des Imports
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InsertResult'
+  /mediafiles/{id}:
+    get:
+      tags: [mediafiles]
+      operationId: getMediaFile
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Medienobjekt
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MediaItem'
+        '404':
+          description: Nicht gefunden
+    put:
+      tags: [mediafiles]
+      operationId: updateMediaFile
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MediaItem'
+      responses:
+        '204':
+          description: Medienobjekt aktualisiert
+  /mediafiles/{id}/description:
+    get:
+      tags: [mediafiles]
+      operationId: getMediaDescription
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Beschreibung
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Text'
+  /mediafiles/{id}/variations:
+    get:
+      tags: [mediafiles, variations]
+      operationId: getVariations
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - name: includeThumbs
+          in: query
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: Variationen des Medienobjekts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Variation'
+    post:
+      tags: [mediafiles, variations]
+      operationId: createVariation
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VariationCreate'
+      responses:
+        '200':
+          description: Neue Variation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Variation'
+    delete:
+      tags: [mediafiles, variations]
+      operationId: deleteVariationByName
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - name: name
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Variation entfernt
+  /mediafiles/{id}/variations/replace:
+    post:
+      tags: [mediafiles, variations]
+      operationId: replaceVariations
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Variation'
+      responses:
+        '200':
+          description: Neue Variationen
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Variation'
+  /mediafiles/actions:
+    post:
+      tags: [mediafiles]
+      operationId: executeMediaAction
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MediaAction'
+      responses:
+        '204':
+          description: Aktion ausgeführt
+  /mediafiles/thumbs:
+    post:
+      tags: [mediafiles]
+      operationId: getThumbs
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: integer
+      responses:
+        '200':
+          description: Thumbnails
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Thumb'
+  /mediafiles/checksum-count:
+    get:
+      tags: [mediafiles]
+      operationId: getChecksumCount
+      parameters:
+        - name: checksum
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Anzahl der Treffer
+          content:
+            application/json:
+              schema:
+                type: integer
+  /mediafiles/from-xml:
+    post:
+      tags: [mediafiles]
+      operationId: importXml
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/XmlImport'
+      responses:
+        '200':
+          description: Importierte Medien in Reihenfolge der Anfrage
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MediaItem'
+
+  /variations/{id}:
+    put:
+      tags: [variations]
+      operationId: updateVariation
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Variation'
+      responses:
+        '204':
+          description: Variation aktualisiert
+    delete:
+      tags: [variations]
+      operationId: deleteVariation
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '204':
+          description: Variation gelöscht
+  /variations/{id}/default:
+    post:
+      tags: [variations]
+      operationId: setDefaultVariation
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '204':
+          description: Variation ist jetzt Standard
+  /variations/{id}/layers:
+    get:
+      tags: [variations]
+      operationId: getLayers
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Ebenen der Variation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Layer'
+    put:
+      tags: [variations]
+      operationId: setLayers
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Layer'
+      responses:
+        '204':
+          description: Ebenen gespeichert
+  /variations/{id}/thumb:
+    get:
+      tags: [variations, mediafiles]
+      operationId: getThumb
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - name: width
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: height
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        '200':
+          description: Thumbnail-Binärdaten
+          content:
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: Kein Thumbnail vorhanden
+    put:
+      tags: [variations, mediafiles]
+      operationId: setThumb
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ThumbUpload'
+      responses:
+        '204':
+          description: Thumbnail gespeichert
+
+  /previews/{variationId}:
+    get:
+      tags: [previews]
+      operationId: getPreview
+      parameters:
+        - $ref: '#/components/parameters/VariationId'
+        - name: width
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: height
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Vorschau
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Preview'
+        '404':
+          description: Keine Vorschau vorhanden
+  /previews/exists:
+    get:
+      tags: [previews]
+      operationId: previewExists
+      parameters:
+        - name: variationId
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: width
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: height
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Vorschau vorhanden
+          content:
+            application/json:
+              schema:
+                type: boolean
+  /previews:
+    delete:
+      tags: [previews]
+      operationId: deletePreviews
+      parameters:
+        - name: width
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: height
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: variationIds
+          in: query
+          required: true
+          schema:
+            type: string
+            example: 1,2,3
+      responses:
+        '204':
+          description: Vorschauen gelöscht
+  /previews/build:
+    post:
+      tags: [previews]
+      operationId: buildPreviews
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ThumbBuild'
+      responses:
+        '204':
+          description: Vorschauen erzeugt
+  /previews/variation-ids:
+    get:
+      tags: [previews]
+      operationId: getPreviewVariationIds
+      parameters:
+        - name: width
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: height
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Variations-IDs mit Vorschau
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: integer
+
+  /faces/previews/{variationId}:
+    get:
+      tags: [previews]
+      operationId: getFacePreview
+      parameters:
+        - $ref: '#/components/parameters/VariationId'
+        - name: width
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: height
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Gesichter der Vorschau
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FacePreview'
+  /faces:
+    get:
+      tags: [previews]
+      operationId: getFaceCounts
+      parameters:
+        - name: width
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: height
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: min
+          in: query
+          required: true
+          schema:
+            type: number
+        - name: max
+          in: query
+          required: true
+          schema:
+            type: number
+        - name: countMin
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: countMax
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: variationIds
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Gesichtsanzahl je Variation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FaceCount'
+
+  /metadata/query:
+    post:
+      tags: [metadata]
+      operationId: queryMetadata
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: integer
+      responses:
+        '200':
+          description: Metadaten der Medien
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MetaData'
+  /metadata/keys:
+    get:
+      tags: [metadata]
+      operationId: getMetadataKeys
+      responses:
+        '200':
+          description: Metadaten-Schlüssel
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+
+  /descriptions/query:
+    post:
+      tags: [descriptions]
+      operationId: queryDescriptions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: integer
+      responses:
+        '200':
+          description: Beschreibungen
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Description'
+  /descriptions:
+    post:
+      tags: [descriptions]
+      operationId: saveDescription
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Description'
+      responses:
+        '204':
+          description: Beschreibung gespeichert
+
+  /attachments/query:
+    post:
+      tags: [attachments]
+      operationId: queryAttachments
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: integer
+      responses:
+        '200':
+          description: Anhänge
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Attachment'
+  /attachments:
+    post:
+      tags: [attachments]
+      operationId: saveAttachments
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Attachment'
+      responses:
+        '204':
+          description: Anhänge gespeichert
+
+  /roles:
+    get:
+      tags: [roles]
+      operationId: getRoles
+      responses:
+        '200':
+          description: Rollen
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Role'
+
+  /gps/points:
+    post:
+      tags: [gps]
+      operationId: insertGpsPoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/GeoPoint'
+      responses:
+        '204':
+          description: GPS-Punkte gespeichert
+  /gps/nearest:
+    get:
+      tags: [gps]
+      operationId: getNearestGpsPoint
+      parameters:
+        - name: date
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: Nächster GPS-Punkt
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeoPoint'
+        '404':
+          description: Kein GPS-Punkt vorhanden
+  /gps/files:
+    get:
+      tags: [gps]
+      operationId: getGpsFiles
+      responses:
+        '200':
+          description: GPS-Dateien
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GpsFile'
+    delete:
+      tags: [gps]
+      operationId: deleteGpsFile
+      parameters:
+        - name: fileTime
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '204':
+          description: GPS-Datei entfernt
+  /gps:
+    get:
+      tags: [gps]
+      operationId: getGpsPoints
+      parameters:
+        - name: from
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+        - name: to
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: GPS-Punkte im Zeitraum
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GeoPoint'
+
+  /meteorology:
+    get:
+      tags: [meteorology]
+      operationId: getMeteorology
+      parameters:
+        - name: from
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+        - name: to
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: Meteorologiedaten
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Meteorology'
+    post:
+      tags: [meteorology]
+      operationId: insertMeteorology
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Meteorology'
+      responses:
+        '204':
+          description: Meteorologiedaten gespeichert
+
+  /requests:
+    get:
+      tags: [requests]
+      operationId: getRequests
+      responses:
+        '200':
+          description: Benutzerdefinierte Anfragen
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserRequest'
+    post:
+      tags: [requests]
+      operationId: saveRequest
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+      responses:
+        '200':
+          description: Gespeicherte Anfrage
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserRequest'
+  /requests/{id}:
+    delete:
+      tags: [requests]
+      operationId: deleteRequest
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '204':
+          description: Anfrage gelöscht
+  /requests/{id}/sql:
+    get:
+      tags: [requests]
+      operationId: getRequestSql
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: SQL der Anfrage
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Text'
+    put:
+      tags: [requests]
+      operationId: setRequestSql
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Text'
+      responses:
+        '204':
+          description: SQL gespeichert
+
+  /duplicates/check:
+    post:
+      tags: [duplicates]
+      operationId: checkDuplicate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MediaAction'
+      responses:
+        '200':
+          description: Ist das Medium ein Duplikat?
+          content:
+            application/json:
+              schema:
+                type: boolean
+  /duplicates/{id}:
+    get:
+      tags: [duplicates]
+      operationId: getDuplicatesForMedia
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - name: criteria
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [CHECKSUM, FILENAME, CONTAINS]
+      responses:
+        '200':
+          description: Duplikate
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Duplicate'
+
+  /maintenance/clean:
+    post:
+      tags: [maintenance]
+      operationId: cleanCatalog
+      responses:
+        '204':
+          description: Katalog bereinigt
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+
+  parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+    VariationId:
+      name: variationId
+      in: path
+      required: true
+      schema:
+        type: integer
+
+  schemas:
+    LoginRequest:
+      type: object
+      required: [username, password]
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+          format: password
+        tenant:
+          type: string
+    RefreshRequest:
+      type: object
+      required: [refreshToken]
+      properties:
+        refreshToken:
+          type: string
+    TokenResponse:
+      type: object
+      required: [accessToken, expiresIn]
+      properties:
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+        tokenType:
+          type: string
+          example: Bearer
+        expiresIn:
+          type: integer
+          description: Gültigkeit des Access-Tokens in Sekunden
+          example: 600
+    CatalogInfo:
+      type: object
+      properties:
+        valid:
+          type: boolean
+        guid:
+          type: string
+        dbName:
+          type: string
+        user:
+          type: string
+        host:
+          type: string
+        message:
+          type: string
+    Folder:
+      type: object
+      properties:
+        id:
+          type: integer
+        foldername:
+          type: string
+        itemCount:
+          type: integer
+    Category:
+      type: object
+      properties:
+        id:
+          type: integer
+        parentId:
+          type: integer
+        name:
+          type: string
+        sortname:
+          type: string
+        description:
+          type: string
+        fullPath:
+          type: string
+        guid:
+          type: string
+        isDate:
+          type: boolean
+        isLocation:
+          type: boolean
+        isUnique:
+          type: boolean
+        date:
+          type: string
+          format: date-time
+          nullable: true
+        longitude:
+          type: number
+          nullable: true
+        latitude:
+          type: number
+          nullable: true
+        itemCount:
+          type: integer
+    CategoryCount:
+      type: object
+      properties:
+        category:
+          $ref: '#/components/schemas/Category'
+        count:
+          type: integer
+    Layer:
+      type: object
+      properties:
+        position:
+          type: integer
+        edit:
+          type: string
+        action:
+          type: string
+    Variation:
+      type: object
+      properties:
+        id:
+          type: integer
+        mediaItemId:
+          type: integer
+        position:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        isOutdated:
+          type: boolean
+        thumb:
+          type: string
+          format: byte
+          nullable: true
+        layers:
+          type: array
+          items:
+            $ref: '#/components/schemas/Layer'
+    VariationCreate:
+      type: object
+      properties:
+        name:
+          type: string
+        setDefault:
+          type: boolean
+        layerAction:
+          type: string
+        layerEdit:
+          type: string
+        thumb:
+          type: string
+          format: byte
+          nullable: true
+    MediaItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        filename:
+          type: string
+        foldername:
+          type: string
+        sortorder:
+          type: string
+        md5Value:
+          type: string
+        fileLength:
+          type: integer
+          format: int64
+        width:
+          type: integer
+        height:
+          type: integer
+        viewed:
+          type: integer
+        duration:
+          type: number
+        frames:
+          type: integer
+        orientation:
+          type: integer
+        type:
+          type: string
+          enum: [rgb, dsh]
+        isBookmarked:
+          type: boolean
+        isDeleted:
+          type: boolean
+        isDuplicate:
+          type: boolean
+        isFileNotFound:
+          type: boolean
+        priority:
+          type: integer
+        roleId:
+          type: integer
+        variationId:
+          type: integer
+        defaultVariationId:
+          type: integer
+        currentVariationId:
+          type: integer
+          nullable: true
+        descriptionId:
+          type: integer
+          nullable: true
+        description:
+          type: string
+        creationDate:
+          type: string
+          format: date-time
+        mediaDate:
+          type: string
+          format: date-time
+        editDate:
+          type: string
+          format: date-time
+        insertDate:
+          type: string
+          format: date-time
+        longitude:
+          type: number
+          nullable: true
+        latitude:
+          type: number
+          nullable: true
+        isThumbOutdated:
+          type: boolean
+        thumb:
+          type: string
+          format: byte
+          nullable: true
+        metadata:
+          type: array
+          items:
+            $ref: '#/components/schemas/MetaData'
+    MediaInsert:
+      allOf:
+        - $ref: '#/components/schemas/MediaItem'
+        - type: object
+          properties:
+            variationName:
+              type: string
+            variationPosition:
+              type: integer
+            layers:
+              type: array
+              items:
+                $ref: '#/components/schemas/Layer'
+            categories:
+              type: array
+              items:
+                $ref: '#/components/schemas/Category'
+    InsertResult:
+      type: object
+      properties:
+        mediaItemId:
+          type: integer
+        variationId:
+          type: integer
+        defaultVariationId:
+          type: integer
+        isDuplicate:
+          type: boolean
+        message:
+          type: string
+    MediaQuery:
+      type: object
+      required: [mode]
+      properties:
+        mode:
+          type: string
+          enum: [SEARCH, FOLDERS, CATEGORIES, MISSING_CATEGORIES, MISSING_FILES, MISSING_THUMBS, FILES_FROM_LIST, FILES_FROM_CHECKSUM, SORT, DUPLICATES, GEO, VIRTUAL, TRASH, BOOKMARKS, CHECKSUM, FILENAME, FILE_PATH, REQUEST]
+        mediaItemIds:
+          type: array
+          items:
+            type: integer
+        folderIds:
+          type: array
+          items:
+            type: integer
+        categoryIds:
+          type: array
+          items:
+            type: integer
+        variationIds:
+          type: array
+          items:
+            type: integer
+        fileNames:
+          type: array
+          items:
+            type: string
+        filePath:
+          type: string
+        checksum:
+          type: string
+        sortString:
+          type: string
+        limit:
+          type: integer
+        storeView:
+          type: boolean
+        isIntersection:
+          type: boolean
+        isRecursive:
+          type: boolean
+        categoryRequestType:
+          type: string
+        searchToken:
+          $ref: '#/components/schemas/SearchToken'
+        longitude:
+          type: number
+        latitude:
+          type: number
+        width:
+          type: number
+        height:
+          type: number
+        requestTicket:
+          type: integer
+          format: int64
+        sql:
+          type: string
+        parameters:
+          type: array
+          items:
+            $ref: '#/components/schemas/SqlParameter'
+        sortFields:
+          type: array
+          items:
+            type: string
+        criteria:
+          type: string
+    SqlParameter:
+      type: object
+      properties:
+        name:
+          type: string
+        value: {}
+    SqlQuery:
+      type: object
+      properties:
+        sql:
+          type: string
+        sortString:
+          type: string
+        limit:
+          type: integer
+        parameters:
+          type: array
+          items:
+            $ref: '#/components/schemas/SqlParameter'
+    MediaAction:
+      type: object
+      required: [action]
+      properties:
+        action:
+          type: string
+          enum: [CHECK, SET_ROLE, SET_PRIORITY, SET_BOOKMARK, SET_DELETED, SET_TRASH, SET_GEODATA, ADJUST_MEDIA_DATE, ADD_VIEW_TIME, RENAME, COPY_TO_FOLDER, REMOVE_AND_RECYCLE, REMOVE_FROM_DB, ROTATE_90, CATEGORIZE, UNCATEGORIZE, UPDATE_DUPLICATE]
+        mediaItemIds:
+          type: array
+          items:
+            type: integer
+        variationIds:
+          type: array
+          items:
+            type: integer
+        categoryIds:
+          type: array
+          items:
+            type: integer
+        folderIds:
+          type: array
+          items:
+            type: integer
+        roleId:
+          type: integer
+        priority:
+          type: integer
+        flag:
+          type: boolean
+        longitude:
+          type: number
+        latitude:
+          type: number
+        newName:
+          type: string
+        mediaDate:
+          type: string
+          format: date-time
+        variationName:
+          type: string
+        layers:
+          type: array
+          items:
+            $ref: '#/components/schemas/Layer'
+        categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/Category'
+        criteria:
+          type: string
+        seconds:
+          type: integer
+    MetaData:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        groupName:
+          type: string
+        value:
+          type: string
+        type:
+          type: string
+        isVisible:
+          type: boolean
+        isNull:
+          type: boolean
+    Attachment:
+      type: object
+      properties:
+        id:
+          type: integer
+          nullable: true
+        fullName:
+          type: string
+        type:
+          type: string
+          enum: [STICKY, ATTACHED, DETACHE]
+        mediaItemIds:
+          type: array
+          items:
+            type: integer
+        isReferenced:
+          type: boolean
+        isShared:
+          type: boolean
+    Description:
+      type: object
+      properties:
+        id:
+          type: integer
+          nullable: true
+        value:
+          type: string
+        command:
+          type: string
+          enum: [SET_AND_CREATE_DESCRIPTION, SET_EXISTING_DESCRIPTION, REMOVE_FROM_MEDIAITEMS, DELETE_DESCRIPTION]
+        mediaItemIds:
+          type: array
+          items:
+            type: integer
+    Role:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        password:
+          type: string
+        description:
+          type: string
+    GeoPoint:
+      type: object
+      properties:
+        longitude:
+          type: number
+        latitude:
+          type: number
+        altitude:
+          type: number
+        localTime:
+          type: string
+          format: date-time
+        utcTime:
+          type: string
+          format: date-time
+        gpsFileSize:
+          type: integer
+          format: int64
+        gpsFileTime:
+          type: string
+          format: date-time
+        distanceMeter:
+          type: number
+        acceleration:
+          type: number
+    GpsFile:
+      type: object
+      properties:
+        filesize:
+          type: integer
+          format: int64
+        fileTime:
+          type: string
+          format: date-time
+    Meteorology:
+      type: object
+      properties:
+        logTime:
+          type: string
+          format: date-time
+        temperature:
+          type: number
+        humidity:
+          type: number
+    Preview:
+      type: object
+      properties:
+        binary:
+          type: string
+          format: byte
+        width:
+          type: integer
+        height:
+          type: integer
+        extension:
+          type: string
+        tempPath:
+          type: string
+    Face:
+      type: object
+      properties:
+        variationId:
+          type: integer
+        x:
+          type: integer
+        y:
+          type: integer
+        width:
+          type: integer
+        height:
+          type: integer
+        relativeSize:
+          type: number
+    FacePreview:
+      type: object
+      properties:
+        width:
+          type: integer
+        height:
+          type: integer
+        faces:
+          type: array
+          items:
+            $ref: '#/components/schemas/Face'
+    FaceCount:
+      type: object
+      properties:
+        variationId:
+          type: integer
+        count:
+          type: integer
+    Duplicate:
+      type: object
+      properties:
+        mediaItemId:
+          type: integer
+        value:
+          type: string
+    Thumb:
+      type: object
+      properties:
+        variationId:
+          type: integer
+        thumb:
+          type: string
+          format: byte
+        extension:
+          type: string
+        isOutdated:
+          type: boolean
+        width:
+          type: integer
+        height:
+          type: integer
+    ThumbUpload:
+      type: object
+      properties:
+        thumb:
+          type: string
+          format: byte
+        extension:
+          type: string
+        width:
+          type: integer
+        height:
+          type: integer
+        isOutdated:
+          type: boolean
+    UserRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        kind:
+          type: string
+          enum: [SEARCH, SQL]
+        payload:
+          type: string
+        limit:
+          type: integer
+    XmlNode:
+      type: object
+      properties:
+        sourceId:
+          type: string
+        xml:
+          type: string
+    XmlImport:
+      type: object
+      properties:
+        folderId:
+          type: integer
+        categoryIds:
+          type: array
+          items:
+            type: integer
+        nodes:
+          type: array
+          items:
+            $ref: '#/components/schemas/XmlNode'
+    SearchToken:
+      type: object
+      properties:
+        searchText1:
+          type: string
+        searchText1Not:
+          type: boolean
+        searchText1Description:
+          type: boolean
+        searchText1Category:
+          type: boolean
+        searchText1Filename:
+          type: boolean
+        searchText1Md5:
+          type: boolean
+        searchText1Folder:
+          type: boolean
+        searchText2:
+          type: string
+        searchText2Not:
+          type: boolean
+        searchText2Description:
+          type: boolean
+        searchText2Category:
+          type: boolean
+        searchText2Filename:
+          type: boolean
+        searchText2Md5:
+          type: boolean
+        searchText2Folder:
+          type: boolean
+        metaDataKey:
+          type: string
+        metaDataValue:
+          type: string
+        dateFromEnabled:
+          type: boolean
+        dateFrom:
+          type: string
+          format: date-time
+        dateToEnabled:
+          type: boolean
+        dateTo:
+          type: string
+          format: date-time
+        lengthFrom:
+          type: number
+        lengthTo:
+          type: number
+        durationFrom:
+          type: number
+        durationTo:
+          type: number
+        priorityFrom:
+          type: integer
+        priorityTo:
+          type: integer
+        dimensionFrom:
+          type: integer
+        dimensionTo:
+          type: integer
+        relationType:
+          type: string
+        mediaTypeRgb:
+          type: boolean
+        mediaTypeDirectShow:
+          type: boolean
+    Text:
+      type: object
+      properties:
+        value:
+          type: string
+    PathRequest:
+      type: object
+      properties:
+        path:
+          type: string
+        sortPath:
+          type: string
+    ThumbBuild:
+      type: object
+      properties:
+        files:
+          type: array
+          items:
+            type: string
+        width:
+          type: integer
+        height:
+          type: integer

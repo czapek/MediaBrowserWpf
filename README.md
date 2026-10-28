@@ -4,9 +4,9 @@ MediaBrowserWpf ist eine Windows-Desktop-Anwendung zur Verwaltung, Kategorisieru
 großer Foto-, Video- und Medienarchive.
 
 Die Anwendung ist eine WPF-Anwendung auf Basis von .NET Framework 4.8. Sie unterstützt historisch
-gewachsene SQLite-Datenbanken sowie eine MariaDB als zentralen Datenbank-Backend. Der Schwerpunkt
-liegt auf einem schnellen Medienkatalog mit Thumbnails, Metadaten, Kategorien, Variationen,
-Geodaten und unterschiedlichen Viewern.
+gewachsene SQLite-Datenbanken, eine MariaDB als zentralen Datenbank-Backend sowie einen
+HTTP-Provider für ein Spring-Boot-Backend. Der Schwerpunkt liegt auf einem schnellen Medienkatalog
+mit Thumbnails, Metadaten, Kategorien, Variationen, Geodaten und unterschiedlichen Viewern.
 
 Lizenz: GNU General Public License v3 (siehe `LICENSE`).
 
@@ -41,6 +41,10 @@ Lizenz: GNU General Public License v3 (siehe `LICENSE`).
 | `Resources` | Native und Drittanbieter-Assemblies, z. B. DirectShowLib, WPFMediaKit und MediaInfo |
 | `WPF-MediaKit` | MediaKit-Quellen und -Ressourcen |
 | `scripts` | Hilfsskripte für MariaDB, u. a. zum Löschen aller Tabellen |
+| `docs/openapi.yaml` | OpenAPI-Vertrag für den Spring-Boot-API-Provider |
+| `docs/backend-implementation-plan.md` | Implementierungsplan für das Spring-Boot-Backend |
+| `docs/api-filesystem-access-plan.md` | Bestandsaufnahme und Plan für Dateisystemzugriffe im API-Modus |
+| `docs/backend/java` | Java-/JDBC-Service-Vorlagen für Katalogabfragen und Insert-Pipeline |
 | `packages` | NuGet-Pakete |
 | `MariaDB-Provider-Plan.md` | Ausführlicher Plan und Architekturentscheidungen zum MariaDB-Provider |
 
@@ -122,6 +126,14 @@ Unterstützte Optionen:
 | `--db-password-file <path>` | Passwort aus einer Datei |
 | `--db-ssl-mode <mode>` | `None`, `Preferred`, `Required`, `VerifyCA` oder `VerifyFull` |
 | `--update` | MariaDB-Schema anlegen oder aktualisieren |
+| `--api-base-url <url>` | Basis-URL des Spring-Boot-Backends |
+| `--api-tenant <tenant>` | Mandant bzw. logischer Katalogname |
+| `--api-key <key>` | Statischer Bearer-Token für Service-Zugänge |
+| `--api-user <user>` | Benutzer für den Login-Token-Flow |
+| `--api-password <password>` | Passwort für den Login-Token-Flow |
+| `--api-password-env <ENV_NAME>` | API-Passwort aus einer Umgebungsvariable |
+| `--api-password-file <path>` | API-Passwort aus einer Datei |
+| `--api-timeout <seconds>` | HTTP-Timeout, Standard 60 Sekunden |
 | `--help`, `-h`, `-?` | Hilfe anzeigen |
 
 Ohne Angabe einer Passwortquelle wird `MEDIABROWSER_DB_PASSWORD` verwendet.
@@ -143,6 +155,37 @@ Danach kann die Anwendung ohne `--update` gestartet werden.
 
 Das direkte Passwort auf der Kommandozeile ist in der Prozessliste sichtbar. Bevorzugt sollten
 Umgebungsvariable oder Passwortdatei verwendet werden.
+
+### API-Provider
+
+Der API-Provider verbindet die Anwendung mit einem Spring-Boot-Backend. Die API wird unter
+`/api/v1` erwartet. Für den normalen Betrieb meldet sich die Anwendung über `/api/v1/auth/login`
+mit Benutzer, Passwort und optionalem Mandanten an und verwendet anschließend den gelieferten
+Bearer-Token. Kurzlebige Access-Tokens werden bei Ablauf oder nach einem `401` über den
+Refresh-Token erneuert.
+
+```powershell
+.\MediaBrowserWPF.exe `
+  --provider api `
+  --api-base-url http://localhost:8080 `
+  --api-tenant <katalog> `
+  --api-user <benutzer> `
+  --api-password-env MEDIABROWSER_API_PASSWORD
+```
+
+Für Service-Zugänge kann alternativ ein statischer Token verwendet werden:
+
+```powershell
+.\MediaBrowserWPF.exe `
+  --provider api `
+  --api-base-url http://localhost:8080 `
+  --api-key <token>
+```
+
+Der vollständige REST-Vertrag inklusive DTO-Schemas und Auth-Endpunkten liegt in
+`docs/openapi.yaml`. Das Backend muss diese Schnittstelle implementieren. Der API-Provider
+unterstützt keine direkten SQL-Transaktionen; `MBCommand` und `MBTransaction` werfen bewusst
+`NotSupportedException`.
 
 ### Launcher
 
@@ -190,7 +233,18 @@ Das Schema wird über `--update` angelegt bzw. erweitert. Fehlende Spalten, Indi
 werden ergänzt; bestehende Daten werden dabei nicht gelöscht.
 
 Im Projekt ist außerdem ein SQL-Server-Provider vorhanden. Der aktuelle Startpfad der Anwendung
-bietet jedoch nur SQLite und MariaDB an.
+bietet jedoch nur SQLite, MariaDB und den API-Provider an.
+
+### API-Provider
+
+`MediaBrowser4Lib\DB\Api\ApiProvider.cs` implementiert die `DBProvider`-Schnittstelle über HTTP.
+`ApiInsert` übernimmt den Insert-Pfad über `POST /api/v1/mediafiles/insert`. Die DTOs liegen in
+`MediaBrowser4Lib\DB\Api\ApiDtos.cs`; der OpenAPI-Vertrag liegt in `docs/openapi.yaml`.
+
+Der Provider eignet sich für ein Spring-Boot-Backend, das den Medienkatalog zentral bereitstellt.
+Direkte SQL-Aufrufe und Transaktionen sind über diesen Provider nicht möglich. Erweiterungen sollten
+zuerst im OpenAPI-Vertrag, danach im Spring-Boot-Backend und anschließend im `ApiProvider` ergänzt
+werden.
 
 ## Migration von SQLite nach MariaDB
 

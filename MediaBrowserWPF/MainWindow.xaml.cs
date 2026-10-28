@@ -22,6 +22,7 @@ using System.Globalization;
 using System.Windows.Threading;
 using MediaBrowser4.Utilities;
 using MediaBrowser4.DB.Maria;
+using MediaBrowser4.DB.Api;
 using MediaProcessing.FaceDetection;
 using MapControl;
 
@@ -84,11 +85,13 @@ namespace MediaBrowserWPF
 
             if (MediaBrowser4.MediaBrowserContext.MainDBProvider != null)
             {
-                if (MediaBrowser4.MediaBrowserContext.MainDBProvider is MariaDbProvider)
+                if (MediaBrowser4.MediaBrowserContext.MainDBProvider is MariaDbProvider
+                    || MediaBrowser4.MediaBrowserContext.MainDBProvider is ApiProvider)
                 {
                     this.DatabasesInFolder.Items.Clear();
                     this.DatabasesInFolder.IsEnabled = false;
-                    this.MenuItemMigrateSqliteToMariaDb.IsEnabled = true;
+                    this.MenuItemMigrateSqliteToMariaDb.IsEnabled =
+                        MediaBrowser4.MediaBrowserContext.MainDBProvider is MariaDbProvider;
                 }
                 else
                 {
@@ -620,10 +623,11 @@ namespace MediaBrowserWPF
 
         private void NewDatabase()
         {
-            if (MediaBrowserContext.MainDBProvider is MariaDbProvider)
+            if (MediaBrowserContext.MainDBProvider is MariaDbProvider
+                || MediaBrowserContext.MainDBProvider is ApiProvider)
             {
                 MessageBox.Show(MainWindow.MainWindowStatic,
-                    "Im MariaDB-Modus kann keine dateibasierte Datenbank geöffnet werden. Starten Sie das Programm mit den MariaDB-Verbindungsargumenten.");
+                    "Im Servermodus kann keine dateibasierte Datenbank geöffnet werden. Starten Sie das Programm mit den Server-Verbindungsargumenten.");
                 return;
             }
 
@@ -658,10 +662,11 @@ namespace MediaBrowserWPF
 
         private void SetDbPath(string filepath)
         {
-            if (MediaBrowserContext.MainDBProvider is MariaDbProvider)
+            if (MediaBrowserContext.MainDBProvider is MariaDbProvider
+                || MediaBrowserContext.MainDBProvider is ApiProvider)
             {
                 MessageBox.Show(MainWindow.MainWindowStatic,
-                    "Im MariaDB-Modus kann keine dateibasierte Datenbank geöffnet werden. Starten Sie das Programm mit den MariaDB-Verbindungsargumenten.");
+                    "Im Servermodus kann keine dateibasierte Datenbank geöffnet werden. Starten Sie das Programm mit den Server-Verbindungsargumenten.");
                 return;
             }
 

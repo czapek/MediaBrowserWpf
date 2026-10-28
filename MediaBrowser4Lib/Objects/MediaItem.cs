@@ -751,6 +751,21 @@ namespace MediaBrowser4.Objects
         private void RefreshMetaData()
         {
             this.metaData = new MetaDataList();
+
+            if (this.Id > 0 && MediaBrowserContext.MainDBProvider is MediaBrowser4.DB.Api.ApiProvider)
+            {
+                List<MediaBrowser4.Objects.MetaData> apiMetaData =
+                    MediaBrowserContext.GetMetaDataFromMediaItems(new List<MediaItem> { this });
+
+                if (apiMetaData != null)
+                {
+                    foreach (MediaBrowser4.Objects.MetaData data in apiMetaData)
+                        this.metaData.Add(data);
+                }
+
+                return;
+            }
+
             using (MediaBrowser4.DB.ICommandHelper com = MediaBrowserContext.MainDBProvider.MBCommand)
             {
                 System.Data.DataTable table

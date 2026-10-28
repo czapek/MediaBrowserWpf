@@ -9,6 +9,7 @@ using System.Windows;
 using MediaBrowser4;
 using System.IO;
 using MediaBrowser4.DB.Maria;
+using MediaBrowser4.DB.Api;
 using MediaBrowser4.Utilities;
 using System.Windows.Markup;
 using System.Globalization;
@@ -30,7 +31,11 @@ namespace MediaBrowserWPF
             "  MediaBrowserWPF.exe --provider mariadb --db-host <host> [--db-port <port>] " +
             "--db-name <database> --db-user <user> [--db-password <password> | " +
             "--db-password-env <ENV_NAME> | --db-password-file <path>] " +
-            "[--db-ssl-mode None|Preferred|Required|VerifyCA|VerifyFull] [--update] [<init-folder>]";
+            "[--db-ssl-mode None|Preferred|Required|VerifyCA|VerifyFull] [--update] [<init-folder>]" + Environment.NewLine +
+            "  MediaBrowserWPF.exe --provider api --api-base-url <url> " +
+            "[--api-tenant <tenant>] [--api-key <key> | --api-user <user> [--api-password <password> | " +
+            "--api-password-env <ENV_NAME> | --api-password-file <path>]] " +
+            "[--api-timeout <seconds>] [<init-folder>]";
 
         private static string[] startupArguments = new string[0];
 
@@ -97,12 +102,22 @@ namespace MediaBrowserWPF
                 progress = WriteUpdateProgress;
                 progress("MediaBrowser MariaDB-Update gestartet.");
             }
+            else if (arguments.Provider == "api")
+            {
+                EnableConsoleOutput();
+                progress = WriteUpdateProgress;
+                progress("MediaBrowser API-Start gestartet.");
+            }
 
             bool initialized;
 
             if (arguments.Provider == "mariadb")
             {
                 initialized = MediaBrowserContext.Init(arguments.MariaDb, arguments.Update, progress);
+            }
+            else if (arguments.Provider == "api")
+            {
+                initialized = MediaBrowserContext.Init(arguments.Api, progress);
             }
             else
             {
@@ -112,11 +127,13 @@ namespace MediaBrowserWPF
             if (!initialized)
             {
                 string errorMessage =
-                    "Die Datenbank konnte nicht ge�ffnet werden." + Environment.NewLine + Environment.NewLine +
+                    "Die Datenbank konnte nicht ge?ffnet werden." + Environment.NewLine + Environment.NewLine +
                     (String.IsNullOrWhiteSpace(MediaBrowserContext.LastInitError)
                         ? (arguments.Provider == "mariadb"
-                            ? "Pr�fen Sie die Verbindungsdaten. Bei einer neuen oder unvollst�ndigen Datenbank starten Sie mit --update."
-                            : "Pr�fen Sie den Pfad zur SQLite-Datenbank.")
+                            ? "Pr?fen Sie die Verbindungsdaten. Bei einer neuen oder unvollst?ndigen Datenbank starten Sie mit --update."
+                            : (arguments.Provider == "api"
+                                ? "Pr?fen Sie die API-URL und die Zugangsdaten."
+                                : "Pr?fen Sie den Pfad zur SQLite-Datenbank."))
                         : MediaBrowserContext.LastInitError);
 
                 if (progress != null)
@@ -247,6 +264,7 @@ namespace MediaBrowserWPF
             StartupArguments result = new StartupArguments();
             List<string> positional = new List<string>();
             int passwordSourceCount = 0;
+            int apiPasswordSourceCount = 0;
 
             for (int i = 0; i < args.Length; i++)
             {
@@ -299,10 +317,45 @@ namespace MediaBrowserWPF
 
                         if (!Enum.TryParse<MySqlSslMode>(sslModeValue, true, out sslMode))
                         {
-                            throw new ArgumentException("Ungültiger SSL-Modus: " + sslModeValue);
+                            throw new ArgumentException("Ung�ltiger SSL-Modus: " + sslModeValue);
                         }
 
                         result.DbSslMode = sslMode;
+                        break;
+                    case "--api-base-url":
+                        result.ApiBaseUrl = RequiredValue(args, ref i, argument);
+                        break;
+                    case "--api-tenant":
+                        result.ApiTenant = RequiredValue(args, ref i, argument);
+                        break;
+                    case "--api-key":
+                        result.ApiKey = RequiredValue(args, ref i, argument);
+                        break;
+                    case "--api-user":
+                        result.ApiUser = RequiredValue(args, ref i, argument);
+                        break;
+                    case "--api-password":
+                        result.ApiPassword = RequiredValue(args, ref i, argument);
+                        apiPasswordSourceCount++;
+                        break;
+                    case "--api-password-env":
+                        result.ApiPasswordEnv = RequiredValue(args, ref i, argument);
+                        apiPasswordSourceCount++;
+                        break;
+                    case "--api-password-file":
+                        result.ApiPasswordFile = RequiredValue(args, ref i, argument);
+                        apiPasswordSourceCount++;
+                        break;
+                    case "--api-timeout":
+                        int apiTimeout;
+
+                        if (!Int32.TryParse(RequiredValue(args, ref i, argument), out apiTimeout)
+                            || apiTimeout <= 0)
+                        {
+                            throw new ArgumentException("Ung�ltiger API-Timeout.");
+                        }
+
+                        result.ApiTimeoutSeconds = apiTimeout;
                         break;
                     case "--update":
                         result.Update = true;
@@ -328,7 +381,12 @@ namespace MediaBrowserWPF
                 throw new ArgumentException("Es darf nur eine Passwortquelle angegeben werden.");
             }
 
-            if (result.Provider != "sqlite" && result.Provider != "mariadb")
+            if (apiPasswordSourceCount > 1)
+            {
+                throw new ArgumentException("Es darf nur eine API-Passwortquelle angegeben werden.");
+            }
+
+            if (result.Provider != "sqlite" && result.Provider != "mariadb" && result.Provider != "api")
             {
                 throw new ArgumentException("Unbekannter Provider: " + result.Provider);
             }
@@ -341,6 +399,10 @@ namespace MediaBrowserWPF
             if (result.Provider == "mariadb")
             {
                 ParseMariaDbArguments(result, positional, passwordSourceCount);
+            }
+            else if (result.Provider == "api")
+            {
+                ParseApiArguments(result, positional, apiPasswordSourceCount);
             }
             else
             {
@@ -409,12 +471,18 @@ namespace MediaBrowserWPF
 
             if (positional.Count == 1)
             {
-                if (!Directory.Exists(positional[0]))
+                if (Directory.Exists(positional[0]))
+                {
+                    result.InitFolder = positional[0];
+                }
+                else if (IsSqliteDatabasePath(positional[0]))
+                {
+                    Log.Info("SQLite-Pfad im MariaDB-Modus ignoriert: " + positional[0]);
+                }
+                else
                 {
                     throw new ArgumentException("Init-Ordner nicht gefunden: " + positional[0]);
                 }
-
-                result.InitFolder = positional[0];
             }
 
             result.MariaDb = new MariaDbConnectionOptions
@@ -426,6 +494,82 @@ namespace MediaBrowserWPF
                 Password = password,
                 SslMode = result.DbSslMode
             };
+        }
+
+        private static void ParseApiArguments(StartupArguments result, List<string> positional,
+            int apiPasswordSourceCount)
+        {
+            if (String.IsNullOrWhiteSpace(result.ApiBaseUrl))
+            {
+                throw new ArgumentException("--api-base-url ist erforderlich.");
+            }
+
+            if (result.Update)
+            {
+                throw new ArgumentException("--update wird vom API-Provider nicht unterstützt.");
+            }
+
+            string password = null;
+
+            if (apiPasswordSourceCount == 0)
+            {
+                password = Environment.GetEnvironmentVariable("MEDIABROWSER_API_PASSWORD");
+            }
+            else if (result.ApiPasswordEnv != null)
+            {
+                password = Environment.GetEnvironmentVariable(result.ApiPasswordEnv);
+
+                if (password == null)
+                {
+                    throw new ArgumentException("Die Umgebungsvariable " + result.ApiPasswordEnv + " ist nicht gesetzt.");
+                }
+            }
+            else if (result.ApiPasswordFile != null)
+            {
+                if (!File.Exists(result.ApiPasswordFile))
+                {
+                    throw new ArgumentException("API-Passwortdatei nicht gefunden: " + result.ApiPasswordFile);
+                }
+
+                password = File.ReadAllText(result.ApiPasswordFile).TrimEnd('\r', '\n');
+            }
+            else
+            {
+                password = result.ApiPassword;
+            }
+
+            if (positional.Count > 1)
+            {
+                throw new ArgumentException("Zu viele Argumente für die API.");
+            }
+
+            if (positional.Count == 1)
+            {
+                if (Directory.Exists(positional[0]))
+                {
+                    result.InitFolder = positional[0];
+                }
+                else if (IsSqliteDatabasePath(positional[0]))
+                {
+                    Log.Info("SQLite-Pfad im API-Modus ignoriert: " + positional[0]);
+                }
+                else
+                {
+                    throw new ArgumentException("Init-Ordner nicht gefunden: " + positional[0]);
+                }
+            }
+
+            result.Api = new ApiConnectionOptions
+            {
+                BaseUrl = result.ApiBaseUrl,
+                ApiKey = result.ApiKey,
+                Username = result.ApiUser,
+                Password = password,
+                Tenant = result.ApiTenant,
+                TimeoutSeconds = result.ApiTimeoutSeconds
+            };
+
+            result.Api.BuildApiBaseUrl();
         }
 
         private static void ParseSqliteArguments(StartupArguments result, List<string> positional)
@@ -510,6 +654,17 @@ namespace MediaBrowserWPF
             return args[index];
         }
 
+        private static bool IsSqliteDatabasePath(string path)
+        {
+            if (String.IsNullOrWhiteSpace(path))
+                return false;
+
+            string extension = Path.GetExtension(path);
+
+            return String.Equals(extension, ".mb4", StringComparison.OrdinalIgnoreCase)
+                || String.Equals(extension, ".mb4t", StringComparison.OrdinalIgnoreCase);
+        }
+
         private class StartupArguments
         {
             public string Provider = "sqlite";
@@ -526,9 +681,18 @@ namespace MediaBrowserWPF
             public string DbPasswordEnv;
             public string DbPasswordFile;
             public MySqlSslMode DbSslMode = MySqlSslMode.Preferred;
+            public string ApiBaseUrl;
+            public string ApiTenant;
+            public string ApiKey;
+            public string ApiUser;
+            public string ApiPassword;
+            public string ApiPasswordEnv;
+            public string ApiPasswordFile;
+            public int ApiTimeoutSeconds = 60;
             public bool Update;
             public bool Help;
             public MariaDbConnectionOptions MariaDb;
+            public ApiConnectionOptions Api;
         }
 
         protected override void OnStartup(StartupEventArgs e)

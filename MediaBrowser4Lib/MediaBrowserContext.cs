@@ -7,6 +7,7 @@ using System.Text;
 using MediaBrowser4.DB;
 using MediaBrowser4.Objects;
 using MediaBrowser4.DB.Maria;
+using MediaBrowser4.DB.Api;
 using MediaBrowser4.DB.SQLite;
 using System.Collections.ObjectModel;
 using System.Xml;
@@ -279,6 +280,51 @@ namespace MediaBrowser4
 
                 DriveMappingLetter = null;
                 MainDBProvider = mariaDbProvider;
+
+                return InitProviderContext();
+            }
+            catch (Exception ex)
+            {
+                LastInitError = ex.Message;
+                Log.Exception(ex);
+            }
+
+            return false;
+        }
+
+        public static bool Init(ApiConnectionOptions options)
+        {
+            return Init(options, null);
+        }
+
+        public static bool Init(ApiConnectionOptions options, Action<string> progress)
+        {            LastInitError = null;
+
+            try
+            {
+                if (options == null)
+                {
+                    LastInitError = "Es wurden keine API-Verbindungsdaten angegeben.";
+                    return false;
+                }
+
+                if (progress != null)
+                    progress("Verbinde mit " + options.BaseUrl + "...");
+
+                ApiProvider apiProvider = new ApiProvider(options);
+
+                if (progress != null)
+                    progress("Validiere API-Katalog...");
+
+                if (!apiProvider.ValidateDB())
+                {
+                    LastInitError = apiProvider.LastValidationError;
+                    MainDBProvider = null;
+                    return false;
+                }
+
+                DriveMappingLetter = null;
+                MainDBProvider = apiProvider;
 
                 return InitProviderContext();
             }
@@ -916,7 +962,8 @@ namespace MediaBrowser4
         {
             get
             {
-                if (mainDBProvider == null || mainDBProvider is MariaDbProvider)
+                if (mainDBProvider == null || mainDBProvider is MariaDbProvider
+                    || mainDBProvider is ApiProvider)
                 {
                     return null;
                 }
@@ -970,7 +1017,7 @@ namespace MediaBrowser4
                     catch { }
 
                 }
-                else if (mainDBProvider is MariaDbProvider)
+                else if (mainDBProvider is MariaDbProvider || mainDBProvider is ApiProvider)
                 {
                     string tempName = mainDBProvider.DBName ?? "default";
 
@@ -1654,18 +1701,9 @@ namespace MediaBrowser4
 
         private static void LoadPropertyTable()
         {
-            propertyTable = new Dictionary<string, string>();
-
-            using (MediaBrowser4.DB.ICommandHelper com = MainDBProvider.MBCommand)
-            {
-                System.Data.DataTable table
-                    = com.GetDataTable("SELECT `KEY`, `VALUE` FROM DBPROPERTIES");
-
-                foreach (System.Data.DataRow row in table.Rows)
-                {
-                    propertyTable.Add(row["KEY"].ToString().Trim(), row["VALUE"].ToString().Trim());
-                }
-            }
+            propertyTable = MainDBProvider != null
+                ? MainDBProvider.GetDBProperties()
+                : new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         }
 
         public static bool HasKnownMediaExtension(string path)

@@ -16,6 +16,28 @@ namespace MediaBrowser4.DB
         public abstract bool ValidateDB();
         public abstract void CreateDB();
 
+        public virtual Dictionary<string, string> GetDBProperties()
+        {
+            Dictionary<string, string> result = new Dictionary<string, string>(
+                StringComparer.OrdinalIgnoreCase);
+
+            using (ICommandHelper command = this.MBCommand)
+            {
+                System.Data.DataTable table = command.GetDataTable("SELECT `KEY`, `VALUE` FROM DBPROPERTIES");
+
+                foreach (System.Data.DataRow row in table.Rows)
+                {
+                    string key = row["KEY"].ToString().Trim();
+                    string value = row["VALUE"] == DBNull.Value ? String.Empty : row["VALUE"].ToString().Trim();
+
+                    if (!String.IsNullOrWhiteSpace(key))
+                        result[key] = value;
+                }
+            }
+
+            return result;
+        }
+
         public abstract string Guid { get; set; }
         public abstract string DBName { get; set; }
         public abstract string User { get; set; }

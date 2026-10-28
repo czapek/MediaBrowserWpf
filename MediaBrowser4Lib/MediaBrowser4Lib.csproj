@@ -79,6 +79,9 @@
     <Reference Include="MySqlConnector, Version=2.0.0.0, Culture=neutral, PublicKeyToken=d33d3e53aa5f8c92, processorArchitecture=MSIL">
       <HintPath>..\packages\MySqlConnector.2.4.0\lib\net48\MySqlConnector.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
@@ -175,6 +178,11 @@
     <Compile Include="DB\Maria\MariaDbProvider.cs" />
     <Compile Include="DB\Maria\SimpleConnection.cs" />
     <Compile Include="DB\Maria\Transaction.cs" />
+    <Compile Include="DB\Api\ApiConnectionOptions.cs" />
+    <Compile Include="DB\Api\ApiDtos.cs" />
+    <Compile Include="DB\Api\ApiInsert.cs" />
+    <Compile Include="DB\Api\ApiProvider.cs" />
+    <Compile Include="DB\Api\SpringApiClient.cs" />
     <Compile Include="DB\Migration\SqliteToMariaDbMigration.cs" />
     <Compile Include="DB\SqlParameterInfo.cs" />
     <Compile Include="DB\SQLite\CommandHelper.cs" />

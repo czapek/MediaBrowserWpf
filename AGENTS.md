@@ -7,7 +7,7 @@ Diese Datei enthält Arbeitshinweise für Coding-Agenten im Repository `MediaBro
 - Windows-Desktop-Anwendung auf Basis von WPF und .NET Framework 4.8.
 - Alte, nicht-SDK-basierte `.csproj`-Projekte.
 - Hauptprojekte: `MediaBrowserWPF`, `MediaBrowser4Lib`, `MediaProcessing`, `MediaBrowserLauncher`.
-- Datenbank-Backends: SQLite (klassisch) und MariaDB (neuer Provider).
+- Datenbank-Backends: SQLite (klassisch), MariaDB (neuer Provider) und Spring-Boot-API-Provider.
 - Ein SQL-Server-Provider ist im Library-Code vorhanden, wird vom aktuellen Startpfad aber nicht angeboten.
 - Die Oberfläche ist deutschsprachig.
 - Lizenz: GPLv3.
@@ -139,11 +139,40 @@ Wichtige Startpfade:
 
 - SQLite: `--provider sqlite --db-file <path>`
 - MariaDB: `--provider mariadb --db-host ... --db-name ... --db-user ...`
+- API: `--provider api --api-base-url ... [--api-tenant ...] [--api-key ... | --api-user ... --api-password ...]`
 - Passwortquellen: `--db-password`, `--db-password-env`, `--db-password-file`
-- Erststart/Schema-Update: `--update`
+- Erststart/Schema-Update: `--update` (nur MariaDB)
 
-Ohne Passwortquelle wird `MEDIABROWSER_DB_PASSWORD` verwendet. Passwörter nicht in der
-Kommandozeile dokumentieren oder loggen, wenn vermeidbar.
+Ohne Passwortquelle wird `MEDIABROWSER_DB_PASSWORD` verwendet. Für die API gibt es analog
+`--api-password`, `--api-password-env`, `--api-password-file` und `MEDIABROWSER_API_PASSWORD`.
+Passwörter nicht in der Kommandozeile dokumentieren oder loggen, wenn vermeidbar.
+
+## API-Provider
+
+Relevante Dateien:
+
+- `MediaBrowser4Lib\DB\Api\ApiProvider.cs`
+- `MediaBrowser4Lib\DB\Api\ApiInsert.cs`
+- `MediaBrowser4Lib\DB\Api\SpringApiClient.cs`
+- `MediaBrowser4Lib\DB\Api\ApiDtos.cs`
+- `MediaBrowser4Lib\DB\Api\ApiConnectionOptions.cs`
+- `docs/openapi.yaml`
+
+Regeln:
+
+- Der API-Vertrag ist in `docs/openapi.yaml` definiert. Änderungen an Endpunkten oder DTOs zuerst dort
+  und in `ApiDtos.cs` nachziehen.
+- Das Spring-Boot-Backend wird separat implementiert und ist nicht Teil dieses Repositories.
+- `ApiProvider.MBCommand` und `ApiProvider.MBTransaction` werfen bewusst `NotSupportedException`.
+  Keine direkten SQL-Aufrufe in API-Pfade einbauen.
+- `MediaBrowserContext` lädt Katalogproperties über `DBProvider.GetDBProperties()`. Der API-Provider
+  überschreibt diese Methode; bei neuen Providern denselben Weg verwenden.
+- `ApiInsert` lädt Thumbnails und Metadaten in den Insert-DTOs hoch. Die Antwort muss
+  `ApiInsertResultDto` mit Medien- und Variations-IDs liefern.
+- Authentifizierung: Login über `/auth/login`, danach Bearer-Token. Abgelaufene oder mit `401`
+  abgelehnte Access-Tokens werden über `/auth/refresh` erneuert; bei ungültigem Refresh-Token erfolgt
+  ein erneuter Login. Keine Tokens oder Passwörter loggen.
+- API-Fehler werden als `ApiException` mit HTTP-Status und Response-Body geworfen.
 
 ## MariaDB-Schema
 
