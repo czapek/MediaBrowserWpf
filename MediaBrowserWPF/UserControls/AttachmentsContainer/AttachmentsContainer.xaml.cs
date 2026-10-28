@@ -32,6 +32,18 @@ namespace MediaBrowserWPF.UserControls
         public AttachmentsContainer()
         {
             InitializeComponent();
+
+            if (MediaBrowserContext.IsApiMode)
+            {
+                this.MenuItemAttachmetsOpen.IsEnabled = false;
+                this.MenuItemAttachmetsOpenWith.IsEnabled = false;
+                this.MenuItemAttachmetsCopy.IsEnabled = false;
+                this.MenuItemAttach.IsEnabled = false;
+                this.MenuItemMoveAndAttach.IsEnabled = false;
+                this.MenuItemMoveAndRename.IsEnabled = false;
+                this.MenuItemAttachmetsCopyAttach.IsEnabled = false;
+                this.MenuItemAttachmetsDetach.IsEnabled = false;
+            }
         }
 
         public void SetInfo(List<MediaItem> mediaItemList)

@@ -355,6 +355,7 @@
     </Compile>
     <Compile Include="Utilities\CategoryTreeWebPage.cs" />
     <Compile Include="Utilities\ConsoleManager.cs" />
+    <Compile Include="Utilities\ApiBusyOverlay.cs" />
     <Compile Include="Utilities\FilesAndFolders.cs" />
     <Compile Include="Utilities\KeyboardFocus.cs" />
     <Compile Include="Utilities\PhotoSphereViewer.cs" />

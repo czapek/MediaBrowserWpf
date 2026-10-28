@@ -453,7 +453,7 @@ namespace MediaBrowserWPF.Viewer
                 this.VisibleMediaItem.Height,
                 this.VisibleMediaItem.FileLength / 1024);
 
-            if (!File.Exists(this.VisibleMediaItem.FullName))
+            if (!MediaBrowserContext.FileExists(this.VisibleMediaItem))
             {
                 if (!MediaBrowserContext.IsImageInPreviewDB(this.VisibleMediaItem.VariationId))
                 {
@@ -571,7 +571,7 @@ namespace MediaBrowserWPF.Viewer
 
                 this.ImagePlayer.MediaItemSource = null;
 
-                if (!File.Exists(mItem.FullName))
+                if (!MediaBrowserContext.FileExists(mItem))
                 {
                     if (MediaBrowserContext.IsImageInPreviewDB(mItem.VariationId))
                     {
@@ -615,7 +615,7 @@ namespace MediaBrowserWPF.Viewer
             this.VideoPlayer.VideoPlayerIntern.MediaItemSource = null;
 
             bool inPreviewDbNotExist = false;
-            if (!File.Exists(mItem.FullName))
+            if (!MediaBrowserContext.FileExists(mItem))
             {
                 if (!MediaBrowserContext.IsImageInPreviewDB(mItem.VariationId))
                     return;
@@ -629,7 +629,7 @@ namespace MediaBrowserWPF.Viewer
                 string pattern = System.IO.Path.GetFileNameWithoutExtension(mItem.Filename);
                 foreach (string name in Directory.GetFiles(mItem.FileObject.DirectoryName, pattern + ".*"))
                 {
-                    if (!name.Equals(mItem.FullName, StringComparison.InvariantCultureIgnoreCase)
+                    if (!name.Equals(mItem.FileObject.FullName, StringComparison.InvariantCultureIgnoreCase)
                         && (name.EndsWith(".mp3", StringComparison.InvariantCultureIgnoreCase) || name.EndsWith(".wav", StringComparison.InvariantCultureIgnoreCase)))
                     {
                         soundFile = name;

@@ -43,6 +43,14 @@ namespace MediaBrowserWPF.UserControls
         {
             InitializeComponent();
             treeViewHelper = new TreeViewHelper(this.treeViewMain);
+
+            if (MediaBrowserContext.IsApiMode)
+            {
+                this.OpenExplorer.IsEnabled = false;
+                this.MenuItemMoveHere.IsEnabled = false;
+                this.MenuItemImportMetadata.IsEnabled = false;
+                this.MenuItemDelete.IsEnabled = false;
+            }
         }
 
         public void Build()

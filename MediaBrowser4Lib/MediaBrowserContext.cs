@@ -297,7 +297,7 @@ namespace MediaBrowser4
             return Init(options, null);
         }
 
-        public static bool Init(ApiConnectionOptions options, Action<string> progress)
+                public static bool Init(ApiConnectionOptions options, Action<string> progress)
         {            LastInitError = null;
 
             try
@@ -335,6 +335,37 @@ namespace MediaBrowser4
             }
 
             return false;
+        }
+
+        public static bool IsApiMode
+        {
+            get { return mainDBProvider is ApiProvider; }
+        }
+
+        public static string GetLocalMediaContentPath(MediaItem item)
+        {
+            ApiProvider apiProvider = mainDBProvider as ApiProvider;
+
+            if (apiProvider != null && item != null)
+                return apiProvider.GetLocalContentPath(item);
+
+            return null;
+        }
+
+        public static bool FileExists(MediaItem item)
+        {
+            if (item == null)
+                return false;
+
+            if (IsApiMode)
+                return true;
+
+            return File.Exists(item.FullName);
+        }
+
+        public static bool FileExists(string path)
+        {
+            return IsApiMode || File.Exists(path);
         }
 
         private static bool InitProviderContext()

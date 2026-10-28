@@ -1,33 +1,46 @@
 # API-Modus: Dateisystemzugriffe und Migrationsplan
 
-## 1. Ziel
+## 1. Ziel und Leitentscheidung
 
 Im API-Modus liegt der Medienkatalog auf einem Spring-Boot-Backend. Der Client darf nicht davon
 ausgehen, dass die Originaldateien eines `MediaItem` lokal vorhanden oder über einen
 Windows-Pfad erreichbar sind.
 
-Dieses Dokument sammelt die Stellen, an denen MediaBrowserWpf heute direkt auf Dateien zugreift,
-und beschreibt eine schrittweise Lösung.
+Verbindliche Leitentscheidung:
 
-Leitentscheidung:
+- **Die MediaBrowser-API führt keine Schreiboperationen auf dem Medien-Dateisystem aus.**
+  Das betrifft insbesondere: keinen Upload von Originaldateien, kein Anlegen, Kopieren,
+  Verschieben, Umbenennen, Löschen oder Recyceln von Medien-, Sidecar- oder Preview-Dateien.
+- Die API darf weiterhin **Datenbank-Schreiboperationen** ausführen, z. B. Katalogfelder,
+  Kategorien, Metadaten, Beschreibungen, Rollen, Thumbnail-BLOBs in `THUMBS`, GPS- und
+  Meteorologiedaten. „Keine Schreiboperationen“ bezieht sich auf das Medien-Dateisystem,
+  nicht auf MariaDB.
+- Originalmedien müssen, wenn sie im API-Modus lesbar sein sollen, bereits in einem vom Backend
+  **read-only** eingebundenen Content Store liegen. Das Backend liest und streamt nur.
+- Das Bereitstellen oder Aktualisieren der Originaldateien erfolgt außerhalb der MediaBrowser-API,
+  z. B. durch einen NAS-/Syncthing-/rsync-Prozess oder einen separaten Ingest-Service.
+- Kann das Backend keinen Content Store bereitstellen, ist der API-Modus katalog- und
+  thumbnailbasiert; Originalansicht, Video, Export und Dateiaktionen werden deaktiviert.
 
-- **Import:** Der Client liest die vom Benutzer ausgewählten Dateien lokal und lädt sie zum Backend
-  hoch.
-- **Anzeige:** Originalmedien werden über die API gestreamt oder bei Bedarf in einen lokalen Cache
-  geladen.
-- **Schreiboperationen:** Rename, Move, Delete, Recycle, Attachment-Änderungen usw. laufen als
-  API-Aktionen gegen den serverseitigen Speicher.
-- **Kein stilles Failover auf lokale Pfade:** Ist im API-Modus kein Content-Endpunkt verfügbar,
-  wird die Funktion deaktiviert oder verständlich als nicht verfügbar gemeldet.
+## 2. Annahmen
 
-## 2. Zentrale Zugriffspunkte
+1. MariaDB ist die zentrale Katalogdatenbank.
+2. Thumbnails liegen als BLOBs in `THUMBS`.
+3. Originalmedien liegen in einem read-only Content Store oder sind im API-Modus nicht verfügbar.
+4. Der Client darf lokale Cache-Dateien anlegen; das ist ein Client-Cache, keine API-Schreiboperation.
+5. Der Client darf local exportierte Dateien schreiben; auch das ist keine API-Schreiboperation.
+6. Dateiänderungen am Originalbestand sind im API-Modus nicht möglich. Sie sind nur im
+   SQLite-/MariaDB-Dateimodus oder über einen separaten, nicht zur API gehörenden Ingest-Prozess
+   zulässig.
 
-### 2.1 Medienmodell
+## 3. Zugriffspunkte im aktuellen Code
+
+### 3.1 Medienmodell
 
 - `MediaBrowser4Lib\Objects\MediaItem.cs`
   - `FullName` setzt sich aus `Foldername` und `Filename` zusammen.
   - `FileObject` erzeugt bei Bedarf ein `FileInfo` aus `FullName`.
-  - `SetCachedImage`, `Rename` und verschiedene Anzeige-/Tooltip-Pfade verwenden lokale Pfade.
+  - `SetCachedImage`, `Rename` und Tooltip-/Anzeigepfade verwenden lokale Pfade.
 - `MediaBrowser4Lib\MediaBrowserContext.cs`
   - `GetMediaItemFromFullname`
   - `GetMediaItems` für virtuelle Medien
@@ -40,10 +53,10 @@ Leitentscheidung:
   - `RenameMediaItem` erzeugt ein neues `FileInfo`.
   - `LoadMediaItems` prüft Dateiexistenz und setzt `FileObject` zurück.
 
-Konsequenz: `FileObject` und `FullName` dürfen im API-Modus nicht mehr als verlässliche
+Konsequenz: `FileObject` und `FullName` dürfen im API-Modus nicht als verlässliche
 Originaldatei-Referenz dienen.
 
-### 2.2 Thumbnails und Vorschauen
+### 3.2 Thumbnails und Vorschauen
 
 - `MediaBrowser4Lib\Objects\MediaItemBitmap.cs`
   - `GetThumbnail` liest EXIF und das Originalbild.
@@ -56,10 +69,10 @@ Originaldatei-Referenz dienen.
 - `MediaBrowserWPF\Utilities\TakeSnapshot.xaml.cs`
   - Export und Snapshot benötigen Originaldaten.
 
-Konsequenz: Thumbnails können aus `THUMBS`/API geliefert werden. Große Vorschauen, Snapshots und
-Exporte brauchen entweder einen Content-Stream oder eine lokale Kopie.
+Konsequenz: Thumbnails können aus der API geliefert werden. Große Vorschauen, Snapshots und
+Exporte brauchen entweder einen read-only Content-Stream oder eine lokale Kopie.
 
-### 2.3 Bild-, Video- und Spezialviewer
+### 3.3 Bild-, Video- und Spezialviewer
 
 Direkte Dateizugriffe:
 
@@ -68,7 +81,7 @@ Direkte Dateizugriffe:
 - `MediaBrowserWPF\UserControls\RgbImage\ViewerSource.cs`
   - `FileObject.Exists`, `Image.FromFile`
 - `MediaBrowserWPF\Viewer\MediaViewer.xaml.cs`
-  - `File.Exists`, fehlende Datei-Anzeige, `Directory.GetFiles` für Sidecars
+  - `File.Exists`, fehlende-Datei-Anzeige, `Directory.GetFiles` für Sidecars
 - `MediaBrowserWPF\Viewer\ViewerBaseControl.xaml.cs`
   - `File.Exists`
 - `MediaBrowserWPF\UserControls\Video\VideoPlayer.xaml.cs`
@@ -86,9 +99,9 @@ Direkte Dateizugriffe:
 
 Konsequenz: Diese Viewer müssen auf eine Content-URL oder einen lokalen Cache-Pfad umgestellt
 werden. WPF-`MediaElement` kann Authorization-Header nicht zuverlässig selbst senden; für Video
-ist ein kurzlebiger signierter Download-/Streaming-Link oder ein lokaler Cache sinnvoll.
+ist ein kurzlebiger signierter Read-only-Link oder ein lokaler Client-Cache sinnvoll.
 
-### 2.4 Metadaten, Checksummen und Datumswerte
+### 3.4 Metadaten, Checksummen und Datumswerte
 
 - `MediaBrowser4Lib\Utilities\Crypto.cs`
   - MD5 wird aus der Originaldatei gelesen.
@@ -99,15 +112,15 @@ ist ein kurzlebiger signierter Download-/Streaming-Link oder ein lokaler Cache s
 - `MediaBrowser4Lib\Objects\ExtraData.cs`
   - Sucht Begleitdateien neben dem Original.
 - `MediaBrowser4Lib\DB\Api\ApiInsert.cs`
-  - `GetThumbnail`, Dateizeit und Dateigröße werden aktuell clientseitig gelesen.
+  - `GetThumbnail`, Dateizeit und Dateigröße werden clientseitig gelesen.
 - `MediaBrowser4Lib\API\MediafileInsert.cs`
-  - älterer Insert-Pfad, ebenfalls dateibasiert.
+  - älterer dateibasierter Insert-Pfad.
 
-Konsequenz: Beim Upload kann der Client diese Werte einmalig lokal ermitteln und im Insert-DTO
-mitschicken. Spätere serverseitige Prüfungen müssen auf gespeicherte Metadaten und Checksummen
-zurückgreifen.
+Konsequenz: Beim Anlegen eines Katalogeintrags kann der Client diese Werte einmalig aus einer
+lokal vorhandenen Datei ermitteln und im Insert-DTO mitschicken. Die Originaldatei selbst wird
+dadurch nicht von der API gespeichert.
 
-### 2.5 Import und Scan
+### 3.5 Import und Scan
 
 - `MediaBrowserWPF\MainWindow.xaml.cs`
   - `MenuItemAddSingle_Click`
@@ -125,10 +138,15 @@ zurückgreifen.
 - `MediaBrowserWPF\UserControls\FolderContainer\FolderTree.xaml.cs`
   - Prüft lokale Ordner und zählt Dateien.
 
-Konsequenz: Der Import bleibt lokal initiiert, benötigt aber einen Upload-Schritt. Der Server darf
-nicht erwarten, dass ein Windows-Pfad des Clients auf dem Backend existiert.
+Konsequenz: Der bisherige Import setzt einen beschreibbaren Dateispeicher voraus und ist im
+API-Modus **nicht unverändert nutzbar**. Möglichkeiten:
 
-### 2.6 Ändernde Dateioperationen
+1. API-Modus ist zunächst nur Katalog-/Lesezugriff; Import bleibt dem Dateimodus vorbehalten.
+2. Ein separater Ingest-Prozess außerhalb der MediaBrowser-API übernimmt das Kopieren/Uploading.
+3. Ein späterer Client-Upload geht direkt in einen externen Objektspeicher; die MediaBrowser-API
+   bekommt nur den bereits vorhandenen Content-Verweis und schreibt keine Dateien.
+
+### 3.6 Ändernde Dateioperationen
 
 - `MediaBrowser4Lib\Utilities\FilesAndFolders.cs`
   - `File.Copy`, `File.Move`, `File.Delete`, ReadOnly-Attribute.
@@ -145,10 +163,12 @@ nicht erwarten, dass ein Windows-Pfad des Clients auf dem Backend existiert.
 - `MediaBrowserWPF\UserControls\AttachmentsContainer\AttachmentsContainer.xaml.cs`
   - Anhänge öffnen, verschieben, löschen, recyceln.
 
-Konsequenz: Diese Aktionen müssen im API-Modus über API-Aktionen laufen. Lokale Dateioperationen
-sind nur für den lokalen Cache oder für den ursprünglichen Upload erlaubt.
+Konsequenz: Diese Aktionen dürfen im API-Modus nicht gegen den Content Store ausgeführt werden.
+Sie werden deaktiviert. Reine Katalogänderungen wie Favorit, Soft-Delete, Kategorie, Rolle und
+Priorität bleiben möglich. Ein „Löschen“ im API-Modus ist ausschließlich ein Soft-Delete oder
+eine Katalogbereinigung, kein Dateilöschen.
 
-### 2.7 Anhänge und Sidecar-Dateien
+### 3.7 Anhänge und Sidecar-Dateien
 
 - `MediaBrowser4Lib\Objects\Attachment.cs`
   - `FullName`, `FileInfo`, Existenzprüfung.
@@ -164,11 +184,11 @@ sind nur für den lokalen Cache oder für den ursprünglichen Upload erlaubt.
 - `MediaBrowser4Lib\DB\Maria\MariaDbProvider.cs`
   - `WriteToPreviewDB` liest `.fcd` und Bilddateien.
 
-Konsequenz: Anhänge und Sidecars brauchen eigene Upload-/Download-Endpunkte oder müssen in das
-Medienobjekt eingebettet werden. Die Existenz von Nachbardateien im selben Verzeichnis darf im
-API-Modus nicht vorausgesetzt werden.
+Konsequenz: Anhänge und Sidecars können im API-Modus nur **gelesen** werden, wenn sie bereits im
+read-only Content Store liegen. Upload, Anlegen, Verschieben und Löschen sind deaktiviert.
+Read-only-Endpunkte für Anhänge und Sidecars sind möglich; schreibende Endpunkte nicht.
 
-### 2.8 Export, Snapshot und Webgalerie
+### 3.8 Export, Snapshot und Webgalerie
 
 - `MediaBrowserWPF\Utilities\TakeSnapshot.xaml.cs`
   - Kopiert Originale und schreibt exportierte Bilder.
@@ -179,10 +199,11 @@ API-Modus nicht vorausgesetzt werden.
 - `MediaBrowserWPF\UserControls\ThumbListContainer\ThumblistContainerContextMenu.xaml.cs`
   - ffmpeg-/Batch-Exporte mit `FullName`.
 
-Konsequenz: Export kann lokal bleiben, benötigt aber zuerst einen Download der Originale. Die
-Webgalerie muss auf API-URLs statt auf lokale Pfade umgestellt werden.
+Konsequenz: Export und Snapshot bleiben **Client-Funktionen**. Sie schreiben nur in einen lokalen
+Exportordner. Voraussetzung ist, dass der Client das Original zuvor über den read-only
+Content-Endpunkt heruntergeladen hat.
 
-### 2.9 Fehlende-Dateien-Erkennung
+### 3.9 Fehlende-Dateien-Erkennung
 
 - `MediaBrowserWPF\UserControls\ThumbListContainer\ThumblistContainer.xaml.cs`
 - `MediaBrowserWPF\Viewer\MediaViewer.xaml.cs`
@@ -192,11 +213,11 @@ Webgalerie muss auf API-URLs statt auf lokale Pfade umgestellt werden.
 - `MediaBrowser4Lib\DB\Api\ApiProvider.cs`
   - `GetMediaItemsWithMissingFiles` ist aktuell nicht implementiert.
 
-Konsequenz: Im API-Modus ist „fehlende Datei“ eine serverseitige Eigenschaft. Das Backend muss
-den Status der gespeicherten Originaldatei prüfen und im MediaItem/DTO melden. Der Client darf
-nicht `File.Exists` auf einem lokalen Pfad ausführen.
+Konsequenz: Im API-Modus ist „fehlende Datei“ eine serverseitige read-only Prüfung. Das Backend
+darf den Content Store lesen und `ContentAvailable` im DTO melden. Der Client darf nicht
+`File.Exists` auf einem lokalen Katalogpfad ausführen.
 
-### 2.10 Lokaler Cache und Vorschaudatenbank
+### 3.10 Lokaler Cache und Vorschaudatenbank
 
 - `MediaBrowser4Lib\Objects\MediaItem.cs`
   - `SetCachedImage`, `ImageCachePath`
@@ -207,165 +228,294 @@ nicht `File.Exists` auf einem lokalen Pfad ausführen.
 - `MediaBrowserWPF\MainWindow.xaml.cs`
   - „Lokalen Medien-Cache leeren“
 
-Konsequenz: Der lokale Cache bleibt erlaubt, ist aber nur eine Kopie. Er darf nicht als
-Originaldatenquelle missverstanden werden und muss bei API-Änderungen invalidiert werden können.
+Konsequenz: Der Client-Cache bleibt erlaubt. Er wird ausschließlich vom Client geschrieben,
+niemals von der API. Das Backend darf keine Preview-/Temp-Dateien anlegen; Vorschauen müssen aus
+der Datenbank, dem read-only Content Store oder speicherintern erzeugt werden.
 
-## 3. Optionen
+## 4. Content-Strategien
 
-### Option A: Alles lokal cachen
+### 4.1 Read-only Content Store
 
-Der Client lädt Originale bei Bedarf in einen lokalen Cache und die bestehende dateibasierte
-Logik bleibt weitgehend unverändert.
+Das Backend bekommt einen read-only eingebundenen Speicher:
+
+```text
+/mnt/media-readonly
+```
+
+oder einen read-only Object Store. Die API löst `FOLDERS.FOLDERNAME` + `MEDIAFILES.FILENAME`
+gegen diesen Store auf und streamt die Datei. Sie schreibt nichts.
 
 Vorteile:
 
-- Wenig Änderungen an Viewern und MediaProcessing.
-- Bestehende Export-, Snapshot- und Video-Pfade funktionieren.
+- Originale bleiben zentral.
+- Keine API-Schreiboperationen auf dem Dateisystem.
+- Range-Streaming für große Dateien möglich.
 
-Nachteile:
+Voraussetzungen:
 
-- Große Downloads, besonders bei Videos.
-- Cache-Verwaltung, Löschung und Aktualisierung nötig.
-- Startzeit und Speicherplatz können stark steigen.
+- Pfadnormalisierung und Schutz vor Directory Traversal.
+- Konfigurierbarer Content-Root.
+- Read-only-Mount und restriktive Rechte für den API-Prozess.
 
-### Option B: Vollständig streamen
+### 4.2 Kein Content Store
 
-Originale werden nur über HTTP gestreamt; lokale Dateizugriffe entfallen.
+Das Backend liefert nur Katalogdaten und Thumbnails. Originalansicht, Video und Export werden
+deaktiviert. Das ist der einfachste und sicherste Modus.
 
-Vorteile:
+### 4.3 Externer Ingest
 
-- Kein großer lokaler Speicherbedarf.
-- Zentrale Datenhaltung.
+Ein separater Prozess außerhalb der MediaBrowser-API schreibt Dateien in den Content Store:
 
-Nachteile:
+- NAS-Sync
+- Syncthing/rsync
+- dedizierter Upload-Service
+- Objektspeicher-Ingest
 
-- Große Umbauten an Viewern, DirectShow, NPOI/NReco, ffmpeg und Export.
-- `MediaElement`/DirectShow brauchen oft einen lokalen Pfad.
-- Authentifizierung bei Streaming muss geklärt werden.
+Die MediaBrowser-API liest anschließend nur den bereits vorhandenen Content. Sie erhält keine
+Upload-Endpunkte und führt keine Dateiänderungen aus.
 
-### Option C: Hybrider Ansatz (Empfehlung)
+## 5. Backend-Endpunkte
 
-- Bilder und Vorschauen: API-Streaming oder kleiner lokaler Cache.
-- Videos/Panoramen/3D: bevorzugt lokaler Cache oder signierter Streaming-Link.
-- Import: Originaldatei wird hochgeladen.
-- Schreiboperationen: API-Aktionen.
-- Export/Snapshot: lädt das Original bei Bedarf herunter.
-- Nicht unterstützte Funktionen werden im API-Modus deaktiviert.
+Die folgenden Endpunkte bilden den API-Modus ab. **Alle Content-Endpunkte sind read-only.**
+Es gibt keine Upload-, Copy-, Move-, Rename-, Delete- oder Recycle-Endpunkte für Dateien.
 
-Dieser Ansatz ist mit der bestehenden Codebasis am pragmatischsten.
+### 5.1 Authentifizierung
 
-## 4. Benötigte API-Erweiterungen
+| Methode | Pfad | Zweck | Request | Response | Dateisystem |
+| --- | --- | --- | --- | --- | --- |
+| POST | `/api/v1/auth/login` | Login | `LoginRequest` | `TokenResponse` | keine |
+| POST | `/api/v1/auth/refresh` | Access-Token erneuern | `RefreshRequest` | `TokenResponse` | keine |
+| POST | `/api/v1/auth/logout` | Refresh-Token widerrufen | `RefreshRequest` | `204` | keine |
 
-### 4.1 Originalinhalt
+`TokenResponse`:
 
-```text
-GET /api/v1/mediafiles/{id}/content
+```json
+{
+  "accessToken": "...",
+  "refreshToken": "...",
+  "tokenType": "Bearer",
+  "expiresIn": 600
+}
 ```
 
-Anforderungen:
+### 5.2 Katalog und Metadaten
 
-- `Content-Type`, `Content-Length`
-- `Range`-Requests für Video und große Dateien
-- `ETag`/`Last-Modified`
-- Autorisierung über Bearer-Token
-- optional signierte, kurzlebige URLs für `MediaElement`/externe Player
+| Methode | Pfad | Zweck | Request | Response | DB | Dateisystem |
+| --- | --- | --- | --- | --- | --- | --- |
+| GET | `/api/v1/catalog/validate` | Katalog prüfen | – | `CatalogInfo` | lesen | keine |
+| POST | `/api/v1/catalog/create` | Schema/Defaults anlegen | – | `204` | schreiben | keine |
+| GET | `/api/v1/catalog/properties` | Properties lesen | – | `map<string,string>` | lesen | keine |
+| PUT | `/api/v1/catalog/properties` | Properties speichern | `map<string,string>` | `204` | schreiben | keine |
+| GET | `/api/v1/catalog/last-folders` | letzte Ordner | – | `map<string,date-time>` | lesen | keine |
+| GET | `/api/v1/catalog/capabilities` | API-Fähigkeiten | – | `Capabilities` | lesen | keine |
 
-Optional:
-
-```text
-GET /api/v1/mediafiles/{id}/content?variationId=...
-GET /api/v1/variations/{id}/content
-```
-
-### 4.2 Upload
-
-```text
-POST /api/v1/mediafiles/insert
-POST /api/v1/mediafiles/{id}/content
-POST /api/v1/uploads
-```
-
-Der Upload muss Originaldaten, Dateiname, Größe, Checksumme, MIME-Typ und optional Thumbnail
-enthalten. Für große Dateien ist ein mehrstufiger Upload oder ein Pre-Signed-Upload sinnvoll.
-
-### 4.3 Dateiaktionen
-
-```text
-POST /api/v1/mediafiles/actions
-```
-
-Neue Aktionen:
-
-- `RENAME_FILE`
-- `MOVE_FILE`
-- `DELETE_FILE`
-- `RECYCLE_FILE`
-- `COPY_FILE`
-- `RESTORE_FILE`
-
-Die Aktion muss den serverseitigen Speicher ändern und den Katalog aktualisieren.
-
-### 4.4 Anhänge und Sidecars
-
-```text
-GET /api/v1/attachments/{id}/content
-POST /api/v1/attachments
-PUT /api/v1/attachments/{id}
-DELETE /api/v1/attachments/{id}
-GET /api/v1/mediafiles/{id}/sidecars
-POST /api/v1/mediafiles/{id}/sidecars
-```
-
-Sidecars sind u. a. `.wav`, `.mp3`, `.fcd`, `.ht_`, `.THM` und Preview-Dateien.
-
-### 4.5 Status und Capabilities
-
-```text
-GET /api/v1/catalog/capabilities
-```
-
-Beispiel:
+`Capabilities`:
 
 ```json
 {
   "canReadContent": true,
-  "canStreamVideo": true,
-  "canUploadContent": true,
-  "canMoveFiles": true,
-  "canDeleteFiles": true,
-  "supportsRange": true
+  "canStreamRange": true,
+  "canReadAttachments": true,
+  "canReadSidecars": true,
+  "canWriteCatalog": true,
+  "canUploadContent": false,
+  "canModifyFiles": false,
+  "contentStoreConfigured": true
 }
 ```
 
-Der Client kann damit lokale Funktionen gezielt ausblenden oder deaktivieren.
+### 5.3 Ordner und Kategorien
 
-## 5. Client-Architektur
+| Methode | Pfad | Zweck | Request | Response | DB | Dateisystem |
+| --- | --- | --- | --- | --- | --- | --- |
+| GET | `/api/v1/folders` | Ordnerliste | – | `Folder[]` | lesen | keine |
+| POST | `/api/v1/folders/ensure` | Ordner anlegen/finden | `Folder` | `Folder` | schreiben | keine |
+| DELETE | `/api/v1/folders/{id}` | Ordnerdatensatz löschen | – | `204` | schreiben | keine |
+| GET | `/api/v1/folders/{id}/count` | Medienanzahl | – | `integer` | lesen | keine |
+| GET | `/api/v1/categories/tree` | Kategoriebaum | – | `Category[]` | lesen | keine |
+| GET | `/api/v1/categories?variationId=...` | Kategorien einer Variation | – | `Category[]` | lesen | keine |
+| POST | `/api/v1/categories` | Kategorie speichern | `Category` | `Category` | schreiben | keine |
+| POST | `/api/v1/categories/by-path` | Kategorie per Pfad | `PathRequest` | `Category` | schreiben | keine |
+| DELETE | `/api/v1/categories/{id}` | Kategorie löschen | – | `204` | schreiben | keine |
+| GET | `/api/v1/categories/geo` | Geo-Kategorien | Query | `Category[]` | lesen | keine |
+| POST | `/api/v1/categories/from-media` | Kategorien zählen | `variationIds[]` | `CategoryCount[]` | lesen | keine |
+| GET | `/api/v1/categories/identifiers/{variationId}` | Kategorie-IDs | – | `integer[]` | lesen | keine |
 
-### 5.1 Neue Abstraktion
+### 5.4 Medien lesen und suchen
+
+| Methode | Pfad | Zweck | Request | Response | DB | Dateisystem |
+| --- | --- | --- | --- | --- | --- | --- |
+| POST | `/api/v1/mediafiles/query` | Medien suchen/filtern | `MediaQuery` | `MediaItem[]` | lesen | keine |
+| POST | `/api/v1/mediafiles/sql-query` | kontrollierte SELECT-Abfrage | `SqlQuery` | `MediaItem[]` | lesen | keine |
+| GET | `/api/v1/mediafiles/{id}` | einzelnes Medium | – | `MediaItem` | lesen | keine |
+| GET | `/api/v1/mediafiles/{id}/description` | Beschreibung | – | `Text` | lesen | keine |
+| GET | `/api/v1/mediafiles/{id}/variations` | Variationen | Query | `Variation[]` | lesen | keine |
+| POST | `/api/v1/mediafiles/insert` | Katalogdatensatz anlegen | `MediaInsert` | `InsertResult` | schreiben | keine Datei |
+| POST | `/api/v1/mediafiles/from-xml` | Katalog aus XML anlegen | `XmlImport` | `MediaItem[]` | schreiben | keine Datei |
+| POST | `/api/v1/mediafiles/thumbs` | Thumbnails laden | `int[]` | `Thumb[]` | lesen | keine |
+| GET | `/api/v1/mediafiles/checksum-count` | Checksum-Treffer | `checksum` | `integer` | lesen | keine |
+| GET | `/api/v1/mediafiles/sql-request` | SQL-Request bauen | `mediaItemIds` | `SqlQuery` | lesen | keine |
+| GET | `/api/v1/mediafiles/missing-files` | fehlende Originale | Query | `MediaItem[]` | lesen | read-only stat |
+| GET | `/api/v1/mediafiles/missing-thumbs` | fehlende Thumbs | Query | `MediaItem[]` | lesen | keine |
+
+`MediaQuery`-Modi bleiben wie in `docs/openapi.yaml`; `MISSING_FILES` darf ausschließlich
+read-only gegen den Content Store prüfen.
+
+### 5.5 Originalcontent, Thumbnails und Vorschauen
+
+| Methode | Pfad | Zweck | Request | Response | DB | Dateisystem |
+| --- | --- | --- | --- | --- | --- | --- |
+| GET/HEAD | `/api/v1/mediafiles/{id}/content` | Original streamen | `Range`, `If-None-Match` | Binärstream | Content-Locator lesen | **nur lesen** |
+| GET | `/api/v1/variations/{id}/thumb` | Thumbnail streamen | `width`, `height` | `image/jpeg` | `THUMBS` lesen | keine |
+| GET | `/api/v1/previews/{variationId}` | Vorschau | `width`, `height` | `Preview` | lesen oder im Speicher erzeugen | keine Schreibdatei |
+| GET | `/api/v1/previews/exists` | Vorschau vorhanden | Query | `boolean` | lesen | keine |
+| GET | `/api/v1/previews/variation-ids` | Vorschau-IDs | Query | `integer[]` | lesen | keine |
+| GET | `/api/v1/faces/previews/{variationId}` | Gesichtervorschau | Query | `FacePreview` | lesen | keine |
+| GET | `/api/v1/faces` | Gesichter zählen | Query | `FaceCount[]` | lesen | keine |
+
+Content-Streaming-Anforderungen:
+
+- `Content-Type` aus Dateiendung/MIME-Metadaten.
+- `Content-Length`.
+- `Accept-Ranges: bytes` und `Range`-Support.
+- `ETag` und/oder `Last-Modified`.
+- `401`/`403` bei fehlender Berechtigung.
+- `404` oder `409`, wenn kein Content Store konfiguriert ist.
+- Keine Temporärdateien auf dem Server.
+- Keine Dateisystem-Schreiboperationen.
+
+Die direkte URL sollte nur mit gültigem Bearer-Token oder einem kurzlebigen signierten
+Read-only-Token funktionieren. Für `MediaElement` kann ein signierter Read-only-Link nötig sein.
+
+Nicht bereitgestellt werden:
+
+- `POST /mediafiles/{id}/content`
+- `POST /uploads`
+- `POST /previews/build`
+- `DELETE /previews`
+- `PUT /variations/{id}/thumb` (Thumbnail-DB-Schreibpfad bleibt optional, aber kein Dateiupload)
+
+Preview-Dateien und temporäre Dateien dürfen auf dem Server nicht entstehen. Vorschauen müssen
+aus der Datenbank, dem read-only Content Store oder speicherintern erzeugt werden.
+
+### 5.6 Variationen, Layer, Metadaten, Beschreibungen
+
+| Methode | Pfad | Zweck | Request | Response | DB | Dateisystem |
+| --- | --- | --- | --- | --- | --- | --- |
+| POST | `/api/v1/mediafiles/{id}/variations` | Variation anlegen | `VariationCreate` | `Variation` | schreiben | keine Datei |
+| DELETE | `/api/v1/mediafiles/{id}/variations?name=...` | Variation löschen | Query | `204` | schreiben | keine Datei |
+| POST | `/api/v1/mediafiles/{id}/variations/replace` | Variationen ersetzen | `Variation[]` | `Variation[]` | schreiben | keine Datei |
+| PUT | `/api/v1/variations/{id}` | Variation ändern | `Variation` | `204` | schreiben | keine Datei |
+| POST | `/api/v1/variations/{id}/default` | Standardvariation | – | `204` | schreiben | keine Datei |
+| GET | `/api/v1/variations/{id}/layers` | Layer lesen | – | `Layer[]` | lesen | keine |
+| PUT | `/api/v1/variations/{id}/layers` | Layer speichern | `Layer[]` | `204` | schreiben | keine Datei |
+| POST | `/api/v1/metadata/query` | Metadaten lesen | `mediaIds[]` | `MetaData[]` | lesen | keine |
+| GET | `/api/v1/metadata/keys` | Metadaten-Keys | – | `string[]` | lesen | keine |
+| POST | `/api/v1/descriptions/query` | Beschreibungen lesen | `mediaIds[]` | `Description[]` | lesen | keine |
+| POST | `/api/v1/descriptions` | Beschreibung speichern | `Description` | `204` | schreiben | keine Datei |
+
+Variationen und Layer sind reine Katalog-/DB-Objekte. Die API erzeugt dabei keine Bilddateien
+auf dem Server.
+
+### 5.7 Anhänge und Sidecars
+
+| Methode | Pfad | Zweck | Request | Response | DB | Dateisystem |
+| --- | --- | --- | --- | --- | --- | --- |
+| POST | `/api/v1/attachments/query` | Anhänge lesen | `mediaIds[]` | `Attachment[]` | lesen | keine |
+| GET | `/api/v1/attachments/{id}/content` | Anhang streamen | – | Binärstream | lesen | **nur lesen** |
+| GET | `/api/v1/mediafiles/{id}/sidecars` | Sidecars listen | – | `Sidecar[]` | lesen | **nur lesen** |
+| GET | `/api/v1/mediafiles/{id}/sidecars/{type}` | Sidecar streamen | – | Binärstream | lesen | **nur lesen** |
+
+Nicht vorgesehen:
+
+- `POST /attachments`
+- `PUT /attachments/{id}`
+- `DELETE /attachments/{id}`
+- `POST /sidecars`
+- Datei-Uploads oder Datei-Löschungen
+
+Anhänge und Sidecars müssen bereits im read-only Content Store existieren.
+
+### 5.8 GPS, Meteorologie, Rollen, Requests, Maintenance
+
+| Methode | Pfad | Zweck | Request | Response | DB | Dateisystem |
+| --- | --- | --- | --- | --- | --- | --- |
+| GET | `/api/v1/roles` | Rollen | – | `Role[]` | lesen | keine |
+| GET | `/api/v1/gps/files` | GPS-Dateien | – | `GpsFile[]` | lesen | keine |
+| GET | `/api/v1/gps` | GPS-Punkte | `from`,`to` | `GeoPoint[]` | lesen | keine |
+| GET | `/api/v1/gps/nearest` | nächster Punkt | `date` | `GeoPoint` | lesen | keine |
+| POST | `/api/v1/gps/points` | GPS-Punkte speichern | `GeoPoint[]` | `204` | schreiben | keine Datei |
+| DELETE | `/api/v1/gps/files` | GPS-Datensatz löschen | `fileTime` | `204` | schreiben | keine Datei |
+| GET | `/api/v1/meteorology` | Meteorologie lesen | `from`,`to` | `Meteorology[]` | lesen | keine |
+| POST | `/api/v1/meteorology` | Meteorologie speichern | `Meteorology[]` | `204` | schreiben | keine Datei |
+| GET | `/api/v1/requests` | gespeicherte Requests | – | `UserRequest[]` | lesen | keine |
+| POST | `/api/v1/requests` | Request speichern | `UserRequest` | `UserRequest` | schreiben | keine Datei |
+| DELETE | `/api/v1/requests/{id}` | Request löschen | – | `204` | schreiben | keine Datei |
+| GET | `/api/v1/requests/{id}/sql` | Request-SQL | – | `Text` | lesen | keine |
+| PUT | `/api/v1/requests/{id}/sql` | Request-SQL speichern | `Text` | `204` | schreiben | keine Datei |
+| POST | `/api/v1/maintenance/clean` | Katalog bereinigen | – | `204` | schreiben | **keine Datei** |
+| POST | `/api/v1/duplicates/check` | Duplikat prüfen | `MediaAction` | `boolean` | lesen | keine |
+| GET | `/api/v1/duplicates/{id}` | Duplikate | `criteria` | `Duplicate[]` | lesen | keine |
+
+`maintenance/clean` darf ausschließlich Datenbankzeilen bereinigen, keine Dateien löschen.
+
+### 5.9 Katalogaktionen ohne Dateisystemzugriff
+
+`POST /api/v1/mediafiles/actions` bleibt für reine Katalogaktionen:
+
+- `SET_ROLE`
+- `SET_PRIORITY`
+- `SET_BOOKMARK`
+- `SET_DELETED` (Soft-Delete)
+- `SET_TRASH` (Soft-Delete/Trash-Flag)
+- `SET_GEODATA`
+- `ADJUST_MEDIA_DATE`
+- `ADD_VIEW_TIME`
+- `CATEGORIZE`
+- `UNCATEGORIZE`
+- `UPDATE_DUPLICATE`
+- `ROTATE_90` nur als Metadaten-/Variationsaktion, ohne Dateisystemzugriff
+
+Nicht mehr zulässig:
+
+- `RENAME_FILE`
+- `MOVE_FILE`
+- `COPY_FILE`
+- `DELETE_FILE`
+- `RECYCLE_FILE`
+- `RESTORE_FILE`
+- `REMOVE_AND_RECYCLE`
+
+`REMOVE_FROM_DB` darf nur den Katalogdatensatz löschen, nicht die Datei.
+
+## 6. Client-Architektur
+
+### 6.1 Neue Abstraktion
 
 ```csharp
-public interface IMediaContentStore
+public interface IMediaContentReader
 {
     bool Exists(MediaItem item);
-    string GetLocalPath(MediaItem item, ContentPurpose purpose);
     Stream OpenRead(MediaItem item);
-    Uri GetStreamUri(MediaItem item, ContentPurpose purpose);
+    Uri GetReadOnlyStreamUri(MediaItem item, ContentPurpose purpose);
     Task<string> EnsureLocalCopyAsync(MediaItem item, ContentPurpose purpose);
-    Task UploadAsync(MediaItem item, string localPath);
-    Task DeleteAsync(MediaItem item);
+    bool CanReadContent { get; }
 }
 ```
 
 Implementierungen:
 
-- `LocalMediaContentStore`: bisheriges Verhalten für SQLite und MariaDB.
-- `ApiMediaContentStore`: API-Streaming, Cache und Upload.
-- `ReadOnlyApiMediaContentStore`: nur Anzeige, keine schreibenden Dateioperationen.
+- `LocalMediaContentReader`: bisheriges Verhalten für SQLite/MariaDB-Dateimodus.
+- `ApiMediaContentReader`: read-only Content-Streaming und lokaler Client-Cache.
+- `UnavailableMediaContentReader`: Content-Funktionen deaktiviert.
+
+Schreibmethoden gehören nicht in diese Schnittstelle. Schreibende Dateioperationen bleiben
+Aufgabe des lokalen Modus oder eines separaten Ingest-Prozesses.
 
 `ContentPurpose` steuert die Strategie, z. B. `Thumbnail`, `Preview`, `ViewImage`, `PlayVideo`,
 `Export`, `Metadata`, `Sidecar`.
 
-### 5.2 `MediaItem` anpassen
+### 6.2 `MediaItem` anpassen
 
 - `FullName` bleibt die logische Katalogreferenz.
 - `FileObject` darf im API-Modus nicht ungeprüft die Originaldatei liefern.
@@ -374,83 +524,87 @@ Implementierungen:
   - `ContentLength`
   - `ContentType`
   - `CanStream`
-- Zugriffe auf `FileObject` in kritischen Pfaden durch `IMediaContentStore` ersetzen.
-- Übergangsweise kann `FileObject` im API-Modus auf eine Cache-Datei zeigen; bei fehlender Kopie
+- Zugriffe auf `FileObject` in kritischen Pfaden durch `IMediaContentReader` ersetzen.
+- `FileObject` kann im API-Modus auf eine Client-Cache-Datei zeigen; bei fehlender Kopie
   muss ein klarer Fehler oder ein asynchroner Download erfolgen.
 
-### 5.3 UI-Verhalten
+### 6.3 UI-Verhalten
 
-- Fehlender Content: Vorschau/Thumbnail anzeigen, Original nicht öffnen.
-- Video ohne lokalen Cache: Streaming oder Download mit Fortschritt.
+- Fehlender Content: Thumbnail anzeigen, Original nicht öffnen.
+- Video ohne lokalen Cache: read-only Streaming oder Download mit Fortschritt.
 - Nicht unterstützte Aktion: Menüpunkt deaktivieren und Tooltip anzeigen.
 - Keine `File.Exists`-Prüfung auf Katalogpfaden im API-Modus.
 - Keine Windows-Pfade in Webgalerien oder externen Playern verwenden.
+- „Datei löschen/umbenennen/verschieben“ im API-Modus ausblenden.
+- „Aus Katalog entfernen“ (DB-only) weiterhin anbieten.
 
-## 6. Umsetzungsphasen
+## 7. Umsetzungsphasen
 
 ### Phase 1: Bestandsaufnahme und Capabilities
 
-- `IMediaContentStore` einführen, zunächst nur `LocalMediaContentStore`.
+- `IMediaContentReader` einführen, zunächst nur `LocalMediaContentReader`.
 - `ApiProvider` liefert Capability-Daten.
-- Alle direkten `FileObject`-Zugriffe in den o. g. Dateien erfassen und als TODO markieren.
+- Alle direkten `FileObject`-Zugriffe erfassen und als TODO markieren.
+- Schreibende Dateifunktionen im API-Modus deaktivieren.
 
-### Phase 2: Original-Content-API
+### Phase 2: Read-only Content-API
 
-- `GET /mediafiles/{id}/content` mit Range und ETag im Backend.
-- Client-Download in Cache.
-- `ApiMediaContentStore.EnsureLocalCopyAsync`.
-- Bilder, Panoramen und 3D-Viewer auf den Store umstellen.
+- `GET/HEAD /mediafiles/{id}/content` mit Range/ETag im Backend.
+- Read-only Content Root konfigurieren.
+- Client-Download in lokalen Cache.
+- Bilder, Panoramen und 3D-Viewer auf den Reader umstellen.
 
 ### Phase 3: Video und Streaming
 
-- Signierte Streaming-URLs oder lokaler Video-Cache.
+- Signierte Read-only-Streaming-URLs oder lokaler Video-Cache.
 - `VideoPlayer`, `nVlc`, `VideoLanDotNet`, `MediaViewer` und `TakeSnapshot` anpassen.
 - Range-Requests und Abbruch/Timeout testen.
 
-### Phase 4: Import/Upload
+### Phase 4: Importstrategie
 
-- Upload-Endpunkt und Pre-Signed-Uploads.
-- `ApiInsert` um Originaldatei und Upload-Fortschritt erweitern.
-- MD5, Thumbnail, EXIF und Datumswerte weiterhin clientseitig erzeugen und mitsenden.
-- Server speichert Content und Katalogmetadaten konsistent.
+- API-Modus ohne Datei-Upload: Import deaktivieren oder auf vorhandenen Content-Store verweisen.
+- Optional separater Ingest-Prozess außerhalb der API.
+- `ApiInsert` ohne Originaldatei-Upload; nur Katalog-/Thumbnail-Daten.
+- Keine API-Schreiboperation auf dem Content Store.
 
-### Phase 5: Mutationen
+### Phase 5: Katalogmutationen
 
-- Rename/Move/Delete/Recycle über `/mediafiles/actions`.
-- `FilesAndFolders`, `RenameFile`, `CopyMenuItem` und `ThumblistContainer` im API-Modus umleiten.
-- Lokale Dateioperationen nur noch auf Cache-Dateien zulassen.
+- Reine DB-Aktionen weiterhin über `/mediafiles/actions`.
+- Dateiaktionen im API-Modus entfernen/deaktivieren.
+- `FilesAndFolders`, `RenameFile`, `CopyMenuItem` und `ThumblistContainer` entsprechend schützen.
 
 ### Phase 6: Anhänge, Sidecars und Export
 
-- Attachment-Content-Endpunkte.
-- Sidecar-Endpunkte.
-- Export/Snapshot lädt Original in Cache.
+- Read-only Attachment-/Sidecar-Endpunkte.
+- Export/Snapshot lädt Original in den Client-Cache.
 - Webgalerie verwendet API-URLs statt lokaler Pfade.
+- Keine Attachment-/Sidecar-Uploads über die API.
 
 ### Phase 7: Fehlende Dateien und Cache
 
-- Serverseitige `ContentAvailable`-Prüfung.
+- Serverseitige `ContentAvailable`-Prüfung (read-only).
 - `GetMediaItemsWithMissingFiles` über API-Status.
 - Cache-LRU, ETag-Invalidierung und Aufräumen.
 - Verhalten bei Offline-Backend und abgelaufenem Token.
 
-## 7. Akzeptanzkriterien
+## 8. Akzeptanzkriterien
 
 - MediaBrowserWpf startet und zeigt Katalog/Thumbnails ohne lokale Originaldateien.
 - Ein Bild aus einem API-Katalog lässt sich ohne lokale Originaldatei anzeigen.
-- Ein Video lässt sich streamen oder in den Cache laden.
-- Ein Import von einem anderen Rechner lädt die Originaldatei zum Backend hoch.
-- Rename/Move/Delete funktionieren über API-Aktionen.
-- Anhänge und Sidecars können geladen und gespeichert werden.
+- Ein Video lässt sich read-only streamen oder in den Client-Cache laden.
+- Der API-Modus führt keine Datei-Schreiboperationen aus.
+- Import, Rename, Move, Delete, Copy und Recycle von Dateien sind im API-Modus deaktiviert.
+- Soft-Delete und Katalogbereinigung ändern nur Datenbankzeilen.
+- Anhänge und Sidecars können nur gelesen werden, wenn sie im read-only Content Store liegen.
 - Fehlende Serverdateien werden korrekt angezeigt, ohne lokale `File.Exists`-Fehlalarme.
-- Keine API-Funktion schreibt versehentlich in einen lokalen Katalogpfad.
+- Der Client schreibt nur in seinen eigenen Cache oder Exportordner.
 - Token- und Content-URLs werden nicht geloggt.
 
-## 8. Offene Entscheidungen
+## 9. Offene Entscheidungen
 
-1. Werden Originaldateien im Backend gespeichert oder nur referenziert?
-2. Sollen Videos gestreamt oder immer lokal gecacht werden?
-3. Werden signierte URLs für `MediaElement` benötigt?
-4. Wie groß darf der lokale Cache werden und wann wird er geleert?
-5. Sollen Sidecars automatisch beim Upload mitgesendet werden?
-6. Sind serverseitige Dateioperationen oder ein externer Objektspeicher vorgesehen?
+1. Wird ein read-only Content Root bereitgestellt oder bleibt der API-Modus katalog-only?
+2. Werden Videos gestreamt oder immer lokal gecacht?
+3. Werden signierte Read-only-URLs für `MediaElement` benötigt?
+4. Wie groß darf der Client-Cache werden und wann wird er geleert?
+5. Welcher externe Ingest-Prozess befüllt den Content Store?
+6. Werden Anhänge und Sidecars im Content Store oder in der Datenbank gehalten?

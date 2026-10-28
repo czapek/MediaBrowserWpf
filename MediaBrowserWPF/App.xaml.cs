@@ -94,6 +94,11 @@ namespace MediaBrowserWPF
                 return;
             }
 
+            if (arguments.Provider == "api")
+            {
+                ApiRequestObserverHost.Observer = new MediaBrowserWPF.Utilities.ApiBusyOverlay();
+            }
+
             Action<string> progress = null;
 
             if (arguments.Provider == "mariadb" && arguments.Update)

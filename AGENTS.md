@@ -51,6 +51,18 @@ Bekannte, bereits vorhandene Warnung:
 
 - `CS0618` in `MediaBrowser4Lib\Objects\MediaItem.cs` wegen `FormattedText`.
 
+## Deployment
+
+Wenn der Benutzer „deploy“ sagt, nach einem erfolgreichen Build ausführen:
+
+```powershell
+.\scripts\Deploy-ToSynology.ps1
+```
+
+Das Skript kopiert die neueren Build-Dateien nach
+`C:\Users\SebastianCzapek\SynologyDriveDevelopment\MediaBrowserWpf`. Vorher sicherstellen, dass
+`MediaBrowserWPF` nicht läuft. Für eine Vorschau `-Preview` verwenden.
+
 Die Warnung ist nicht durch neue Änderungen verursacht und muss nicht behoben werden, sofern die
 Aufgabe nichts anderes verlangt.
 
@@ -163,6 +175,10 @@ Regeln:
 - Der API-Vertrag ist in `docs/openapi.yaml` definiert. Änderungen an Endpunkten oder DTOs zuerst dort
   und in `ApiDtos.cs` nachziehen.
 - Das Spring-Boot-Backend wird separat implementiert und ist nicht Teil dieses Repositories.
+- Die MediaBrowser-API darf keine Schreiboperationen auf dem Medien-Dateisystem ausführen:
+  keine Uploads, kein Copy/Move/Rename/Delete/Recycle von Original-, Sidecar- oder Preview-Dateien.
+  Datenbank-Schreiboperationen bleiben erlaubt. Der geplante Umgang steht in
+  `docs/api-filesystem-access-plan.md`.
 - `ApiProvider.MBCommand` und `ApiProvider.MBTransaction` werfen bewusst `NotSupportedException`.
   Keine direkten SQL-Aufrufe in API-Pfade einbauen.
 - `MediaBrowserContext` lädt Katalogproperties über `DBProvider.GetDBProperties()`. Der API-Provider

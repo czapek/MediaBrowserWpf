@@ -182,6 +182,7 @@
     <Compile Include="DB\Api\ApiDtos.cs" />
     <Compile Include="DB\Api\ApiInsert.cs" />
     <Compile Include="DB\Api\ApiProvider.cs" />
+    <Compile Include="DB\Api\ApiRequestObserver.cs" />
     <Compile Include="DB\Api\SpringApiClient.cs" />
     <Compile Include="DB\Migration\SqliteToMariaDbMigration.cs" />
     <Compile Include="DB\SqlParameterInfo.cs" />

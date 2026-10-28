@@ -145,6 +145,17 @@ paths:
                 additionalProperties:
                   type: string
                   format: date-time
+  /catalog/capabilities:
+    get:
+      tags: [catalog]
+      operationId: getCapabilities
+      responses:
+        '200':
+          description: Verfügbare API-Funktionen
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Capabilities'
 
   /folders:
     get:
@@ -448,6 +459,60 @@ paths:
       responses:
         '204':
           description: Medienobjekt aktualisiert
+  /mediafiles/{id}/content:
+    get:
+      tags: [mediafiles]
+      operationId: getMediaContent
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - name: Range
+          in: header
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Originalinhalt
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '206':
+          description: Teilinhalt für Range-Request
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: Inhalt nicht vorhanden
+        '409':
+          description: Kein Content Store konfiguriert
+    head:
+      tags: [mediafiles]
+      operationId: headMediaContent
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Content-Metadaten
+        '404':
+          description: Inhalt nicht vorhanden
+  /mediafiles/{id}/sidecars:
+    get:
+      tags: [mediafiles]
+      operationId: getSidecars
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Read-only Sidecar-Dateien
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Sidecar'
   /mediafiles/{id}/description:
     get:
       tags: [mediafiles]
@@ -762,43 +827,6 @@ paths:
             application/json:
               schema:
                 type: boolean
-  /previews:
-    delete:
-      tags: [previews]
-      operationId: deletePreviews
-      parameters:
-        - name: width
-          in: query
-          required: true
-          schema:
-            type: integer
-        - name: height
-          in: query
-          required: true
-          schema:
-            type: integer
-        - name: variationIds
-          in: query
-          required: true
-          schema:
-            type: string
-            example: 1,2,3
-      responses:
-        '204':
-          description: Vorschauen gelöscht
-  /previews/build:
-    post:
-      tags: [previews]
-      operationId: buildPreviews
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ThumbBuild'
-      responses:
-        '204':
-          description: Vorschauen erzeugt
   /previews/variation-ids:
     get:
       tags: [previews]
@@ -987,21 +1015,22 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Attachment'
-  /attachments:
-    post:
+  /attachments/{id}/content:
+    get:
       tags: [attachments]
-      operationId: saveAttachments
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: array
-              items:
-                $ref: '#/components/schemas/Attachment'
+      operationId: getAttachmentContent
+      parameters:
+        - $ref: '#/components/parameters/Id'
       responses:
-        '204':
-          description: Anhänge gespeichert
+        '200':
+          description: Read-only Anhang
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: Anhang nicht vorhanden
 
   /roles:
     get:
@@ -1312,6 +1341,27 @@ components:
           type: integer
           description: Gültigkeit des Access-Tokens in Sekunden
           example: 600
+    Capabilities:
+      type: object
+      properties:
+        canReadContent:
+          type: boolean
+        canStreamRange:
+          type: boolean
+        canReadAttachments:
+          type: boolean
+        canReadSidecars:
+          type: boolean
+        canWriteCatalog:
+          type: boolean
+        canUploadContent:
+          type: boolean
+          example: false
+        canModifyFiles:
+          type: boolean
+          example: false
+        contentStoreConfigured:
+          type: boolean
     CatalogInfo:
       type: object
       properties:
@@ -1713,6 +1763,18 @@ components:
           type: boolean
         isShared:
           type: boolean
+    Sidecar:
+      type: object
+      properties:
+        type:
+          type: string
+        fullName:
+          type: string
+        contentAvailable:
+          type: boolean
+        contentLength:
+          type: integer
+          format: int64
     Description:
       type: object
       properties:

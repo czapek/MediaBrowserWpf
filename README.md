@@ -85,6 +85,18 @@ Die wichtigsten Ergebnisse liegen unter:
 Bekannte, bereits vorhandene Compilerwarnung: `CS0618` in
 `MediaBrowser4Lib\Objects\MediaItem.cs` wegen einer veralteten `FormattedText`-Überladung.
 
+### Deployment
+
+Nach dem Build können die neueren Dateien in das lokale Synology-Deployment kopiert werden:
+
+```powershell
+.\scripts\Deploy-ToSynology.ps1 -Preview
+.\scripts\Deploy-ToSynology.ps1
+```
+
+Das Skript kopiert aus `MediaBrowserWPF\bin\Debug` nur Dateien, die im Ziel neuer sind, und löscht
+keine zusätzlichen Dateien im Deployment-Ordner.
+
 ## Start und Kommandozeile
 
 ### SQLite
@@ -186,6 +198,11 @@ Der vollständige REST-Vertrag inklusive DTO-Schemas und Auth-Endpunkten liegt i
 `docs/openapi.yaml`. Das Backend muss diese Schnittstelle implementieren. Der API-Provider
 unterstützt keine direkten SQL-Transaktionen; `MBCommand` und `MBTransaction` werfen bewusst
 `NotSupportedException`.
+
+Wichtig für den API-Modus: Das Backend führt keine Schreiboperationen auf dem Medien-Dateisystem
+aus. Originaldateien werden nur aus einem read-only Content Store gelesen. Upload, Rename, Move,
+Delete und Recycle von Dateien sind nicht Teil der API. Details stehen in
+`docs/api-filesystem-access-plan.md`.
 
 ### Launcher
 

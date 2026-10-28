@@ -126,6 +126,20 @@ namespace MediaBrowserWPF
                                            .Version
                                            .ToString();
 
+            ApplyApiModeRestrictions();
+        }
+
+        private void ApplyApiModeRestrictions()
+        {
+            if (!MediaBrowserContext.IsApiMode)
+                return;
+
+            this.MenuItemAddMedia.IsEnabled = false;
+            this.MenuItemOpenOrCreateDatabase.IsEnabled = false;
+            this.MenuItemOpenFromList.IsEnabled = false;
+            this.MenuItemRemoveDeleted.IsEnabled = false;
+            this.MenuItemImportMetadata.IsEnabled = false;
+            this.MenuItemMissingFileBehavior.IsEnabled = false;
         }
 
         public static void GiveShortFeedback()

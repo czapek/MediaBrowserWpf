@@ -35,6 +35,18 @@ namespace MediaBrowserWPF.UserControls
         public ThumblistContainerContextMenu()
         {
             InitializeComponent();
+
+            if (MediaBrowserContext.IsApiMode)
+            {
+                this.MenuItemOpenInExplorer.IsEnabled = false;
+                this.MenuItemOpenWith.IsEnabled = false;
+                this.MenuItemRenameSmart.IsEnabled = false;
+                this.MenuItemRemoveTemp.IsEnabled = false;
+                this.MenuItemOpenWithHugin.IsEnabled = false;
+                this.MenuItemOpenWithICE.IsEnabled = false;
+                this.MenuItemPanoramaStudio.IsEnabled = false;
+                this.CopyMenuItem.IsEnabled = false;
+            }
         }
 
         public ThumblistContainer ThumblistContainer

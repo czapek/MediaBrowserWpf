@@ -9,6 +9,16 @@ Das Backend stellt den Medienkatalog über HTTP bereit, sodass MediaBrowserWpf m
 `--provider api` gegen eine zentrale Instanz arbeiten kann. Die MariaDB bleibt ausschließlich
 serverseitig konfiguriert. Der Client sendet keine Datenbank-Zugangsdaten an die API.
 
+Verbindliche Einschränkung:
+
+- Die API führt **keine Schreiboperationen auf dem Medien-Dateisystem** aus.
+- Es gibt keine Upload-, Copy-, Move-, Rename-, Delete- oder Recycle-Endpunkte für Original-,
+  Sidecar- oder Preview-Dateien.
+- Originalmedien werden nur gelesen, wenn sie bereits in einem read-only Content Store liegen.
+- Datenbank-Schreiboperationen bleiben erlaubt.
+- Das Befüllen des Content Stores erfolgt außerhalb der MediaBrowser-API durch einen separaten
+  Ingest-/Sync-Prozess.
+
 ## 2. Technologievorschlag
 
 - Java 21
@@ -276,7 +286,48 @@ Diese Gruppen bilden die bestehenden Provider-Methoden ab. Thumbnails werden als
 gestreamt oder als Base64 in DTOs übertragen. Metadaten und Beschreibungen werden immer
 tenant- und medienbezogen validiert.
 
-### 6.7 GPS, Meteorologie, Requests, Duplicates, Maintenance
+Anhänge und Sidecars werden nur gelesen. Upload, Änderung und Löschen von Anhängen oder
+Sidecar-Dateien sind nicht Teil der API.
+
+### 6.7 Originalcontent und Capabilities
+
+Read-only Endpunkte:
+
+- `HEAD /mediafiles/{id}/content`
+- `GET /mediafiles/{id}/content`
+- `GET /variations/{id}/thumb`
+- `GET /previews/{variationId}`
+- `GET /faces/previews/{variationId}`
+- `GET /attachments/{id}/content`
+- `GET /mediafiles/{id}/sidecars`
+- `GET /catalog/capabilities`
+
+Content-Anforderungen:
+
+- `Content-Type`, `Content-Length`
+- `Range`-Requests
+- `ETag`/`Last-Modified`
+- Pfadnormalisierung und Schutz vor Directory Traversal
+- Content Root nur read-only öffnen
+- keine temporären Dateien auf dem Server
+- `404`/`409`, wenn kein Content Store konfiguriert ist
+
+Capabilities melden mindestens:
+
+```json
+{
+  "canReadContent": true,
+  "canStreamRange": true,
+  "canReadAttachments": true,
+  "canReadSidecars": true,
+  "canWriteCatalog": true,
+  "canUploadContent": false,
+  "canModifyFiles": false,
+  "contentStoreConfigured": true
+}
+```
+
+### 6.8 GPS, Meteorologie, Requests, Duplicates, Maintenance
 
 - GPS-Dateien und GPS-Punkte
 - Meteorologiedaten
@@ -284,7 +335,8 @@ tenant- und medienbezogen validiert.
 - Duplikaterkennung
 - Katalogbereinigung
 
-Die Bereinigung darf nur mit expliziter Berechtigung ausgeführt werden.
+Die Bereinigung darf nur Datenbankzeilen ändern. Sie darf keine Dateien löschen und nur mit
+expliziter Berechtigung ausgeführt werden.
 
 ## 7. DTO- und Fehlerbehandlung
 
@@ -365,8 +417,11 @@ SPRING_DATASOURCE_PASSWORD
 MEDIABROWSER_JWT_SECRET
 MEDIABROWSER_ACCESS_TOKEN_SECONDS=600
 MEDIABROWSER_REFRESH_TOKEN_SECONDS=28800
+MEDIABROWSER_CONTENT_ROOT=/mnt/media-readonly
 ```
 
+- `MEDIABROWSER_CONTENT_ROOT` muss read-only eingebunden sein.
+- Ohne Content Root liefert `/catalog/capabilities` `canReadContent=false`.
 - Secrets nicht im Repository speichern.
 - HTTPS über Reverse Proxy oder Ingress.
 - Health- und Metrics-Endpunkte für Betrieb bereitstellen.
@@ -394,27 +449,30 @@ MEDIABROWSER_REFRESH_TOKEN_SECONDS=28800
 - MediaQuery-Modi
 - Suche, Sortierung, Filter
 - Trash, Bookmarks, Missing Files/Thumbs
+- Missing Files nur als read-only Content-Store-Prüfung
 - Thumbnail-Batch-Abruf
 
-### Phase 4: Insert und Medien schreiben
+### Phase 4: Insert und Katalog schreiben
 
-- Insert-Endpunkt inklusive Variation und Thumbnail
+- Insert-Endpunkt für Katalogmetadaten und Variation/Thumbnail
+- Originalcontent muss bereits im read-only Content Store existieren
+- Kein Upload von Originaldateien über die API
 - Update, Aktionen, Rollen, Prioritäten
 - Duplikaterkennung
-- Massenimport und Batch-Verhalten
+- Keine Dateioperationen (Rename/Move/Delete/Recycle)
 
 ### Phase 5: Variationen und Vorschauen
 
 - Variations-CRUD
 - Layers
-- Preview-/Face-Endpunkte
+- Preview-/Face-Endpunkte ohne serverseitige Dateischreibungen
 - Thumbnail-Streaming
 
 ### Phase 6: Metadaten und Zusatzdaten
 
 - Metadaten
 - Beschreibungen
-- Anhänge
+- Anhänge nur lesend
 - GPS und Meteorologie
 - Benutzerdefinierte Requests
 
@@ -423,6 +481,8 @@ MEDIABROWSER_REFRESH_TOKEN_SECONDS=28800
 - Lasttests
 - Tenant-Isolation
 - SQL-Endpunkte absichern
+- Sicherstellen, dass keine API-Route Dateien schreibt
+- Content-Root read-only prüfen
 - Backup-/Restore-Konzept
 - Monitoring und Alerting
 - Deployment-Dokumentation
@@ -431,10 +491,14 @@ MEDIABROWSER_REFRESH_TOKEN_SECONDS=28800
 
 - Alle Endpunkte aus `docs/openapi.yaml` sind implementiert.
 - Login, Refresh und Logout funktionieren mit Token-Rotation.
-- MediaBrowserWpf kann mit `--provider api` starten, suchen, lesen und neue Medien importieren.
+- MediaBrowserWpf kann mit `--provider api` starten, suchen und Katalog/Thumbnails lesen.
+- Originalmedien werden nur aus einem read-only Content Store gelesen.
+- Die API führt keine Schreiboperationen auf dem Medien-Dateisystem aus.
+- Keine Upload-, Rename-, Move-, Delete- oder Recycle-Endpunkte für Dateien.
 - Thumbnails werden mit `PREVIEW_WIDTH=0` und `PREVIEW_HEIGHT=0` ausgeliefert.
 - Keine MariaDB-Zugangsdaten im Client oder in API-Logs.
 - Integrationstests laufen gegen eine echte MariaDB in Testcontainers.
+- Content-Tests prüfen Range, ETag und fehlende Dateien ohne Schreibzugriffe.
 - OpenAPI-Validierung und Contract-Tests laufen in der CI.
 - Betriebs- und Backup-Dokumentation ist vorhanden.
 
@@ -447,6 +511,9 @@ MariaDB-Provider und dem MariaDB-Insert:
   Metadatenabfragen.
 - `MediaBrowserInsertService.java`: Insert-Pipeline mit Ordner-, Duplikat-, History-,
   Thumbnail-, Layer-, Kategorie- und Metadatenlogik.
+
+Die detaillierten Backend-Endpunkte und das Verbot von Dateisystem-Schreiboperationen sind in
+`docs/api-filesystem-access-plan.md` beschrieben.
 
 Diese Klassen sind als Datenzugriffsschicht gedacht und müssen noch in die Controller-,
 Security- und DTO-Schicht des Backends eingebunden werden.

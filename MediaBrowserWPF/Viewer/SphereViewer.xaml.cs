@@ -352,8 +352,8 @@ namespace MediaBrowserWPF.Viewer
             try
             {
                 this.visibleMediaItem = this.mediaItemList[this.selectedIndex];
-                this.mediaElementMaterial.Source = new Uri(this.mediaItemList[this.selectedIndex].FullName);
-                this.mediaElementBackMaterial.Source = new Uri(this.mediaItemList[this.selectedIndex].FullName);
+                this.mediaElementMaterial.Source = new Uri(this.mediaItemList[this.selectedIndex].FileObject.FullName);
+                this.mediaElementBackMaterial.Source = new Uri(this.mediaItemList[this.selectedIndex].FileObject.FullName);
 
                 sp.Restart();
                 this.slideShowTimer.IsEnabled = this.visibleMediaItem is MediaItemBitmap;

@@ -12,11 +12,12 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using MediaBrowser4.Objects;
+using MediaBrowser4;
 
 namespace MediaBrowserWPF.UserControls
 {
     /// <summary>
-    /// Interaktionslogik für ThumblistContainerTabItemContextMenu.xaml
+    /// Interaktionslogik f�r ThumblistContainerTabItemContextMenu.xaml
     /// </summary>
     public partial class ThumblistContainerTabItemContextMenu : ContextMenu
     {
@@ -32,6 +33,12 @@ namespace MediaBrowserWPF.UserControls
         {
             this.tabItem = tabItem;
             InitializeComponent();
+
+            if (MediaBrowserContext.IsApiMode)
+            {
+                this.MenuItemRescan.IsEnabled = false;
+                this.MenuItemRescanRecursive.IsEnabled = false;
+            }
         }
 
         private void MenuItem_CloseThis(object sender, RoutedEventArgs e)

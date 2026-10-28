@@ -228,6 +228,9 @@ namespace MediaBrowserWPF.UserControls
 
             this.SortMediaItemList();
 
+            if (MediaBrowserContext.IsApiMode)
+                MediaBrowserContext.GetThumbsForAllMediaItems(this.mediaItemList);
+
             this.AddMediaItems();
 
             this.SelectedMediaItem = selectedOld;
@@ -236,14 +239,14 @@ namespace MediaBrowserWPF.UserControls
             {
                 foreach (MediaItem mItem in this.mediaItemList)
                 {
-                    if (!File.Exists(mItem.FullName))
+                    if (!MediaBrowserContext.FileExists(mItem))
                     {
                         Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Normal, new Action(delegate ()
                         {
                             mItem.IsFileNotFound = true;
                         }));
                     }
-                    else if (File.Exists(mItem.FullName))
+                    else
                     {
                         Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Normal, new Action(delegate ()
                         {

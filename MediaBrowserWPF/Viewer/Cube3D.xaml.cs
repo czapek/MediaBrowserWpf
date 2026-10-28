@@ -136,7 +136,7 @@ namespace MediaBrowserWPF.Viewer
             {
                 Random rand = new Random();
                 MediaItem mItem = this.mediaItemListBackground[rand.Next(this.mediaItemListBackground.Count)];
-                this.SetBackground(mItem.FullName);
+                this.SetBackground(mItem.FileObject.FullName);
 
                 ImageBrush imageBrush = new ImageBrush();
                 BitmapImage bmp = new BitmapImage();
@@ -240,7 +240,7 @@ namespace MediaBrowserWPF.Viewer
                 {
                     if (!File.Exists(filename))
                     {
-                        System.Drawing.Bitmap bmp = System.Drawing.Image.FromFile(mItem.FullName) as System.Drawing.Bitmap;
+                        System.Drawing.Bitmap bmp = System.Drawing.Image.FromFile(mItem.FileObject.FullName) as System.Drawing.Bitmap;
 
                         if (i == 0)
                             bmp = MediaProcessing.ResizeImage.ActionCropIn(bmp, new System.Drawing.Size((int)System.Windows.SystemParameters.PrimaryScreenWidth, (int)System.Windows.SystemParameters.PrimaryScreenHeight), new System.Drawing.Size(), System.Drawing.Color.Black, 0);
@@ -254,7 +254,7 @@ namespace MediaBrowserWPF.Viewer
                 }
                 else
                 {
-                    filenames.Add(mItem.FullName);
+                    filenames.Add(mItem.FileObject.FullName);
                 }
             }
         }

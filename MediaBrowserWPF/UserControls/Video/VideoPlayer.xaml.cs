@@ -1009,7 +1009,7 @@ namespace MediaBrowserWPF.UserControls.Video
                 }
 
                 if (this.videoPlayer == null
-                    || !File.Exists(this.visibleMediaItem.FullName))
+                    || !MediaBrowserContext.FileExists(this.visibleMediaItem))
                 {
                     this.usePreviewDb = MediaBrowserContext.IsImageInPreviewDB(this.visibleMediaItem.VariationId);
 

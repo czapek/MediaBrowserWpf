@@ -38,7 +38,7 @@
                     <ContextMenu Opened="ContextMenu_Opened">
                         <MenuItem Name="MenuItemRecentFolders" Header="Zuletzt geöffnet ..." />
                         <MenuItem Name="OpenExplorer" Header="Öffne in Windows Explorer" InputGestureText="Umschalt+Enter" Click="OpenExplorer_Click" />
-                        <MenuItem Header="Medien hierhin verschieben" InputGestureText="Strg+V" Click="MoveMediaItems_Click" />
+                        <MenuItem Name="MenuItemMoveHere" Header="Medien hierhin verschieben" InputGestureText="Strg+V" Click="MoveMediaItems_Click" />
                         <MenuItem Name="MenuItemImportMetadata" Header="Importiere Metadaten (*.xml)" Click="MenuItemImportMetadata_Click" />
                         <MenuItem Header="Lösche ..." >
                             <MenuItem Name="MenuItemDelete" Header="... diese Ebene inkl. Dateien" InputGestureText="Entf" Click="MenuItemDelete_Click" />

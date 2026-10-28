@@ -47,18 +47,18 @@
 
             <Menu Height="23" Grid.Row="0" Background="LightSteelBlue" HorizontalAlignment="Stretch" VerticalAlignment="Top" >
                 <MenuItem Header="Datenbank" >
-                    <MenuItem Header="Datenbank öffnen oder neu erstellen" Click="MenuItem_Click_NewDatabase"  />
+                    <MenuItem Name="MenuItemOpenOrCreateDatabase" Header="Datenbank öffnen oder neu erstellen" Click="MenuItem_Click_NewDatabase"  />
                     <MenuItem Name="DatabasesInFolder" Header="Gefundene Datenbanken" />
                     <MenuItem Header="Datenbank bereinigen" Click="MenuItemCleanDB_Click"  />
                 </MenuItem>
                 <MenuItem Header="Import">
-                    <MenuItem  Header="Medien zur Datenbank hinzufügen" >
-                        <MenuItem Header="Einzelne Dateien" Click="MenuItemAddSingle_Click" />
-                        <MenuItem Header="Ordner inkl. Unterordner" Click="MenuItemAddDirectory_Click" />
-                        <MenuItem Header="Ordner in Vorschau-Datenbank einlesen" Click="MenuItemVorschauDB_Click" />
-                        <MenuItem Header="Aus der Zwischenablage" InputGestureText="Strg+V" Click="MenuItemAddFromClipboard_Click" />
-                        <MenuItem Header="Von einer Speicherkarte" InputGestureText="Strg+Q" Click="MenuItemAddSDCard_Click" />
-                        <MenuItem Header="Aus Metadaten (*.xml)" ToolTip="Der Ordner wo die XML-Datei liegt ist auch Import-Ordner" Click="MenuItemImportMetadata_Click" />
+                    <MenuItem Name="MenuItemAddMedia" Header="Medien zur Datenbank hinzufügen" >
+                        <MenuItem Name="MenuItemAddSingle" Header="Einzelne Dateien" Click="MenuItemAddSingle_Click" />
+                        <MenuItem Name="MenuItemAddDirectory" Header="Ordner inkl. Unterordner" Click="MenuItemAddDirectory_Click" />
+                        <MenuItem Name="MenuItemVorschauDB" Header="Ordner in Vorschau-Datenbank einlesen" Click="MenuItemVorschauDB_Click" />
+                        <MenuItem Name="MenuItemAddFromClipboard" Header="Aus der Zwischenablage" InputGestureText="Strg+V" Click="MenuItemAddFromClipboard_Click" />
+                        <MenuItem Name="MenuItemAddSDCard" Header="Von einer Speicherkarte" InputGestureText="Strg+Q" Click="MenuItemAddSDCard_Click" />
+                        <MenuItem Name="MenuItemImportMetadata" Header="Aus Metadaten (*.xml)" ToolTip="Der Ordner wo die XML-Datei liegt ist auch Import-Ordner" Click="MenuItemImportMetadata_Click" />
                         <MenuItem Header="Geodaten (*.kml)" ToolTip="Lese KML-Dateien aus Ordner ein" Click="MenuItemImportGeoData_Click"/>
                     </MenuItem>
                     <MenuItem Name="MenuItemOpenFromList" Header="Aus Liste öffnen" ToolTip="Sucht Medien anhand der Dateinamen einer Liste." Click="MenuItemOpenFromList_Click"  />
@@ -70,7 +70,7 @@
                         <MenuItem Header="Freetec Datalogger" Click="FreetecDatalogger_Click" />
                     </MenuItem>
                     <MenuItem Header="Virtuell anzeigen" Click="MenuItemVirtuell_Click" ToolTip="Zeigt Medien an ohne sie der Datenbank hinzuzufügen."  />-->
-                    <MenuItem Header="Als gelöscht markierte entfernen" Click="MenuItemRemoveDeleted_Click" InputGestureText="Strg+Umschalt+Entf" ToolTip="Alle Datenbankweit als gelöscht markierten Medien werden in den Windows Papierkorb verschoben und aus der Datenbank entfernt."  />
+                    <MenuItem Name="MenuItemRemoveDeleted" Header="Als gelöscht markierte entfernen" Click="MenuItemRemoveDeleted_Click" InputGestureText="Strg+Umschalt+Entf" ToolTip="Alle Datenbankweit als gelöscht markierten Medien werden in den Windows Papierkorb verschoben und aus der Datenbank entfernt."  />
                 </MenuItem>
                 <MenuItem Header="Einstellungen" >
                     <MenuItem Name="MenuItemMissingFileBehavior" SubmenuOpened="MenuItemMissingFileBehavior_SubmenuOpened"  Header="Fehlende Dateien ...">

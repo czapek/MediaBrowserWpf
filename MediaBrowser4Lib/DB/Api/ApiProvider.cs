@@ -16,6 +16,7 @@ namespace MediaBrowser4.DB.Api
         private readonly ApiConnectionOptions options;
         private readonly SpringApiClient client;
         private readonly ApiInsert insert;
+        private readonly object contentCacheSync = new object();
 
         public ApiProvider(ApiConnectionOptions options)
         {
@@ -38,6 +39,73 @@ namespace MediaBrowser4.DB.Api
         }
 
         public string LastValidationError { get; private set; }
+
+        public string GetLocalContentPath(MediaItem item)
+        {
+            if (item == null || item.Id <= 0)
+                return null;
+
+            string folder = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "MediaBrowserWpf",
+                "content-cache",
+                SafePathPart(this.DBName),
+                item.Id.ToString());
+
+            string extension = Path.GetExtension(item.Filename);
+            string fileName = item.Id + "_" + item.LastWriteDate.Ticks
+                + (String.IsNullOrWhiteSpace(extension) ? ".bin" : extension);
+            string path = Path.Combine(folder, fileName);
+
+            lock (this.contentCacheSync)
+            {
+                if (File.Exists(path) && new FileInfo(path).Length > 0)
+                    return path;
+
+                byte[] content = this.client.GetBytes("/mediafiles/" + item.Id + "/content");
+
+                if (content == null || content.Length == 0)
+                    return null;
+
+                Directory.CreateDirectory(folder);
+                string tempPath = path + ".tmp";
+
+                try
+                {
+                    File.WriteAllBytes(tempPath, content);
+
+                    if (File.Exists(path))
+                        File.Delete(path);
+
+                    File.Move(tempPath, path);
+                }
+                finally
+                {
+                    if (File.Exists(tempPath))
+                    {
+                        try
+                        {
+                            File.Delete(tempPath);
+                        }
+                        catch
+                        {
+                        }
+                    }
+                }
+
+                return path;
+            }
+        }
+
+        private static string SafePathPart(string value)
+        {
+            string result = String.IsNullOrWhiteSpace(value) ? "default" : value;
+
+            foreach (char invalidChar in Path.GetInvalidFileNameChars())
+                result = result.Replace(invalidChar, '_');
+
+            return result;
+        }
 
         public override event EventHandler<MediaItemCallbackArgs> OnInsert;
         public override event EventHandler<MediaItemNewThumbArgs> OnThumbUpdate;
@@ -125,7 +193,7 @@ namespace MediaBrowser4.DB.Api
 
         public override void AddMediaItemAsync(MediaItem mItem)
         {
-            this.insert.AddMediaItem(mItem);
+            throw new NotSupportedException("Dateiimporte werden im API-Modus nicht unterstützt.");
         }
 
         public override List<Folder> GetFolderlist()
@@ -359,13 +427,17 @@ namespace MediaBrowser4.DB.Api
                     || categoryRequest.CategoryRequestType == MediaItemCategoryRequestType.NO_LOCATION
                     || categoryRequest.CategoryRequestType == MediaItemCategoryRequestType.NO_OTHER;
 
+                bool recursive = request.RequestType != MediaItemRequestType.SINGLE;
+                int categoryCount = categoryRequest.Categories.Count(x => x.Id > 0);
+
                 return this.QueryMedia(new ApiMediaQueryDto
                 {
                     Mode = missing ? "MISSING_CATEGORIES" : "CATEGORIES",
                     CategoryRequestType = categoryRequest.CategoryRequestType.ToString(),
-                    CategoryIds = categoryRequest.Categories.Where(x => x.Id > 0).Select(x => x.Id).ToList(),
-                    IsIntersection = request.RequestType == MediaItemRequestType.INTERSECT,
-                    IsRecursive = request.RequestType != MediaItemRequestType.SINGLE,
+                    CategoryIds = GetCategoryIds(categoryRequest.Categories, recursive),
+                    IsIntersection = request.RequestType == MediaItemRequestType.INTERSECT
+                        && categoryCount > 1 && !recursive,
+                    IsRecursive = recursive,
                     Limit = GetLimit(request)
                 });
             }
@@ -455,12 +527,7 @@ namespace MediaBrowser4.DB.Api
 
         public override List<MediaItem> GetMediaItemsWithMissingFiles(string sortString, int limtRequest)
         {
-            return this.QueryMedia(new ApiMediaQueryDto
-            {
-                Mode = "MISSING_FILES",
-                SortString = sortString,
-                Limit = limtRequest
-            });
+            return new List<MediaItem>();
         }
 
         public override List<MediaItem> GetMediaItemsWithMissingThumbs(string sortString, int limtRequest)
@@ -492,10 +559,10 @@ namespace MediaBrowser4.DB.Api
             return this.QueryMedia(new ApiMediaQueryDto
             {
                 Mode = "CATEGORIES",
-                CategoryIds = categoryList == null
-                    ? new List<int>()
-                    : categoryList.Where(x => x.Id > 0).Select(x => x.Id).ToList(),
-                IsIntersection = isIntersection,
+                CategoryIds = GetCategoryIds(categoryList, isRecursive),
+                IsIntersection = isIntersection
+                    && categoryList != null && categoryList.Count(x => x.Id > 0) > 1
+                    && !isRecursive,
                 IsRecursive = isRecursive,
                 SortString = sortString,
                 Limit = limtRequest
@@ -898,30 +965,12 @@ namespace MediaBrowser4.DB.Api
 
         public override void DeleteFromPreviewDB(List<MediaItem> fmediaItemList, System.Drawing.Size size)
         {
-            if (fmediaItemList == null || fmediaItemList.Count == 0)
-                return;
-
-            IDictionary<string, string> query = new Dictionary<string, string>
-            {
-                { "width", size.Width.ToString() },
-                { "height", size.Height.ToString() },
-                { "variationIds", String.Join(",", fmediaItemList.Select(x => x.VariationId).Distinct()) }
-            };
-
-            this.client.Delete("/previews", query);
+            throw new NotSupportedException("Preview-Dateien werden im API-Modus nicht verwaltet.");
         }
 
         public override void WriteToPreviewDB(List<string> fileList, System.Drawing.Size size)
         {
-            if (fileList == null || fileList.Count == 0)
-                return;
-
-            this.client.Post("/previews/build", new ApiThumbBuildDto
-            {
-                Files = fileList,
-                Width = size.Width,
-                Height = size.Height
-            });
+            throw new NotSupportedException("Preview-Dateien werden im API-Modus nicht verwaltet.");
         }
 
         public override List<int> GetPreviewDBVariationIdList(System.Drawing.Size size)
@@ -1246,17 +1295,7 @@ namespace MediaBrowser4.DB.Api
 
         public override void SetAttachment(List<Attachment> attachmentList)
         {
-            List<ApiAttachmentDto> dtos = (attachmentList ?? new List<Attachment>()).Select(x => new ApiAttachmentDto
-            {
-                Id = x.Id,
-                FullName = x.FullName,
-                Type = x.Type.ToString(),
-                MediaItemIds = x.MediaItemList == null ? new List<int>() : x.MediaItemList.Select(m => m.Id).ToList(),
-                IsReferenced = x.IsReferenced,
-                IsShared = x.IsShared
-            }).ToList();
-
-            this.client.Post("/attachments", dtos);
+            throw new NotSupportedException("Datei-Anhänge werden im API-Modus nicht verändert.");
         }
 
         public override Dictionary<MediaItem, XmlNode> CreateMediaItemFromXml(List<XmlNode> nodeList,
@@ -1402,51 +1441,17 @@ namespace MediaBrowser4.DB.Api
 
         public override void RenameMediaItem(MediaItem mediaItem, string newName)
         {
-            if (mediaItem == null)
-                return;
-
-            this.PostAction(new ApiMediaActionDto
-            {
-                Action = "RENAME",
-                MediaItemIds = new List<int> { mediaItem.Id },
-                NewName = newName
-            });
-
-            mediaItem.Filename = newName;
+            throw new NotSupportedException("Dateien werden im API-Modus nicht umbenannt.");
         }
 
         public override void CopyToFolder(List<MediaItem> mediaItemList, Folder folder)
         {
-            if (folder == null)
-                return;
-
-            this.PostAction(new ApiMediaActionDto
-            {
-                Action = "COPY_TO_FOLDER",
-                MediaItemIds = Ids(mediaItemList),
-                FolderIds = new List<int> { folder.Id }
-            });
+            throw new NotSupportedException("Dateien werden im API-Modus nicht kopiert.");
         }
 
         public override Exception RemoveAndRecycle(MediaItem mItem)
         {
-            if (mItem == null)
-                return new ArgumentNullException("mItem");
-
-            try
-            {
-                this.PostAction(new ApiMediaActionDto
-                {
-                    Action = "REMOVE_AND_RECYCLE",
-                    MediaItemIds = new List<int> { mItem.Id }
-                });
-
-                return null;
-            }
-            catch (Exception ex)
-            {
-                return ex;
-            }
+            return new NotSupportedException("Dateien werden im API-Modus nicht gelöscht oder recycelt.");
         }
 
         public override void RemoveFromDB(List<MediaItem> mediaItemList)
@@ -1644,6 +1649,35 @@ namespace MediaBrowser4.DB.Api
         private static int GetLimit(MediaItemRequest request)
         {
             return request.LimitRequest > 0 ? request.LimitRequest : MediaBrowserContext.LimitRequest;
+        }
+
+        private static List<int> GetCategoryIds(IEnumerable<Category> categories, bool recursive)
+        {
+            if (categories == null)
+                return new List<int>();
+
+            List<int> result = new List<int>();
+
+            foreach (Category category in categories)
+            {
+                if (category == null || category.Id <= 0)
+                    continue;
+
+                if (recursive)
+                {
+                    foreach (Category child in category.AllChildrenRecursive())
+                    {
+                        if (child != null && child.Id > 0)
+                            result.Add(child.Id);
+                    }
+                }
+                else
+                {
+                    result.Add(category.Id);
+                }
+            }
+
+            return result.Distinct().ToList();
         }
 
         private static List<int> Ids(List<MediaItem> items)

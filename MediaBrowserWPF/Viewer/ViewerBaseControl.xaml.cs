@@ -274,7 +274,7 @@ namespace MediaBrowserWPF.Viewer
             this.VideoPlayer.VideoPlayerIntern.MediaItemSource = null;
             this.mediaTimer.IsEnabled = false;
 
-            if (!File.Exists(mItem.FullName))
+            if (!MediaBrowserContext.FileExists(mItem))
                 return;
 
             try
@@ -308,7 +308,7 @@ namespace MediaBrowserWPF.Viewer
                 this.VideoPlayer.VideoPlayerIntern.MediaItemSource = mItem;
                 this.VideoPlayer.VideoPlayerIntern.PlayInterval = Tuple.Create<double, double>(mItem.DirectShowInfo.StartPosition, mItem.DirectShowInfo.StopPosition);
 
-                if (!File.Exists(mItem.FullName))
+                if (!MediaBrowserContext.FileExists(mItem))
                     return;
 
                 if (mItem.DirectShowInfo.StartPosition > 0)

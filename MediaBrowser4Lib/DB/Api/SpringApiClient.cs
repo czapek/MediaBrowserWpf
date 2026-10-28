@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Threading;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
@@ -120,12 +121,33 @@ namespace MediaBrowser4.DB.Api
         private ApiResponse Execute(HttpMethod method, string path, IDictionary<string, string> query,
             object body, bool allowNotFound)
         {
+            ApiRequestInfo requestInfo = new ApiRequestInfo
+            {
+                Method = method.Method,
+                Path = path
+            };
+
+            IApiRequestObserver observer = ApiRequestObserverHost.Observer;
+
+            if (observer != null)
+            {
+                return observer.Execute(requestInfo, cancellationToken =>
+                    this.ExecuteCore(method, path, query, body, allowNotFound, cancellationToken));
+            }
+
+            return this.ExecuteCore(method, path, query, body, allowNotFound, CancellationToken.None);
+        }
+
+        private ApiResponse ExecuteCore(HttpMethod method, string path, IDictionary<string, string> query,
+            object body, bool allowNotFound, CancellationToken cancellationToken)
+        {
             string url = this.BuildUrl(path, query);
 
             for (int attempt = 0; attempt < 2; attempt++)
             {
-                string token = this.EnsureAccessToken();
-                ApiResponse response = this.SendOnce(method, url, body, token);
+                cancellationToken.ThrowIfCancellationRequested();
+                string token = this.EnsureAccessToken(cancellationToken);
+                ApiResponse response = this.SendOnce(method, url, body, token, cancellationToken);
 
                 if (response.StatusCode == (int)HttpStatusCode.Unauthorized
                     && attempt == 0 && !this.useApiKey && !String.IsNullOrWhiteSpace(token))
@@ -151,7 +173,8 @@ namespace MediaBrowser4.DB.Api
                 (int)HttpStatusCode.Unauthorized, null);
         }
 
-        private ApiResponse SendOnce(HttpMethod method, string url, object body, string bearerToken)
+        private ApiResponse SendOnce(HttpMethod method, string url, object body, string bearerToken,
+            CancellationToken cancellationToken)
         {
             using (HttpRequestMessage request = new HttpRequestMessage(method, url))
             {
@@ -166,7 +189,7 @@ namespace MediaBrowser4.DB.Api
                     request.Content = new StringContent(json, Encoding.UTF8, "application/json");
                 }
 
-                using (HttpResponseMessage response = this.httpClient.SendAsync(request)
+                using (HttpResponseMessage response = this.httpClient.SendAsync(request, cancellationToken)
                     .ConfigureAwait(false).GetAwaiter().GetResult())
                 {
                     byte[] binary = response.Content.ReadAsByteArrayAsync()
@@ -184,7 +207,7 @@ namespace MediaBrowser4.DB.Api
             }
         }
 
-        private string EnsureAccessToken()
+        private string EnsureAccessToken(CancellationToken cancellationToken)
         {
             if (this.useApiKey)
                 return this.options.ApiKey.Trim();
@@ -194,6 +217,8 @@ namespace MediaBrowser4.DB.Api
 
             lock (this.authSync)
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
                 if (!String.IsNullOrWhiteSpace(this.accessToken)
                     && DateTime.UtcNow < this.accessTokenExpiresUtc)
                 {
@@ -204,7 +229,7 @@ namespace MediaBrowser4.DB.Api
                 {
                     try
                     {
-                        return this.RefreshAccessToken();
+                        return this.RefreshAccessToken(cancellationToken);
                     }
                     catch (ApiException ex)
                     {
@@ -220,23 +245,25 @@ namespace MediaBrowser4.DB.Api
                     }
                 }
 
-                return this.Login();
+                return this.Login(cancellationToken);
             }
         }
 
-        private string Login()
+        private string Login(CancellationToken cancellationToken)
         {
+            string loginUrl = this.BuildUrl("/auth/login", null);
             ApiResponse response = this.SendOnce(HttpMethod.Post,
-                this.BuildUrl("/auth/login", null),
+                loginUrl,
                 new ApiLoginRequestDto
                 {
                     Username = this.options.Username,
                     Password = this.options.Password,
                     Tenant = this.options.Tenant
                 },
-                null);
+                null,
+                cancellationToken);
 
-            this.EnsureSuccess(response, HttpMethod.Post, this.BuildUrl("/auth/login", null));
+            this.EnsureSuccess(response, HttpMethod.Post, loginUrl);
 
             ApiTokenDto token = this.Deserialize<ApiTokenDto>(response);
 
@@ -248,15 +275,17 @@ namespace MediaBrowser4.DB.Api
             return this.accessToken;
         }
 
-        private string RefreshAccessToken()
+        private string RefreshAccessToken(CancellationToken cancellationToken)
         {
             string previousRefreshToken = this.refreshToken;
+            string refreshUrl = this.BuildUrl("/auth/refresh", null);
             ApiResponse response = this.SendOnce(HttpMethod.Post,
-                this.BuildUrl("/auth/refresh", null),
+                refreshUrl,
                 new ApiRefreshTokenDto { RefreshToken = previousRefreshToken },
-                null);
+                null,
+                cancellationToken);
 
-            this.EnsureSuccess(response, HttpMethod.Post, this.BuildUrl("/auth/refresh", null));
+            this.EnsureSuccess(response, HttpMethod.Post, refreshUrl);
 
             ApiTokenDto token = this.Deserialize<ApiTokenDto>(response);
 

@@ -663,7 +663,10 @@ namespace MediaBrowser4.Objects
             get
             {
                 if (this.fileObject == null)
-                    this.fileObject = new System.IO.FileInfo(this.FullName);
+                {
+                    string localContentPath = MediaBrowserContext.GetLocalMediaContentPath(this);
+                    this.fileObject = new System.IO.FileInfo(localContentPath ?? this.FullName);
+                }
                 return this.fileObject;
             }
 

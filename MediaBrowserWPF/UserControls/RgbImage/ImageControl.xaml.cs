@@ -975,7 +975,7 @@ namespace MediaBrowserWPF.UserControls.RgbImage
                     return;
                 }
 
-                if (!File.Exists(this.visibleMediaItem.FullName))
+                if (!MediaBrowserContext.FileExists(this.visibleMediaItem))
                 {
                     this.imageCache.Remove(this.visibleMediaItem.FullName);
 
