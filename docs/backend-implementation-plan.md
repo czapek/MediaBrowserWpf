@@ -576,12 +576,12 @@ MEDIABROWSER_CONTENT_ROOT=/mnt/media-readonly
 - `DELETE /mediafiles/{id}/image-analysis` mit Kaskade
 - `POST /image-analysis/query` mit Filtern, Volltext, Pagination und optionalen Kindzeilen
 - `POST /image-analysis/search` mit Volltext- und Feldfiltern, Rückgabe von MediaItems
-- `POST /image-analysis/facets` mit distinkten Werten und MediaItem-Counts
+- `GET /image-analysis/value-search` mit distinkten Werten für Autocomplete/DDL
 - `GET /image-analysis/filter-fields` und `GET /image-analysis/ranges`
 - FULLTEXT-Indizes für `WEATHER_DESCRIPTION`, `LOCATION_DESCRIPTION`,
   `FORMAT_OF_DOCUMENT_OR_IMAGE` und `OBJECT_NAME`; B-Tree-Indizes für `MODEL` und `CREATED_AT`
 - Berechtigungsprüfung für Schreiben und Löschen
-- Integrationstests inklusive Cascade, Volltext, Facetten und Mandantenisolierung
+- Integrationstests inklusive Cascade, Volltext, Value-Search und Mandantenisolierung
 
 ### Phase 8: Härtung und Betrieb
 
@@ -757,13 +757,12 @@ Ablauf für `POST /image-analysis/query`:
 - Kindzeilen werden nur bei Bedarf geladen.
 - Es werden keine Dateien gelesen, geschrieben oder gelöscht.
 
-## 16. Image-Analysis-Suche und Facetten
+## 16. Image-Analysis-Suche und Value-Search
 
 Zusätzlich zu den Analyse-Endpunkten werden folgende read-only Endpunkte benötigt:
 
 - `POST /image-analysis/search` – Volltext- und Feldsuche, Rückgabe von MediaItems
-- `POST /image-analysis/facets` – distinkte Werte + MediaItem-Counts für
-  `OBJECT_NAME`, `WEATHER_DESCRIPTION` und `LOCATION_DESCRIPTION`
+- `GET /image-analysis/value-search` – distinkte Werte für Autocomplete/DDL, ohne Counts
 - `GET /image-analysis/filter-fields` – Feldkatalog für den Frontend-Aufbau
 - `GET /image-analysis/ranges` – Min/Max für Zähler- und Temperaturfilter
 
@@ -774,7 +773,8 @@ Wichtig:
 
 - DDLs nur für `OBJECT_NAME`, `WEATHER_DESCRIPTION` und `LOCATION_DESCRIPTION`.
 - Zähler und Temperaturen sind Range-/Number-Inputs, keine DDLs.
-- Facetten zählen `COUNT(DISTINCT MEDIA_ID)`.
+- `value-search` liefert nur distinkte Werte, keine Counts und keine globale Aggregation.
+- Facetten-Endpunkte gibt es nicht.
 - Die neuen FULLTEXT-Indizes auf `WEATHER_DESCRIPTION`, `LOCATION_DESCRIPTION`,
   `FORMAT_OF_DOCUMENT_OR_IMAGE` und `OBJECT_NAME` sowie die B-Tree-Indizes auf `MODEL` und
   `CREATED_AT` sind Bestandteil des Schemas.

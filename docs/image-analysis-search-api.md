@@ -1,7 +1,7 @@
-# Image-Analysis-Suche und Facetten-API
+# Image-Analysis-Suche und Value-Search-API
 
 Dieses Dokument beschreibt die Backend-Umsetzung der Image-Analysis-Suche. Der verbindliche
-HTTP-Vertrag steht in `docs/openapi.yaml` (Version 1.2.0), die C#-DTOs in
+HTTP-Vertrag steht in `docs/openapi.yaml` (Version 1.3.0), die C#-DTOs in
 `MediaBrowser4Lib\DB\Api\ApiDtos.cs`.
 
 ## 1. Ziel
@@ -14,12 +14,13 @@ Neue Endpunkte:
 | Endpunkt | Zweck |
 |---|---|
 | `POST /api/v1/image-analysis/search` | Suche über Volltext und strukturierte Analysefelder, Rückgabe von MediaItems |
-| `POST /api/v1/image-analysis/facets` | Distinkte Werte + Anzahl der betroffenen MediaItems für DDLs/Autocomplete |
+| `GET /api/v1/image-analysis/value-search` | Distinkte Werte für Autocomplete/DDL, ohne Counts und ohne globale Aggregation |
 | `GET /api/v1/image-analysis/filter-fields` | Feldkatalog für den Frontend-Aufbau |
 | `GET /api/v1/image-analysis/ranges` | Min/Max für Zähler- und Temperaturfilter |
 
-Der bestehende `POST /api/v1/image-analysis/query` bleibt für analyseorientierte Antworten
-bestehen. Die neue Suche liefert bewusst MediaItems.
+Facetten-Endpunkte gibt es bewusst **nicht**. Das Frontend verwendet für die Werteliste
+ausschließlich `value-search`. Die Suche selbst filtert anschließend mit den ausgewählten
+exakten Werten über `POST /image-analysis/search`.
 
 ## 2. Datenmodell
 
@@ -299,105 +300,86 @@ Unbekannte Sortierwerte → `400`.
 - Bei Volltext kann die Count-Abfrage teuer sein. Ergebnis kurzzeitig cachen oder alternativ nur
   `hasMore` liefern (aktuell nicht im Vertrag).
 
-## 6. Facetten
+## 6. Value-Search für Autocomplete
 
-Nur diese Felder sind für DDLs/Autocomplete vorgesehen:
+Nur diese Felder unterstützen `value-search`:
 
 - `OBJECT_NAME`
 - `WEATHER_DESCRIPTION`
 - `LOCATION_DESCRIPTION`
 
-Zähler und Temperaturen sind keine Facetten, sondern Range-/Number-Inputs.
+Zähler und Temperaturen werden über `ranges` und Range-Controls abgedeckt. Sie haben keine
+Werteliste.
 
-Request (`ImageAnalysisFacetRequest`):
+Aufruf:
+
+```http
+GET /api/v1/image-analysis/value-search?field=OBJECT_NAME&query=Wein&limit=50
+```
+
+Parameter:
+
+- `field`: `OBJECT_NAME`, `WEATHER_DESCRIPTION` oder `LOCATION_DESCRIPTION`
+- `query`: Pflicht, mindestens 3 Zeichen
+- `limit`: Standard 50, Maximum 200
+
+Antwort (`ImageAnalysisValueSearchResult`):
 
 ```json
 {
-  "filter": {
-    "text": "Skelett",
-    "personCount": { "min": 0, "max": 3 }
-  },
-  "fields": ["OBJECT_NAME", "WEATHER_DESCRIPTION", "LOCATION_DESCRIPTION"],
-  "valueSearch": "Stra",
-  "limitPerField": 100,
-  "minCount": 1,
-  "contextual": true
+  "values": ["Weinberge", "Weinberg", "Weinflasche"]
 }
 ```
 
-Antwort (`ImageAnalysisFacetResult`):
+Eigenschaften:
 
-```json
-{
-  "objectName": [
-    { "value": "Straße", "count": 42 }
-  ],
-  "weatherDescription": [
-    { "value": "sonnig", "count": 420 }
-  ],
-  "locationDescription": [
-    { "value": "Weinberge", "count": 120 }
-  ]
-}
-```
+- Es werden nur distinkte Werte zurückgegeben, **keine Counts**.
+- Es gibt keine globale Aggregation über alle Objekte.
+- Die Sortierung ist alphabetisch.
+- `query` wird über die vorhandenen FULLTEXT-Indizes gesucht.
+- Bei weniger als 3 Zeichen oder unbekanntem Feld: `400`.
 
-### 6.1 Zählweise
-
-Immer `COUNT(DISTINCT a.MEDIA_ID)`, damit die Anzahl zu den zurückgegebenen MediaItems passt.
-Nicht die Join-Zeilen zählen.
-
-### 6.2 Objektnamen
+### 6.1 Objektnamen
 
 ```sql
-SELECT o.OBJECT_NAME AS value, COUNT(DISTINCT a.MEDIA_ID) AS count
+SELECT DISTINCT o.OBJECT_NAME
 FROM IMAGE_OBJECTS o
-JOIN IMAGE_ANALYSIS a ON a.ID = o.IMAGE_ANALYSIS_ID
-JOIN MEDIAFILES m ON m.ID = a.MEDIA_ID
-WHERE o.OBJECT_NAME IS NOT NULL
-  AND o.OBJECT_NAME <> ''
-  AND <filterbedingungen>
-GROUP BY o.OBJECT_NAME
-HAVING COUNT(DISTINCT a.MEDIA_ID) >= :minCount
-ORDER BY count DESC, value ASC
-LIMIT :limitPerField
+WHERE MATCH(o.OBJECT_NAME) AGAINST (:query IN NATURAL LANGUAGE MODE)
+ORDER BY o.OBJECT_NAME
+LIMIT :limit
 ```
 
-Bei `valueSearch`:
+### 6.2 Wetter
 
 ```sql
-AND MATCH(o.OBJECT_NAME) AGAINST (:valueSearch IN NATURAL LANGUAGE MODE)
-```
-
-Alternativ ist für kurze Präfixe `o.OBJECT_NAME LIKE CONCAT(:valueSearch, '%')` möglich.
-
-### 6.3 Wetter und Ort
-
-```sql
-SELECT a.WEATHER_DESCRIPTION AS value, COUNT(DISTINCT a.MEDIA_ID) AS count
+SELECT DISTINCT a.WEATHER_DESCRIPTION
 FROM IMAGE_ANALYSIS a
-JOIN MEDIAFILES m ON m.ID = a.MEDIA_ID
-WHERE a.WEATHER_DESCRIPTION IS NOT NULL
+WHERE MATCH(a.WEATHER_DESCRIPTION) AGAINST (:query IN NATURAL LANGUAGE MODE)
+  AND a.WEATHER_DESCRIPTION IS NOT NULL
   AND a.WEATHER_DESCRIPTION <> ''
-  AND <filterbedingungen>
-GROUP BY a.WEATHER_DESCRIPTION
-HAVING COUNT(DISTINCT a.MEDIA_ID) >= :minCount
-ORDER BY count DESC, value ASC
-LIMIT :limitPerField
+ORDER BY a.WEATHER_DESCRIPTION
+LIMIT :limit
 ```
 
-`LOCATION_DESCRIPTION` analog.
-
-Bei `valueSearch`:
+### 6.3 Ort
 
 ```sql
-AND MATCH(a.WEATHER_DESCRIPTION) AGAINST (:valueSearch IN NATURAL LANGUAGE MODE)
+SELECT DISTINCT a.LOCATION_DESCRIPTION
+FROM IMAGE_ANALYSIS a
+WHERE MATCH(a.LOCATION_DESCRIPTION) AGAINST (:query IN NATURAL LANGUAGE MODE)
+  AND a.LOCATION_DESCRIPTION IS NOT NULL
+  AND a.LOCATION_DESCRIPTION <> ''
+ORDER BY a.LOCATION_DESCRIPTION
+LIMIT :limit
 ```
 
-### 6.4 Kontext
+### 6.4 Frontend-Verhalten
 
-- `contextual=true`: Die Filter aus `filter` werden auf die Facettenberechnung angewendet.
-- `contextual=false`: Die Filter werden ignoriert; es werden globale Verteilungen geliefert.
-  `includeDeleted` sollte weiterhin berücksichtigt werden.
+- Das Frontend ruft `value-search` erst ab 3 Zeichen auf.
+- Die Ergebnisse füllen eine DDL oder ein Autocomplete-Control.
+- Nach der Auswahl wird der exakte Wert in `objectNames`, `weatherDescriptions` bzw.
+  `locationDescriptions` an `POST /image-analysis/search` übergeben.
+- Für die Anzeige von Trefferzahlen ist kein Facetten-Endpunkt vorgesehen.
 
 ## 7. Wertebereiche
 
@@ -423,7 +405,7 @@ read-only und kann kurz gecacht werden.
 `GET /api/v1/image-analysis/filter-fields` liefert eine feste Liste. Das Frontend baut daraus
 die Filter-UI.
 
-| key | label | type | control | facetable | source |
+| key | label | type | control | valueSearch | source |
 |---|---|---|---|---|---|
 | `model` | Modell | STRING | TEXT | false | IMAGE_ANALYSIS |
 | `objectName` | Objekt | STRING | AUTOCOMPLETE | true | IMAGE_OBJECTS |
@@ -447,7 +429,8 @@ die Filter-UI.
 ## 9. Fehler und Sicherheit
 
 - `400`: unbekanntes Feld, ungültige Sortierung, ungültiger Bereich, `from > to`,
-  ungültiger `textMode`, `limit > 500`.
+  ungültiger `textMode`, `limit > 500`, `value-search` mit unbekanntem `field` oder `query`
+  unter 3 Zeichen.
 - `401`: fehlender oder ungültiger Bearer-Token.
 - `403`: Mandant/Rolle nicht erlaubt.
 - `500`: unerwarteter Fehler.
@@ -463,8 +446,9 @@ die Filter-UI.
 - Volltext über alle `textFields`, Natural und Boolean.
 - `objectMatch=ANY` und `ALL`.
 - Kombination aus Volltext, Objekt, Modell, Zähler, Temperatur und Datum.
-- Facetten mit und ohne Filter, `valueSearch`, `minCount`, `limitPerField`.
-- Counts als `COUNT(DISTINCT MEDIA_ID)`.
+- `value-search` für `OBJECT_NAME`, `WEATHER_DESCRIPTION` und `LOCATION_DESCRIPTION`.
+- `value-search` mit unbekanntem Feld, `query` unter 3 Zeichen und `limit > 200`.
+- `value-search` liefert keine Counts, keine Duplikate und maximal `limit` Werte.
 - `includeObjects`/`includeReadableText`.
 - Pagination, Sortierung und `total`.
 - Leere Ergebnisse.
@@ -478,7 +462,9 @@ die Filter-UI.
 ## 11. Abnahmekriterien
 
 - `search` liefert MediaItems in der vertraglich definierten Struktur.
-- `facets` liefert nur `OBJECT_NAME`, `WEATHER_DESCRIPTION`, `LOCATION_DESCRIPTION`.
+- `value-search` liefert ausschließlich distinkte Werte für `OBJECT_NAME`,
+  `WEATHER_DESCRIPTION` und `LOCATION_DESCRIPTION`.
+- Es gibt keine Facetten-Endpunkte und keine globalen Counts.
 - Zähler/Temperaturen werden über `ranges` und Range-Controls abgedeckt.
 - `filter-fields` liefert die Controls für das Frontend.
 - Volltextsuche nutzt die FULLTEXT-Indizes.

@@ -418,27 +418,9 @@ namespace MediaBrowser4.DB.Api
         public List<string> ReadableText { get; set; }
     }
 
-    public sealed class ApiImageAnalysisFacetRequestDto
+    public sealed class ApiImageAnalysisValueSearchResultDto
     {
-        public ApiImageAnalysisFilterDto Filter { get; set; }
-        public List<string> Fields { get; set; }
-        public string ValueSearch { get; set; }
-        public int LimitPerField { get; set; } = 100;
-        public int MinCount { get; set; } = 1;
-        public bool Contextual { get; set; } = true;
-    }
-
-    public sealed class ApiImageAnalysisFacetValueDto
-    {
-        public string Value { get; set; }
-        public long Count { get; set; }
-    }
-
-    public sealed class ApiImageAnalysisFacetResultDto
-    {
-        public List<ApiImageAnalysisFacetValueDto> ObjectName { get; set; }
-        public List<ApiImageAnalysisFacetValueDto> WeatherDescription { get; set; }
-        public List<ApiImageAnalysisFacetValueDto> LocationDescription { get; set; }
+        public List<string> Values { get; set; }
     }
 
     public sealed class ApiImageAnalysisFilterFieldDto
@@ -447,7 +429,7 @@ namespace MediaBrowser4.DB.Api
         public string Label { get; set; }
         public string Type { get; set; }
         public string Control { get; set; }
-        public bool Facetable { get; set; }
+        public bool ValueSearch { get; set; }
         public string Source { get; set; }
         public List<string> FixedValues { get; set; }
     }

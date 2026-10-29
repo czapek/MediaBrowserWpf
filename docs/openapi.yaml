@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: MediaBrowser Spring API
-  version: 1.2.0
+  version: 1.3.0
   description: >
     REST-Vertrag für das Spring-Boot-Backend des MediaBrowserWpf-ApiProviders.
     Die API verwendet JSON (UTF-8). Binärdaten wie Thumbnails werden als
@@ -754,25 +754,38 @@ paths:
                 $ref: '#/components/schemas/ImageAnalysisSearchResult'
         '400':
           description: Ungültige Filter, Sortierung oder Pagination
-  /image-analysis/facets:
-    post:
+  /image-analysis/value-search:
+    get:
       tags: [imageanalysis]
-      operationId: getImageAnalysisFacets
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ImageAnalysisFacetRequest'
+      operationId: searchImageAnalysisValues
+      parameters:
+        - name: field
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [OBJECT_NAME, WEATHER_DESCRIPTION, LOCATION_DESCRIPTION]
+        - name: query
+          in: query
+          required: true
+          schema:
+            type: string
+            minLength: 3
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+            maximum: 200
       responses:
         '200':
-          description: Distinkte Werte und Anzahl der betroffenen MediaItems
+          description: Passende distinkte Werte für Autocomplete
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ImageAnalysisFacetResult'
+                $ref: '#/components/schemas/ImageAnalysisValueSearchResult'
         '400':
-          description: Ungültige Facettenanfrage
+          description: Ungültiges Feld oder ungültiger Suchbegriff
   /image-analysis/filter-fields:
     get:
       tags: [imageanalysis]
@@ -2324,55 +2337,13 @@ components:
           type: array
           items:
             type: string
-    ImageAnalysisFacetRequest:
+    ImageAnalysisValueSearchResult:
       type: object
       properties:
-        filter:
-          $ref: '#/components/schemas/ImageAnalysisFilter'
-        fields:
+        values:
           type: array
           items:
             type: string
-            enum:
-              - OBJECT_NAME
-              - WEATHER_DESCRIPTION
-              - LOCATION_DESCRIPTION
-        valueSearch:
-          type: string
-          description: Optionaler Suchbegriff für die Werte (Autocomplete).
-        limitPerField:
-          type: integer
-          default: 100
-          maximum: 500
-        minCount:
-          type: integer
-          default: 1
-        contextual:
-          type: boolean
-          default: true
-    ImageAnalysisFacetValue:
-      type: object
-      properties:
-        value:
-          type: string
-        count:
-          type: integer
-          format: int64
-    ImageAnalysisFacetResult:
-      type: object
-      properties:
-        objectName:
-          type: array
-          items:
-            $ref: '#/components/schemas/ImageAnalysisFacetValue'
-        weatherDescription:
-          type: array
-          items:
-            $ref: '#/components/schemas/ImageAnalysisFacetValue'
-        locationDescription:
-          type: array
-          items:
-            $ref: '#/components/schemas/ImageAnalysisFacetValue'
     ImageAnalysisFilterField:
       type: object
       properties:
@@ -2386,7 +2357,7 @@ components:
         control:
           type: string
           enum: [AUTOCOMPLETE, RANGE, NUMBER, DATE_RANGE, SELECT, TEXT]
-        facetable:
+        valueSearch:
           type: boolean
         source:
           type: string
