@@ -89,7 +89,6 @@ de.mediabrowser.api
     ThumbnailService
   preview
     PreviewController
-    FaceController
   metadata
     MetadataController
     MetadataService
@@ -314,7 +313,7 @@ Der `MediaQuery`-Service bildet die Modi aus `ApiMediaQueryDto` auf Repository-A
 - `GET /variations/{id}/thumb`
 - `PUT /variations/{id}/thumb`
 
-### 6.6 Previews, Faces, Metadata, Descriptions, Attachments
+### 6.6 Previews, Metadata, Descriptions, Attachments
 
 Diese Gruppen bilden die bestehenden Provider-Methoden ab. Thumbnails werden als Binärdaten
 gestreamt oder als Base64 in DTOs übertragen. Metadaten und Beschreibungen werden immer
@@ -331,7 +330,6 @@ Read-only Endpunkte:
 - `GET /mediafiles/{id}/content`
 - `GET /variations/{id}/thumb`
 - `GET /previews/{variationId}`
-- `GET /faces/previews/{variationId}`
 - `GET /attachments/{id}/content`
 - `GET /mediafiles/{id}/sidecars`
 - `GET /catalog/capabilities`
@@ -556,7 +554,7 @@ MEDIABROWSER_CONTENT_ROOT=/mnt/media-readonly
 
 - Variations-CRUD
 - Layers
-- Preview-/Face-Endpunkte ohne serverseitige Dateischreibungen
+- Preview-Endpunkte ohne serverseitige Dateischreibungen
 - Thumbnail-Streaming
 
 ### Phase 6: Metadaten und Zusatzdaten

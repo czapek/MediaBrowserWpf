@@ -912,52 +912,18 @@ namespace MediaBrowser4.DB.Api
 
         public override Faces GetFaceDetectionPreviewDB(int variationId, System.Drawing.Size size)
         {
-            IDictionary<string, string> query = new Dictionary<string, string>
+            return new Faces
             {
-                { "width", size.Width.ToString() },
-                { "height", size.Height.ToString() }
-            };
-
-            ApiFacePreviewDto preview = this.client.GetOrDefault<ApiFacePreviewDto>(
-                "/faces/previews/" + variationId, query);
-
-            Faces result = new Faces
-            {
-                Width = preview == null ? 0 : preview.Width,
-                Height = preview == null ? 0 : preview.Height,
+                Width = 0,
+                Height = 0,
                 Facelist = new List<Rectangle>()
             };
-
-            if (preview != null && preview.Faces != null)
-            {
-                foreach (ApiFaceDto face in preview.Faces)
-                    result.Facelist.Add(new Rectangle(face.X, face.Y, face.Width, face.Height));
-            }
-
-            return result;
         }
 
         public override Dictionary<int, int> GetAllFaces(System.Drawing.Size size, double min,
             double max, int countMin, int countMax, List<MediaItem> itemList)
         {
-            IDictionary<string, string> query = new Dictionary<string, string>
-            {
-                { "width", size.Width.ToString() },
-                { "height", size.Height.ToString() },
-                { "min", min.ToString(System.Globalization.CultureInfo.InvariantCulture) },
-                { "max", max.ToString(System.Globalization.CultureInfo.InvariantCulture) },
-                { "countMin", countMin.ToString() },
-                { "countMax", countMax.ToString() }
-            };
-
-            if (itemList != null && itemList.Count > 0)
-                query["variationIds"] = String.Join(",", itemList.Select(x => x.VariationId).Distinct());
-
-            List<ApiFaceCountDto> counts = this.client.Get<List<ApiFaceCountDto>>("/faces", query);
-
-            return counts == null
-                ? new Dictionary<int, int>()
-                : counts.Where(x => x != null).ToDictionary(x => x.VariationId, x => x.Count);
+            return new Dictionary<int, int>();
         }
 
         public override bool IsImageInPreviewDB(int variationId, System.Drawing.Size size)

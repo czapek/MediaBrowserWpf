@@ -67,8 +67,8 @@ Originaldatei-Referenz dienen.
 - `MediaBrowser4Lib\Objects\MediaItemVideo.cs`
   - `GetThumbnail` liest Videos über NReco, DirectShow oder MediaInfo.
 - `MediaBrowser4Lib\DB\Api\ApiProvider.cs`
-  - `GetThumbJpegData`, `GetThumbsForAllMediaItems`, `GetImagePreviewDB`,
-    `GetFaceDetectionPreviewDB` greifen bereits auf API-Endpunkte zu.
+  - `GetThumbJpegData`, `GetThumbsForAllMediaItems` und `GetImagePreviewDB` greifen bereits auf
+    API-Endpunkte zu.
 - `MediaBrowserWPF\Utilities\TakeSnapshot.xaml.cs`
   - Export und Snapshot benötigen Originaldaten.
 
@@ -373,9 +373,6 @@ read-only gegen den Content Store prüfen.
 | GET | `/api/v1/previews/{variationId}` | Vorschau | `width`, `height` | `Preview` | lesen oder im Speicher erzeugen | keine Schreibdatei |
 | GET | `/api/v1/previews/exists` | Vorschau vorhanden | Query | `boolean` | lesen | keine |
 | GET | `/api/v1/previews/variation-ids` | Vorschau-IDs | Query | `integer[]` | lesen | keine |
-| GET | `/api/v1/faces/previews/{variationId}` | Gesichtervorschau | Query | `FacePreview` | lesen | keine |
-| GET | `/api/v1/faces` | Gesichter zählen | Query | `FaceCount[]` | lesen | keine |
-
 Content-Streaming-Anforderungen:
 
 - `Content-Type` aus Dateiendung/MIME-Metadaten.

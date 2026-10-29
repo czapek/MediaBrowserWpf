@@ -1,7 +1,7 @@
 # Image-Analysis-Suche und Value-Search-API
 
 Dieses Dokument beschreibt die Backend-Umsetzung der Image-Analysis-Suche. Der verbindliche
-HTTP-Vertrag steht in `docs/openapi.yaml` (Version 1.3.0), die C#-DTOs in
+HTTP-Vertrag steht in `docs/openapi.yaml` (Version 1.4.0), die C#-DTOs in
 `MediaBrowser4Lib\DB\Api\ApiDtos.cs`.
 
 ## 1. Ziel

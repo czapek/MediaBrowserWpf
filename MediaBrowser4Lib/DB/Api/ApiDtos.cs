@@ -517,29 +517,6 @@ namespace MediaBrowser4.DB.Api
         public string TempPath { get; set; }
     }
 
-    public sealed class ApiFaceDto
-    {
-        public int VariationId { get; set; }
-        public int X { get; set; }
-        public int Y { get; set; }
-        public int Width { get; set; }
-        public int Height { get; set; }
-        public double RelativeSize { get; set; }
-    }
-
-    public sealed class ApiFacePreviewDto
-    {
-        public int Width { get; set; }
-        public int Height { get; set; }
-        public List<ApiFaceDto> Faces { get; set; }
-    }
-
-    public sealed class ApiFaceCountDto
-    {
-        public int VariationId { get; set; }
-        public int Count { get; set; }
-    }
-
     public sealed class ApiDuplicateDto
     {
         public int MediaItemId { get; set; }
