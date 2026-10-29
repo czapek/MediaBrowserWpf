@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: MediaBrowser Spring API
-  version: 1.1.0
+  version: 1.2.0
   description: >
     REST-Vertrag für das Spring-Boot-Backend des MediaBrowserWpf-ApiProviders.
     Die API verwendet JSON (UTF-8). Binärdaten wie Thumbnails werden als
@@ -734,6 +734,69 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ImageAnalysis'
+
+  /image-analysis/search:
+    post:
+      tags: [imageanalysis]
+      operationId: searchImageAnalysisMedia
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ImageAnalysisSearchRequest'
+      responses:
+        '200':
+          description: MediaItems, die den Analysefiltern entsprechen
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImageAnalysisSearchResult'
+        '400':
+          description: Ungültige Filter, Sortierung oder Pagination
+  /image-analysis/facets:
+    post:
+      tags: [imageanalysis]
+      operationId: getImageAnalysisFacets
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ImageAnalysisFacetRequest'
+      responses:
+        '200':
+          description: Distinkte Werte und Anzahl der betroffenen MediaItems
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImageAnalysisFacetResult'
+        '400':
+          description: Ungültige Facettenanfrage
+  /image-analysis/filter-fields:
+    get:
+      tags: [imageanalysis]
+      operationId: getImageAnalysisFilterFields
+      responses:
+        '200':
+          description: Verfügbare Filterfelder und passende Frontend-Controls
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ImageAnalysisFilterField'
+  /image-analysis/ranges:
+    get:
+      tags: [imageanalysis]
+      operationId: getImageAnalysisRanges
+      responses:
+        '200':
+          description: Wertebereiche für Zahlen- und Zählerfilter
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImageAnalysisRanges'
 
   /variations/{id}:
     put:
@@ -2016,6 +2079,339 @@ components:
           type: string
           enum: [CREATED_AT_DESC, CREATED_AT_ASC, MEDIA_DATE_DESC, MEDIA_DATE_ASC, ID_DESC, ID_ASC]
           default: CREATED_AT_DESC
+    NumericRange:
+      type: object
+      properties:
+        min:
+          type: number
+          nullable: true
+        max:
+          type: number
+          nullable: true
+    DateRange:
+      type: object
+      properties:
+        from:
+          type: string
+          format: date-time
+          nullable: true
+        to:
+          type: string
+          format: date-time
+          nullable: true
+    ImageAnalysisFilter:
+      type: object
+      properties:
+        text:
+          type: string
+          description: Volltextsuchbegriff über die in textFields angegebenen Felder.
+        textMode:
+          type: string
+          enum: [NATURAL, BOOLEAN]
+          default: NATURAL
+        textFields:
+          type: array
+          items:
+            type: string
+            enum:
+              - DETAILED_IMAGE_ANALYSIS
+              - READABLE_TEXT
+              - WEATHER_DESCRIPTION
+              - LOCATION_DESCRIPTION
+              - FORMAT_OF_DOCUMENT_OR_IMAGE
+              - OBJECT_NAME
+        models:
+          type: array
+          items:
+            type: string
+        objectNames:
+          type: array
+          items:
+            type: string
+        objectMatch:
+          type: string
+          enum: [ANY, ALL]
+          default: ANY
+        weatherDescriptions:
+          type: array
+          items:
+            type: string
+        locationDescriptions:
+          type: array
+          items:
+            type: string
+        formats:
+          type: array
+          items:
+            type: string
+        mediaTypes:
+          type: array
+          items:
+            type: string
+          description: "Medientypen aus MEDIAFILES.TYPE, z. B. rgb, video, audio."
+        personCount:
+          $ref: '#/components/schemas/NumericRange'
+        animalCount:
+          $ref: '#/components/schemas/NumericRange'
+        objectCount:
+          $ref: '#/components/schemas/NumericRange'
+        temperaturMinCelsius:
+          $ref: '#/components/schemas/NumericRange'
+        temperaturMaxCelsius:
+          $ref: '#/components/schemas/NumericRange'
+        modelTemperature:
+          $ref: '#/components/schemas/NumericRange'
+        createdInMilliseconds:
+          $ref: '#/components/schemas/NumericRange'
+        creationDate:
+          $ref: '#/components/schemas/DateRange'
+        createdAt:
+          $ref: '#/components/schemas/DateRange'
+        mediaDate:
+          $ref: '#/components/schemas/DateRange'
+        mediaItemIds:
+          type: array
+          items:
+            type: integer
+        folderIds:
+          type: array
+          items:
+            type: integer
+        categoryIds:
+          type: array
+          items:
+            type: integer
+        categoryRecursive:
+          type: boolean
+          default: false
+        includeDeleted:
+          type: boolean
+          default: false
+        hasObjects:
+          type: boolean
+          nullable: true
+        hasReadableText:
+          type: boolean
+          nullable: true
+    ImageAnalysisSearchRequest:
+      type: object
+      properties:
+        filter:
+          $ref: '#/components/schemas/ImageAnalysisFilter'
+        sort:
+          type: string
+          enum:
+            - MEDIA_DATE_DESC
+            - MEDIA_DATE_ASC
+            - CREATION_DATE_DESC
+            - CREATION_DATE_ASC
+            - CREATED_AT_DESC
+            - CREATED_AT_ASC
+            - PERSON_COUNT_DESC
+            - PERSON_COUNT_ASC
+            - ANIMAL_COUNT_DESC
+            - ANIMAL_COUNT_ASC
+            - OBJECT_COUNT_DESC
+            - OBJECT_COUNT_ASC
+            - ID_ASC
+            - ID_DESC
+            - RELEVANCE_DESC
+          default: MEDIA_DATE_DESC
+        offset:
+          type: integer
+          default: 0
+        limit:
+          type: integer
+          default: 100
+          maximum: 500
+        includeObjects:
+          type: boolean
+          default: false
+        includeReadableText:
+          type: boolean
+          default: false
+    ImageAnalysisSearchResult:
+      type: object
+      properties:
+        total:
+          type: integer
+          format: int64
+        offset:
+          type: integer
+        limit:
+          type: integer
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ImageAnalysisMediaItem'
+    ImageAnalysisMediaItem:
+      type: object
+      required: [id, filename, mediaDate, type]
+      properties:
+        id:
+          type: integer
+        filename:
+          type: string
+        foldername:
+          type: string
+        mediaDate:
+          type: string
+          format: date-time
+        type:
+          type: string
+        width:
+          type: integer
+        height:
+          type: integer
+        variationId:
+          type: integer
+        isDeleted:
+          type: boolean
+        isBookmarked:
+          type: boolean
+        analysis:
+          $ref: '#/components/schemas/ImageAnalysisSummary'
+    ImageAnalysisSummary:
+      type: object
+      properties:
+        id:
+          type: integer
+        model:
+          type: string
+          nullable: true
+        personCount:
+          type: integer
+        animalCount:
+          type: integer
+        objectCount:
+          type: integer
+        temperaturMinCelsius:
+          type: integer
+          nullable: true
+        temperaturMaxCelsius:
+          type: integer
+          nullable: true
+        modelTemperature:
+          type: number
+          format: double
+          nullable: true
+        createdInMilliseconds:
+          type: integer
+          format: int64
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+          nullable: true
+        creationDate:
+          type: string
+          format: date-time
+          nullable: true
+        weatherDescription:
+          type: string
+          nullable: true
+        locationDescription:
+          type: string
+          nullable: true
+        formatOfDocumentOrImage:
+          type: string
+          nullable: true
+        objects:
+          type: array
+          items:
+            type: string
+        readableText:
+          type: array
+          items:
+            type: string
+    ImageAnalysisFacetRequest:
+      type: object
+      properties:
+        filter:
+          $ref: '#/components/schemas/ImageAnalysisFilter'
+        fields:
+          type: array
+          items:
+            type: string
+            enum:
+              - OBJECT_NAME
+              - WEATHER_DESCRIPTION
+              - LOCATION_DESCRIPTION
+        valueSearch:
+          type: string
+          description: Optionaler Suchbegriff für die Werte (Autocomplete).
+        limitPerField:
+          type: integer
+          default: 100
+          maximum: 500
+        minCount:
+          type: integer
+          default: 1
+        contextual:
+          type: boolean
+          default: true
+    ImageAnalysisFacetValue:
+      type: object
+      properties:
+        value:
+          type: string
+        count:
+          type: integer
+          format: int64
+    ImageAnalysisFacetResult:
+      type: object
+      properties:
+        objectName:
+          type: array
+          items:
+            $ref: '#/components/schemas/ImageAnalysisFacetValue'
+        weatherDescription:
+          type: array
+          items:
+            $ref: '#/components/schemas/ImageAnalysisFacetValue'
+        locationDescription:
+          type: array
+          items:
+            $ref: '#/components/schemas/ImageAnalysisFacetValue'
+    ImageAnalysisFilterField:
+      type: object
+      properties:
+        key:
+          type: string
+        label:
+          type: string
+        type:
+          type: string
+          enum: [STRING, INTEGER, NUMBER, DATE, BOOLEAN]
+        control:
+          type: string
+          enum: [AUTOCOMPLETE, RANGE, NUMBER, DATE_RANGE, SELECT, TEXT]
+        facetable:
+          type: boolean
+        source:
+          type: string
+          enum: [IMAGE_ANALYSIS, IMAGE_OBJECTS, IMAGE_READABLE_TEXT, MEDIAFILES]
+        fixedValues:
+          type: array
+          items:
+            type: string
+    ImageAnalysisRanges:
+      type: object
+      properties:
+        personCount:
+          $ref: '#/components/schemas/NumericRange'
+        animalCount:
+          $ref: '#/components/schemas/NumericRange'
+        objectCount:
+          $ref: '#/components/schemas/NumericRange'
+        temperaturMinCelsius:
+          $ref: '#/components/schemas/NumericRange'
+        temperaturMaxCelsius:
+          $ref: '#/components/schemas/NumericRange'
+        modelTemperature:
+          $ref: '#/components/schemas/NumericRange'
+        createdInMilliseconds:
+          $ref: '#/components/schemas/NumericRange'
     Attachment:
       type: object
       properties:

@@ -155,7 +155,13 @@ namespace MediaBrowser4.DB.Maria
 
                         if (indexName != null && existingIndexes.Add(indexName))
                         {
-                            this.Execute(connection, "ALTER TABLE " + QuoteIdentifier(tableName) + " ADD " + segment);
+                            string alterStatement = "ALTER TABLE " + QuoteIdentifier(tableName)
+                                + " ADD " + segment;
+
+                            if (segment.StartsWith("FULLTEXT ", StringComparison.OrdinalIgnoreCase))
+                                alterStatement += ", ALGORITHM=INPLACE";
+
+                            this.Execute(connection, alterStatement);
                         }
                     }
                     else
@@ -195,6 +201,63 @@ namespace MediaBrowser4.DB.Maria
                     "ALTER TABLE " + QuoteIdentifier("METADATA") + " MODIFY COLUMN "
                     + QuoteIdentifier("VALUE") + " TEXT NULL");
             }
+
+            if (TryGetColumnInfo(connection, "IMAGE_ANALYSIS", "WEATHER_DESCRIPTION", out dataType, out maxLength)
+                && !String.Equals(dataType, "longtext", StringComparison.OrdinalIgnoreCase))
+            {
+                this.Execute(connection,
+                    "ALTER TABLE " + QuoteIdentifier("IMAGE_ANALYSIS") + " MODIFY COLUMN "
+                    + QuoteIdentifier("WEATHER_DESCRIPTION") + " LONGTEXT NULL");
+            }
+
+            if (TryGetColumnInfo(connection, "IMAGE_ANALYSIS", "LOCATION_DESCRIPTION", out dataType, out maxLength)
+                && !String.Equals(dataType, "longtext", StringComparison.OrdinalIgnoreCase))
+            {
+                this.Execute(connection,
+                    "ALTER TABLE " + QuoteIdentifier("IMAGE_ANALYSIS") + " MODIFY COLUMN "
+                    + QuoteIdentifier("LOCATION_DESCRIPTION") + " LONGTEXT NULL");
+            }
+
+            if (TryGetColumnInfo(connection, "IMAGE_ANALYSIS", "FORMAT_OF_DOCUMENT_OR_IMAGE", out dataType, out maxLength)
+                && !IsAtLeastTextType(dataType))
+            {
+                this.Execute(connection,
+                    "ALTER TABLE " + QuoteIdentifier("IMAGE_ANALYSIS") + " MODIFY COLUMN "
+                    + QuoteIdentifier("FORMAT_OF_DOCUMENT_OR_IMAGE") + " TEXT NULL");
+            }
+
+            if (TryGetColumnInfo(connection, "IMAGE_ANALYSIS", "DETAILED_IMAGE_ANALYSIS", out dataType, out maxLength)
+                && !String.Equals(dataType, "longtext", StringComparison.OrdinalIgnoreCase))
+            {
+                this.Execute(connection,
+                    "ALTER TABLE " + QuoteIdentifier("IMAGE_ANALYSIS") + " MODIFY COLUMN "
+                    + QuoteIdentifier("DETAILED_IMAGE_ANALYSIS") + " LONGTEXT NULL");
+            }
+
+            if (TryGetColumnInfo(connection, "IMAGE_OBJECTS", "OBJECT_NAME", out dataType, out maxLength)
+                && !((String.Equals(dataType, "varchar", StringComparison.OrdinalIgnoreCase)
+                    || String.Equals(dataType, "char", StringComparison.OrdinalIgnoreCase))
+                    && maxLength >= 1024))
+            {
+                this.Execute(connection,
+                    "ALTER TABLE " + QuoteIdentifier("IMAGE_OBJECTS") + " MODIFY COLUMN "
+                    + QuoteIdentifier("OBJECT_NAME") + " VARCHAR(1024) NOT NULL");
+            }
+
+            if (TryGetColumnInfo(connection, "IMAGE_READABLE_TEXT", "TEXT_LINE", out dataType, out maxLength)
+                && !IsAtLeastTextType(dataType))
+            {
+                this.Execute(connection,
+                    "ALTER TABLE " + QuoteIdentifier("IMAGE_READABLE_TEXT") + " MODIFY COLUMN "
+                    + QuoteIdentifier("TEXT_LINE") + " TEXT NOT NULL");
+            }
+        }
+
+        private static bool IsAtLeastTextType(string dataType)
+        {
+            return String.Equals(dataType, "text", StringComparison.OrdinalIgnoreCase)
+                || String.Equals(dataType, "mediumtext", StringComparison.OrdinalIgnoreCase)
+                || String.Equals(dataType, "longtext", StringComparison.OrdinalIgnoreCase);
         }
 
         private bool TryGetColumnInfo(MySqlConnection connection, string tableName, string columnName,
@@ -381,7 +444,11 @@ namespace MediaBrowser4.DB.Maria
             return segment.StartsWith("KEY ", StringComparison.OrdinalIgnoreCase)
                 || segment.StartsWith("UNIQUE KEY ", StringComparison.OrdinalIgnoreCase)
                 || segment.StartsWith("INDEX ", StringComparison.OrdinalIgnoreCase)
-                || segment.StartsWith("UNIQUE INDEX ", StringComparison.OrdinalIgnoreCase);
+                || segment.StartsWith("UNIQUE INDEX ", StringComparison.OrdinalIgnoreCase)
+                || segment.StartsWith("FULLTEXT KEY ", StringComparison.OrdinalIgnoreCase)
+                || segment.StartsWith("FULLTEXT INDEX ", StringComparison.OrdinalIgnoreCase)
+                || segment.StartsWith("SPATIAL KEY ", StringComparison.OrdinalIgnoreCase)
+                || segment.StartsWith("SPATIAL INDEX ", StringComparison.OrdinalIgnoreCase);
         }
 
         private static string GetColumnName(string definition)
@@ -420,6 +487,22 @@ namespace MediaBrowser4.DB.Maria
             else if (value.StartsWith("UNIQUE INDEX ", StringComparison.OrdinalIgnoreCase))
             {
                 value = value.Substring("UNIQUE INDEX ".Length).Trim();
+            }
+            else if (value.StartsWith("FULLTEXT KEY ", StringComparison.OrdinalIgnoreCase))
+            {
+                value = value.Substring("FULLTEXT KEY ".Length).Trim();
+            }
+            else if (value.StartsWith("FULLTEXT INDEX ", StringComparison.OrdinalIgnoreCase))
+            {
+                value = value.Substring("FULLTEXT INDEX ".Length).Trim();
+            }
+            else if (value.StartsWith("SPATIAL KEY ", StringComparison.OrdinalIgnoreCase))
+            {
+                value = value.Substring("SPATIAL KEY ".Length).Trim();
+            }
+            else if (value.StartsWith("SPATIAL INDEX ", StringComparison.OrdinalIgnoreCase))
+            {
+                value = value.Substring("SPATIAL INDEX ".Length).Trim();
             }
             else if (value.StartsWith("KEY ", StringComparison.OrdinalIgnoreCase))
             {
@@ -728,6 +811,64 @@ namespace MediaBrowser4.DB.Maria
                 "KEY idx_faces_rel_size (REL_SIZE)" +
                 ") " + TableOptions);
 
+            statements.Add(
+                "CREATE TABLE IF NOT EXISTS IMAGE_ANALYSIS (" +
+                "ID BIGINT NOT NULL AUTO_INCREMENT, " +
+                "MEDIA_ID BIGINT NOT NULL, " +
+                "ANIMAL_COUNT INT NOT NULL, " +
+                "WEATHER_DESCRIPTION LONGTEXT NULL, " +
+                "OBJECT_COUNT INT NOT NULL, " +
+                "CREATION_DATE DATETIME(6) NULL, " +
+                "LOCATION_DESCRIPTION LONGTEXT NULL, " +
+                "FORMAT_OF_DOCUMENT_OR_IMAGE TEXT NULL, " +
+                "DETAILED_IMAGE_ANALYSIS LONGTEXT NULL, " +
+                "TEMPERATUR_MIN_CELSIUS INT NULL, " +
+                "TEMPERATUR_MAX_CELSIUS INT NULL, " +
+                "MODEL_TEMPERATURE DOUBLE NULL, " +
+                "CREATED_IN_MILLISECONDS BIGINT NULL, " +
+                "MODEL VARCHAR(100) NULL, " +
+                "PERSON_COUNT INT NOT NULL, " +
+                "CREATED_AT TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP, " +
+                "PRIMARY KEY (ID), " +
+                "UNIQUE KEY uk_image_analysis_media_id (MEDIA_ID), " +
+                "KEY idx_image_analysis_creation_date (CREATION_DATE), " +
+                "KEY idx_image_analysis_animal_count (ANIMAL_COUNT), " +
+                "KEY idx_image_analysis_object_count (OBJECT_COUNT), " +
+                "KEY idx_image_analysis_person_count (PERSON_COUNT), " +
+                "KEY idx_image_analysis_temperatur_min (TEMPERATUR_MIN_CELSIUS), " +
+                "KEY idx_image_analysis_temperatur_max (TEMPERATUR_MAX_CELSIUS), " +
+                "KEY idx_image_analysis_all_counts (ANIMAL_COUNT, OBJECT_COUNT, PERSON_COUNT), " +
+                "KEY idx_image_analysis_temperatur_range (TEMPERATUR_MIN_CELSIUS, TEMPERATUR_MAX_CELSIUS), " +
+                "KEY idx_image_analysis_model (MODEL), " +
+                "KEY idx_image_analysis_created_at (CREATED_AT), " +
+                "FULLTEXT KEY ft_detailed_image_analysis (DETAILED_IMAGE_ANALYSIS), " +
+                "FULLTEXT KEY ft_weather_description (WEATHER_DESCRIPTION), " +
+                "FULLTEXT KEY ft_location_description (LOCATION_DESCRIPTION), " +
+                "FULLTEXT KEY ft_format_of_document_or_image (FORMAT_OF_DOCUMENT_OR_IMAGE)" +
+                ") " + TableOptions);
+
+            statements.Add(
+                "CREATE TABLE IF NOT EXISTS IMAGE_OBJECTS (" +
+                "ID BIGINT NOT NULL AUTO_INCREMENT, " +
+                "IMAGE_ANALYSIS_ID BIGINT NOT NULL, " +
+                "OBJECT_NAME VARCHAR(1024) NOT NULL, " +
+                "PRIMARY KEY (ID), " +
+                "KEY idx_image_objects_analysis (IMAGE_ANALYSIS_ID), " +
+                "KEY idx_image_objects_object_name (OBJECT_NAME(768)), " +
+                "KEY idx_image_objects_analysis_name (IMAGE_ANALYSIS_ID, OBJECT_NAME(191)), " +
+                "FULLTEXT KEY ft_object_name (OBJECT_NAME)" +
+                ") " + TableOptions);
+
+            statements.Add(
+                "CREATE TABLE IF NOT EXISTS IMAGE_READABLE_TEXT (" +
+                "ID BIGINT NOT NULL AUTO_INCREMENT, " +
+                "IMAGE_ANALYSIS_ID BIGINT NOT NULL, " +
+                "TEXT_LINE TEXT NOT NULL, " +
+                "PRIMARY KEY (ID), " +
+                "KEY idx_image_text_analysis (IMAGE_ANALYSIS_ID), " +
+                "FULLTEXT KEY ft_image_readable_text (TEXT_LINE)" +
+                ") " + TableOptions);
+
             return statements;
         }
 
@@ -747,6 +888,13 @@ namespace MediaBrowser4.DB.Maria
                     "DELETE FROM EXTRADATAS WHERE MEDIAFILES_FK = OLD.ID; " +
                     "DELETE FROM METADATA WHERE MEDIAFILES_FK = OLD.ID; " +
                     "DELETE FROM ATTACHED WHERE MEDIAFILES_FK = OLD.ID; " +
+                    "DELETE FROM IMAGE_ANALYSIS WHERE MEDIA_ID = OLD.ID; " +
+                    "END"),
+                new Tuple<string, string>("trg_image_analysis_delete",
+                    "CREATE TRIGGER trg_image_analysis_delete BEFORE DELETE ON IMAGE_ANALYSIS " +
+                    "FOR EACH ROW BEGIN " +
+                    "DELETE FROM IMAGE_OBJECTS WHERE IMAGE_ANALYSIS_ID = OLD.ID; " +
+                    "DELETE FROM IMAGE_READABLE_TEXT WHERE IMAGE_ANALYSIS_ID = OLD.ID; " +
                     "END"),
                 new Tuple<string, string>("trg_variations_delete",
                     "CREATE TRIGGER trg_variations_delete BEFORE DELETE ON VARIATIONS " +

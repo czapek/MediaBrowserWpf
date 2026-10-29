@@ -322,6 +322,147 @@ namespace MediaBrowser4.DB.Api
         public string Sort { get; set; }
     }
 
+    public sealed class ApiNumericRangeDto
+    {
+        public double? Min { get; set; }
+        public double? Max { get; set; }
+    }
+
+    public sealed class ApiDateRangeDto
+    {
+        public DateTime? From { get; set; }
+        public DateTime? To { get; set; }
+    }
+
+    public sealed class ApiImageAnalysisFilterDto
+    {
+        public string Text { get; set; }
+        public string TextMode { get; set; } = "NATURAL";
+        public List<string> TextFields { get; set; }
+        public List<string> Models { get; set; }
+        public List<string> ObjectNames { get; set; }
+        public string ObjectMatch { get; set; } = "ANY";
+        public List<string> WeatherDescriptions { get; set; }
+        public List<string> LocationDescriptions { get; set; }
+        public List<string> Formats { get; set; }
+        public List<string> MediaTypes { get; set; }
+        public ApiNumericRangeDto PersonCount { get; set; }
+        public ApiNumericRangeDto AnimalCount { get; set; }
+        public ApiNumericRangeDto ObjectCount { get; set; }
+        public ApiNumericRangeDto TemperaturMinCelsius { get; set; }
+        public ApiNumericRangeDto TemperaturMaxCelsius { get; set; }
+        public ApiNumericRangeDto ModelTemperature { get; set; }
+        public ApiNumericRangeDto CreatedInMilliseconds { get; set; }
+        public ApiDateRangeDto CreationDate { get; set; }
+        public ApiDateRangeDto CreatedAt { get; set; }
+        public ApiDateRangeDto MediaDate { get; set; }
+        public List<int> MediaItemIds { get; set; }
+        public List<int> FolderIds { get; set; }
+        public List<int> CategoryIds { get; set; }
+        public bool CategoryRecursive { get; set; }
+        public bool IncludeDeleted { get; set; }
+        public bool? HasObjects { get; set; }
+        public bool? HasReadableText { get; set; }
+    }
+
+    public sealed class ApiImageAnalysisSearchRequestDto
+    {
+        public ApiImageAnalysisFilterDto Filter { get; set; }
+        public string Sort { get; set; } = "MEDIA_DATE_DESC";
+        public int Offset { get; set; }
+        public int Limit { get; set; } = 100;
+        public bool IncludeObjects { get; set; }
+        public bool IncludeReadableText { get; set; }
+    }
+
+    public sealed class ApiImageAnalysisSearchResultDto
+    {
+        public long Total { get; set; }
+        public int Offset { get; set; }
+        public int Limit { get; set; }
+        public List<ApiImageAnalysisMediaItemDto> Items { get; set; }
+    }
+
+    public sealed class ApiImageAnalysisMediaItemDto
+    {
+        public int Id { get; set; }
+        public string Filename { get; set; }
+        public string Foldername { get; set; }
+        public DateTime MediaDate { get; set; }
+        public string Type { get; set; }
+        public int Width { get; set; }
+        public int Height { get; set; }
+        public int VariationId { get; set; }
+        public bool IsDeleted { get; set; }
+        public bool IsBookmarked { get; set; }
+        public ApiImageAnalysisSummaryDto Analysis { get; set; }
+    }
+
+    public sealed class ApiImageAnalysisSummaryDto
+    {
+        public int Id { get; set; }
+        public string Model { get; set; }
+        public int PersonCount { get; set; }
+        public int AnimalCount { get; set; }
+        public int ObjectCount { get; set; }
+        public int? TemperaturMinCelsius { get; set; }
+        public int? TemperaturMaxCelsius { get; set; }
+        public double? ModelTemperature { get; set; }
+        public long? CreatedInMilliseconds { get; set; }
+        public DateTime? CreatedAt { get; set; }
+        public DateTime? CreationDate { get; set; }
+        public string WeatherDescription { get; set; }
+        public string LocationDescription { get; set; }
+        public string FormatOfDocumentOrImage { get; set; }
+        public List<string> Objects { get; set; }
+        public List<string> ReadableText { get; set; }
+    }
+
+    public sealed class ApiImageAnalysisFacetRequestDto
+    {
+        public ApiImageAnalysisFilterDto Filter { get; set; }
+        public List<string> Fields { get; set; }
+        public string ValueSearch { get; set; }
+        public int LimitPerField { get; set; } = 100;
+        public int MinCount { get; set; } = 1;
+        public bool Contextual { get; set; } = true;
+    }
+
+    public sealed class ApiImageAnalysisFacetValueDto
+    {
+        public string Value { get; set; }
+        public long Count { get; set; }
+    }
+
+    public sealed class ApiImageAnalysisFacetResultDto
+    {
+        public List<ApiImageAnalysisFacetValueDto> ObjectName { get; set; }
+        public List<ApiImageAnalysisFacetValueDto> WeatherDescription { get; set; }
+        public List<ApiImageAnalysisFacetValueDto> LocationDescription { get; set; }
+    }
+
+    public sealed class ApiImageAnalysisFilterFieldDto
+    {
+        public string Key { get; set; }
+        public string Label { get; set; }
+        public string Type { get; set; }
+        public string Control { get; set; }
+        public bool Facetable { get; set; }
+        public string Source { get; set; }
+        public List<string> FixedValues { get; set; }
+    }
+
+    public sealed class ApiImageAnalysisRangesDto
+    {
+        public ApiNumericRangeDto PersonCount { get; set; }
+        public ApiNumericRangeDto AnimalCount { get; set; }
+        public ApiNumericRangeDto ObjectCount { get; set; }
+        public ApiNumericRangeDto TemperaturMinCelsius { get; set; }
+        public ApiNumericRangeDto TemperaturMaxCelsius { get; set; }
+        public ApiNumericRangeDto ModelTemperature { get; set; }
+        public ApiNumericRangeDto CreatedInMilliseconds { get; set; }
+    }
+
     public sealed class ApiMetaDataDto
     {
         public int Id { get; set; }

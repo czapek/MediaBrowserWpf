@@ -86,7 +86,8 @@ namespace MediaBrowser4.DB.Migration
             "DBPROPERTIES", "ATTACHMENTS", "ATTACHED", "MEDIAFILES", "VARIATIONS", "DESCRIPTION",
             "LAYERS", "FOLDERS", "ROLES", "FAVORITES", "CATEGORY", "CATEGORIZE", "REMOTEMAPPING",
             "METADATA", "METADATANAME", "EXTRADATA", "EXTRADATAS", "USERDEFINEDREQUESTS",
-            "DATALOGGER_METEOROLOGY", "DATALOGGER_GPS", "THUMBS", "FACES"
+            "DATALOGGER_METEOROLOGY", "DATALOGGER_GPS", "THUMBS", "FACES",
+            "IMAGE_ANALYSIS", "IMAGE_OBJECTS", "IMAGE_READABLE_TEXT"
         };
 
         private static readonly string[] AutoIncrementTables =
@@ -728,6 +729,14 @@ namespace MediaBrowser4.DB.Migration
 
             if (!result.TargetCounts.ContainsKey("FACES") || result.TargetCounts["FACES"] != 0)
                 errors.Add("FACES muss leer bleiben.");
+
+            foreach (string analysisTable in new[] { "IMAGE_ANALYSIS", "IMAGE_OBJECTS", "IMAGE_READABLE_TEXT" })
+            {
+                long analysisRows;
+
+                if (!result.TargetCounts.TryGetValue(analysisTable, out analysisRows) || analysisRows != 0)
+                    errors.Add(analysisTable + " muss leer bleiben.");
+            }
 
             long sourceProperties;
 
