@@ -11,6 +11,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using MediaBrowser4;
 using MediaBrowser4.Objects;
 
 namespace MediaBrowserWPF.UserControls
@@ -25,6 +26,9 @@ namespace MediaBrowserWPF.UserControls
         public InfoContainer()
         {
             InitializeComponent();
+            this.ImageAnalysisExpander.Visibility = MediaBrowserContext.IsApiMode
+                ? Visibility.Visible
+                : Visibility.Collapsed;
         }
 
         public void Clear()
@@ -32,6 +36,7 @@ namespace MediaBrowserWPF.UserControls
             this.infoCategories.Clear();
             this.infoExif.Clear();
             this.infoBase.Clear();
+            this.infoImageAnalysis.Clear();
         }
 
         public void SetInfo(List<MediaItem> mediaItemList)
@@ -46,40 +51,51 @@ namespace MediaBrowserWPF.UserControls
 
         private void Build(List<MediaItem> mediaItemList)
         {
+            this.ImageAnalysisExpander.Visibility = MediaBrowserContext.IsApiMode
+                ? Visibility.Visible
+                : Visibility.Collapsed;
+
             this.infoCategories.SetInfo(mediaItemList);
             this.infoBase.SetInfo(mediaItemList);
             this.infoExif.SetInfo(mediaItemList);
+            this.infoImageAnalysis.SetInfo(mediaItemList);
         }
 
         private void SetExpanderSize()
         {
             if ( this.ExifExpander == null
                 || this.CategoryExpander == null
-                || this.BaseInfoExpander == null)
+                || this.BaseInfoExpander == null
+                || this.ImageAnalysisExpander == null)
                 return;
 
             if (this.defaultExpanderColapsedHeight == 0 && this.CategoryExpander.RenderSize.Height > 0)
-            {
                 this.defaultExpanderColapsedHeight = this.CategoryExpander.RenderSize.Height;
 
-                this.expanderList = new List<Expander>();
-                this.expanderList.Add(this.CategoryExpander);
-                this.expanderList.Add(this.BaseInfoExpander);
-                this.expanderList.Add(this.ExifExpander);
-            }
+            this.expanderList = new List<Expander>();
+            this.expanderList.Add(this.CategoryExpander);
+            this.expanderList.Add(this.BaseInfoExpander);
+            this.expanderList.Add(this.ExifExpander);
 
-            if (this.expanderList != null)
+            if (this.ImageAnalysisExpander.Visibility == Visibility.Visible)
+                this.expanderList.Add(this.ImageAnalysisExpander);
+
+            if (this.expanderList.Count == 0 || this.defaultExpanderColapsedHeight == 0)
+                return;
+
+            int openExpanders = this.expanderList.Where(x => x.IsExpanded).Count();
+
+            if (openExpanders == 0)
+                return;
+
+            double availableHeight
+                = ((this.RenderSize.Height - (this.expanderList.Count * this.defaultExpanderColapsedHeight)) / openExpanders) + this.defaultExpanderColapsedHeight;
+
+            if (availableHeight >= this.defaultExpanderColapsedHeight && availableHeight < 50000)
             {
-                int openExpanders = this.expanderList.Where(x => x.IsExpanded).Count();
-                double availableHeight
-                    = ((this.RenderSize.Height - (this.expanderList.Count * this.defaultExpanderColapsedHeight)) / openExpanders) + this.defaultExpanderColapsedHeight;
-
-                if (availableHeight >= this.defaultExpanderColapsedHeight && availableHeight < 50000)
+                foreach (Expander expander in this.expanderList)
                 {
-                    foreach (Expander expander in this.expanderList)
-                    {
-                        expander.Height = expander.IsExpanded ? availableHeight : this.defaultExpanderColapsedHeight;
-                    }
+                    expander.Height = expander.IsExpanded ? availableHeight : this.defaultExpanderColapsedHeight;
                 }
             }
         }

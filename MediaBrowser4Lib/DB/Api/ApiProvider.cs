@@ -97,6 +97,15 @@ namespace MediaBrowser4.DB.Api
             }
         }
 
+        public ApiImageAnalysisDto GetImageAnalysis(int mediaItemId)
+        {
+            if (mediaItemId <= 0)
+                return null;
+
+            return this.client.GetOrDefault<ApiImageAnalysisDto>(
+                "/mediafiles/" + mediaItemId + "/image-analysis");
+        }
+
         private static string SafePathPart(string value)
         {
             string result = String.IsNullOrWhiteSpace(value) ? "default" : value;

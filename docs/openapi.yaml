@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: MediaBrowser Spring API
-  version: 1.0.0
+  version: 1.1.0
   description: >
     REST-Vertrag für das Spring-Boot-Backend des MediaBrowserWpf-ApiProviders.
     Die API verwendet JSON (UTF-8). Binärdaten wie Thumbnails werden als
@@ -19,6 +19,7 @@ tags:
   - name: folders
   - name: categories
   - name: mediafiles
+  - name: imageanalysis
   - name: variations
   - name: previews
   - name: metadata
@@ -670,6 +671,69 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/MediaItem'
+
+  /mediafiles/{id}/image-analysis:
+    get:
+      tags: [imageanalysis]
+      operationId: getImageAnalysis
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: KI-/OCR-Analyse des Medienobjekts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImageAnalysis'
+        '404':
+          description: Medienobjekt oder Analyse nicht gefunden
+    put:
+      tags: [imageanalysis]
+      operationId: upsertImageAnalysis
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ImageAnalysisUpsert'
+      responses:
+        '204':
+          description: Analyse gespeichert oder ersetzt
+        '400':
+          description: Ungültige Analysedaten
+        '404':
+          description: Medienobjekt nicht gefunden
+    delete:
+      tags: [imageanalysis]
+      operationId: deleteImageAnalysis
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '204':
+          description: Analyse und Kindzeilen entfernt
+        '404':
+          description: Medienobjekt nicht gefunden
+  /image-analysis/query:
+    post:
+      tags: [imageanalysis]
+      operationId: queryImageAnalysis
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ImageAnalysisQuery'
+      responses:
+        '200':
+          description: Gefundene KI-/OCR-Analysen
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ImageAnalysis'
 
   /variations/{id}:
     put:
@@ -1744,6 +1808,214 @@ components:
           type: boolean
         isNull:
           type: boolean
+    ImageObject:
+      type: object
+      required: [objectName]
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        objectName:
+          type: string
+    ImageReadableText:
+      type: object
+      required: [textLine]
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        textLine:
+          type: string
+    ImageAnalysis:
+      type: object
+      required: [id, mediaItemId, animalCount, objectCount, personCount]
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        mediaItemId:
+          type: integer
+        filename:
+          type: string
+          readOnly: true
+        foldername:
+          type: string
+          readOnly: true
+        mediaType:
+          type: string
+          readOnly: true
+        mediaDate:
+          type: string
+          format: date-time
+          readOnly: true
+        animalCount:
+          type: integer
+        weatherDescription:
+          type: string
+          nullable: true
+        objectCount:
+          type: integer
+        creationDate:
+          type: string
+          format: date-time
+          nullable: true
+        locationDescription:
+          type: string
+          nullable: true
+        formatOfDocumentOrImage:
+          type: string
+          nullable: true
+        detailedImageAnalysis:
+          type: string
+          nullable: true
+        temperaturMinCelsius:
+          type: integer
+          nullable: true
+        temperaturMaxCelsius:
+          type: integer
+          nullable: true
+        modelTemperature:
+          type: number
+          format: double
+          nullable: true
+        createdInMilliseconds:
+          type: integer
+          format: int64
+          nullable: true
+        model:
+          type: string
+          nullable: true
+        personCount:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+          nullable: true
+        objects:
+          type: array
+          items:
+            $ref: '#/components/schemas/ImageObject'
+        readableText:
+          type: array
+          items:
+            $ref: '#/components/schemas/ImageReadableText'
+    ImageAnalysisUpsert:
+      type: object
+      required: [animalCount, objectCount, personCount]
+      properties:
+        animalCount:
+          type: integer
+        weatherDescription:
+          type: string
+          nullable: true
+        objectCount:
+          type: integer
+        creationDate:
+          type: string
+          format: date-time
+          nullable: true
+        locationDescription:
+          type: string
+          nullable: true
+        formatOfDocumentOrImage:
+          type: string
+          nullable: true
+        detailedImageAnalysis:
+          type: string
+          nullable: true
+        temperaturMinCelsius:
+          type: integer
+          nullable: true
+        temperaturMaxCelsius:
+          type: integer
+          nullable: true
+        modelTemperature:
+          type: number
+          format: double
+          nullable: true
+        createdInMilliseconds:
+          type: integer
+          format: int64
+          nullable: true
+        model:
+          type: string
+          nullable: true
+        personCount:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+          nullable: true
+        objects:
+          type: array
+          items:
+            type: string
+        readableText:
+          type: array
+          items:
+            type: string
+    ImageAnalysisQuery:
+      type: object
+      properties:
+        mediaItemIds:
+          type: array
+          items:
+            type: integer
+        model:
+          type: string
+        animalCountFrom:
+          type: integer
+        animalCountTo:
+          type: integer
+        objectCountFrom:
+          type: integer
+        objectCountTo:
+          type: integer
+        personCountFrom:
+          type: integer
+        personCountTo:
+          type: integer
+        temperaturMinCelsiusFrom:
+          type: integer
+        temperaturMinCelsiusTo:
+          type: integer
+        temperaturMaxCelsiusFrom:
+          type: integer
+        temperaturMaxCelsiusTo:
+          type: integer
+        creationDateFrom:
+          type: string
+          format: date-time
+        creationDateTo:
+          type: string
+          format: date-time
+        objectName:
+          type: string
+        text:
+          type: string
+        hasObjects:
+          type: boolean
+          nullable: true
+        hasReadableText:
+          type: boolean
+          nullable: true
+        includeObjects:
+          type: boolean
+          default: false
+        includeReadableText:
+          type: boolean
+          default: false
+        offset:
+          type: integer
+          default: 0
+        limit:
+          type: integer
+          default: 100
+          maximum: 500
+        sort:
+          type: string
+          enum: [CREATED_AT_DESC, CREATED_AT_ASC, MEDIA_DATE_DESC, MEDIA_DATE_ASC, ID_DESC, ID_ASC]
+          default: CREATED_AT_DESC
     Attachment:
       type: object
       properties:

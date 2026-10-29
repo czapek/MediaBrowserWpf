@@ -264,6 +264,9 @@
     <Compile Include="UserControls\InfoContainer\InfoContainerCategories.xaml.cs">
       <DependentUpon>InfoContainerCategories.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UserControls\InfoContainer\InfoContainerImageAnalysis.xaml.cs">
+      <DependentUpon>InfoContainerImageAnalysis.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UserControls\InfoContainer\InfoContainerCategoryHelper.cs" />
     <Compile Include="UserControls\Levels\GammaRemap.cs" />
     <Compile Include="UserControls\Levels\HistogrammSlider.xaml.cs">
@@ -485,6 +488,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UserControls\InfoContainer\InfoContainerCategories.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\InfoContainer\InfoContainerImageAnalysis.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

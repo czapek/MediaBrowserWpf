@@ -21,6 +21,8 @@ Vor Änderungen lesen:
 ## Grundregeln
 
 - Keine Commits, Push-Operationen oder PRs ohne ausdrückliche Aufforderung.
+- Ausnahme: Bei "deploy" ist das Commit und Push der in diesem Arbeitslauf erstellten Änderungen
+  ausdrücklich gewünscht.
 - Keine destruktiven Git-Operationen.
 - Keine Kommentare im Code ergänzen, außer der Benutzer verlangt es ausdrücklich.
 - Bestehenden Code-Stil, Namensschema und Schreibweise übernehmen.
@@ -62,6 +64,10 @@ Wenn der Benutzer „deploy“ sagt, nach einem erfolgreichen Build ausführen:
 Das Skript kopiert die neueren Build-Dateien nach
 `C:\Users\SebastianCzapek\SynologyDriveDevelopment\MediaBrowserWpf`. Vorher sicherstellen, dass
 `MediaBrowserWPF` nicht läuft. Für eine Vorschau `-Preview` verwenden.
+
+Nach dem erfolgreichen Deployment zusätzlich alle in diesem Arbeitslauf erstellten und geänderten
+Dateien committen und den aktuellen Branch nach `origin` pushen. Vorher `git status` und
+`git diff` prüfen; keine Secrets oder temporären Testdateien committen.
 
 Die Warnung ist nicht durch neue Änderungen verursacht und muss nicht behoben werden, sofern die
 Aufgabe nichts anderes verlangt.

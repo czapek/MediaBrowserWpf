@@ -237,6 +237,91 @@ namespace MediaBrowser4.DB.Api
         public string Message { get; set; }
     }
 
+    public sealed class ApiImageObjectDto
+    {
+        public int Id { get; set; }
+        public string ObjectName { get; set; }
+    }
+
+    public sealed class ApiImageReadableTextDto
+    {
+        public int Id { get; set; }
+        public string TextLine { get; set; }
+    }
+
+    public sealed class ApiImageAnalysisDto
+    {
+        public int Id { get; set; }
+        public int MediaItemId { get; set; }
+        public string Filename { get; set; }
+        public string Foldername { get; set; }
+        public string MediaType { get; set; }
+        public DateTime MediaDate { get; set; }
+        public int AnimalCount { get; set; }
+        public string WeatherDescription { get; set; }
+        public int ObjectCount { get; set; }
+        public DateTime? CreationDate { get; set; }
+        public string LocationDescription { get; set; }
+        public string FormatOfDocumentOrImage { get; set; }
+        public string DetailedImageAnalysis { get; set; }
+        public int? TemperaturMinCelsius { get; set; }
+        public int? TemperaturMaxCelsius { get; set; }
+        public double? ModelTemperature { get; set; }
+        public long? CreatedInMilliseconds { get; set; }
+        public string Model { get; set; }
+        public int PersonCount { get; set; }
+        public DateTime? CreatedAt { get; set; }
+        public List<ApiImageObjectDto> Objects { get; set; }
+        public List<ApiImageReadableTextDto> ReadableText { get; set; }
+    }
+
+    public sealed class ApiImageAnalysisUpsertDto
+    {
+        public int AnimalCount { get; set; }
+        public string WeatherDescription { get; set; }
+        public int ObjectCount { get; set; }
+        public DateTime? CreationDate { get; set; }
+        public string LocationDescription { get; set; }
+        public string FormatOfDocumentOrImage { get; set; }
+        public string DetailedImageAnalysis { get; set; }
+        public int? TemperaturMinCelsius { get; set; }
+        public int? TemperaturMaxCelsius { get; set; }
+        public double? ModelTemperature { get; set; }
+        public long? CreatedInMilliseconds { get; set; }
+        public string Model { get; set; }
+        public int PersonCount { get; set; }
+        public DateTime? CreatedAt { get; set; }
+        public List<string> Objects { get; set; }
+        public List<string> ReadableText { get; set; }
+    }
+
+    public sealed class ApiImageAnalysisQueryDto
+    {
+        public List<int> MediaItemIds { get; set; }
+        public string Model { get; set; }
+        public int? AnimalCountFrom { get; set; }
+        public int? AnimalCountTo { get; set; }
+        public int? ObjectCountFrom { get; set; }
+        public int? ObjectCountTo { get; set; }
+        public int? PersonCountFrom { get; set; }
+        public int? PersonCountTo { get; set; }
+        public int? TemperaturMinCelsiusFrom { get; set; }
+        public int? TemperaturMinCelsiusTo { get; set; }
+        public int? TemperaturMaxCelsiusFrom { get; set; }
+        public int? TemperaturMaxCelsiusTo { get; set; }
+        public DateTime? CreationDateFrom { get; set; }
+        public DateTime? CreationDateTo { get; set; }
+        public string ObjectName { get; set; }
+        public string Text { get; set; }
+        public bool? HasObjects { get; set; }
+        public bool? HasReadableText { get; set; }
+        public bool IncludeObjects { get; set; }
+        public bool IncludeReadableText { get; set; }
+        public int Offset { get; set; }
+        public int Limit { get; set; }
+        public string Sort { get; set; }
+    }
+
     public sealed class ApiMetaDataDto
     {
         public int Id { get; set; }

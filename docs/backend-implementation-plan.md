@@ -74,6 +74,12 @@ de.mediabrowser.api
     MediaFileRepository
     MediaQueryService
     DuplicateService
+  imageanalysis
+    ImageAnalysisController
+    ImageAnalysisService
+    ImageAnalysisRepository
+    ImageObjectRepository
+    ImageReadableTextRepository
   variation
     VariationController
     VariationService
@@ -194,6 +200,34 @@ Wichtige Regeln:
 - Katalogweite Einstellungen liegen in `DBPROPERTIES`
 - Binärdaten als `LONGBLOB`, große Texte als `TEXT`/`LONGTEXT`
 - IDs und AUTO_INCREMENT-Werte aus dem bestehenden Schema übernehmen
+
+### 5.1 Image-Analyse (KI/OCR)
+
+Die Analyse-Tabellen wurden aus der alten Datenbank `mediabrowser` nach `mediabrowser-new`
+übernommen. Das einmalige Importskript liegt unter
+`scripts/Migrate-ImageAnalysisToMariaDb.ps1`.
+
+Tabellen und Beziehungen:
+
+- `IMAGE_ANALYSIS`: 1:1 zu `MEDIAFILES` über `MEDIA_ID` (UNIQUE, FK, `ON DELETE CASCADE`).
+- `IMAGE_OBJECTS`: 1:n zu `IMAGE_ANALYSIS` über `IMAGE_ANALYSIS_ID` (FK, `ON DELETE CASCADE`).
+- `IMAGE_READABLE_TEXT`: 1:n zu `IMAGE_ANALYSIS` über `IMAGE_ANALYSIS_ID` (FK, `ON DELETE CASCADE`).
+
+Wichtige Regeln:
+
+- `IMAGE_ANALYSIS.OBJECT_COUNT`, `ANIMAL_COUNT` und `PERSON_COUNT` sind KI-Zähler und werden nicht
+  aus den Kindzeilen abgeleitet. Die Service-Schicht darf sie nicht stillschweigend neu berechnen.
+- Volltextindizes: `FT_DETAILED_IMAGE_ANALYSIS` auf `DETAILED_IMAGE_ANALYSIS` und
+  `FT_IMAGE_READABLE_TEXT` auf `TEXT_LINE`.
+- `IMAGE_OBJECTS.OBJECT_NAME` nutzt einen B-Tree-Präfixindex. Eine Suche nach exakten Objektnamen
+  erfolgt über `OBJECT_NAME = ?`; für unscharfe Suche kann später ein eigener Volltextindex ergänzt
+  werden.
+- Schreiboperationen auf diese Tabellen sind reine Datenbank-Schreiboperationen und damit erlaubt.
+  Die API darf dabei keine Dateien anlegen, ändern oder löschen.
+- Die Tabellen gehören zum Katalog des Mandanten. Der Tenant wird über die Datenquelle des
+  authentifizierten Requests bestimmt, nicht über einen Client-Parameter.
+- Die Flyway-Baseline muss die drei Tabellen und ihre Indizes enthalten. Der einmalige Import aus
+  der Alt-Datenbank ist nicht Teil der Flyway-Historie.
 
 Flyway sollte mit einer Baseline des bestehenden Schemas starten. Spätere Änderungen werden als
 versionierte Migrationen ergänzt.
@@ -338,6 +372,49 @@ Capabilities melden mindestens:
 Die Bereinigung darf nur Datenbankzeilen ändern. Sie darf keine Dateien löschen und nur mit
 expliziter Berechtigung ausgeführt werden.
 
+### 6.9 Image-Analyse (KI/OCR)
+
+Endpunkte:
+
+- `GET /mediafiles/{id}/image-analysis`
+- `PUT /mediafiles/{id}/image-analysis`
+- `DELETE /mediafiles/{id}/image-analysis`
+- `POST /image-analysis/query`
+
+Verhalten:
+
+- `GET` liefert die Analyse inklusive `objects` und `readableText`. Existiert keine Analyse, wird
+  `404` geliefert.
+- `PUT` ist ein Upsert: Es legt die Analyse an oder ersetzt sie für das angegebene Medium. Die
+  Kindzeilen in `IMAGE_OBJECTS` und `IMAGE_READABLE_TEXT` werden vollständig ersetzt. Das Medium
+  muss existieren, sonst `404`.
+- `DELETE` entfernt die Analyse. Die Kindzeilen werden über die Fremdschlüssel kaskadiert oder
+  explizit in derselben Transaktion gelöscht.
+- `POST /image-analysis/query` filtert nach Medien-IDs, Modell, Zählerbereichen,
+  Temperaturbereichen, Erstellungsdatum, exaktem Objektnamen, Volltext und dem Vorhandensein von
+  Objekten bzw. lesbarem Text. Die Ergebnisse werden mit `offset` und `limit` paginiert; `limit`
+  wird serverseitig auf 500 begrenzt.
+- Sortierung: `CREATED_AT_DESC`, `CREATED_AT_ASC`, `MEDIA_DATE_DESC`, `MEDIA_DATE_ASC`, `ID_DESC`,
+  `ID_ASC`. Standard ist `CREATED_AT_DESC`.
+
+Volltextsuche:
+
+- Der Suchtext wird ausschließlich über `MATCH ... AGAINST` auf
+  `IMAGE_ANALYSIS.DETAILED_IMAGE_ANALYSIS` und `IMAGE_READABLE_TEXT.TEXT_LINE` ausgeführt.
+- Leere oder zu kurze Suchbegriffe werden verworfen. Es werden keine Suchbegriffe in dynamisches
+  SQL interpoliert.
+- Die Treffer aus beiden Tabellen werden mit den übrigen Filtern kombiniert. Bei mehreren
+  Suchbegriffen entscheidet der Service über `OR` innerhalb der Volltextbedingungen und `AND`
+  zwischen den Filtergruppen.
+
+Berechtigungen:
+
+- Lesen: authentifizierter Benutzer mit Lesezugriff auf den Mandanten.
+- Schreiben/Löschen: Rolle `CATALOG_WRITE` oder eine eigene Berechtigung
+  `IMAGE_ANALYSIS_WRITE`. Die Entscheidung muss zentral im `ImageAnalysisService` bzw. in
+  Spring Security erfolgen.
+- Alle Zugriffe bleiben auf die Datenquelle des Mandanten beschränkt.
+
 ## 7. DTO- und Fehlerbehandlung
 
 - DTOs entsprechen den Schemas in `docs/openapi.yaml`.
@@ -367,6 +444,9 @@ expliziter Berechtigung ausgeführt werden.
 - `POST /mediafiles/insert` ist eine Transaktion über Ordner, Medium, Variation und Thumbnail.
 - `POST /mediafiles/actions` verarbeitet eine Aktionsliste atomar, sofern fachlich möglich.
 - Duplikaterkennung und anschließende Flags werden innerhalb einer Transaktion gesetzt.
+- `PUT /mediafiles/{id}/image-analysis` prüft das Medium, upsertet `IMAGE_ANALYSIS` und ersetzt
+  `IMAGE_OBJECTS` und `IMAGE_READABLE_TEXT` in einer Transaktion.
+- `DELETE /mediafiles/{id}/image-analysis` löscht Analyse und Kindzeilen in einer Transaktion.
 - Bei Massenimporten werden Batch-Grenzen und Fehler pro Batch protokolliert.
 
 ## 9. Performance
@@ -376,7 +456,13 @@ expliziter Berechtigung ausgeführt werden.
 - Thumbnails nur bei Bedarf laden; nicht in jeder Listenabfrage einbetten.
 - Bulk-Inserts für große Imports verwenden.
 - `max_allowed_packet` des MariaDB-Servers dokumentieren und im Deployment ausreichend dimensionieren.
+  Der aktuelle Server kann mit 1 MB konfiguriert sein; Kindzeilen der Image-Analyse daher in
+  Batches schreiben.
 - Große DTOs mit Base64-Thumbnails vermeiden, wo Streaming möglich ist.
+- Die Image-Analyse-Suche nutzt die vorhandenen B-Tree- und Volltextindizes. Volltext wird nur
+  ausgeführt, wenn `text` gesetzt ist.
+- `POST /image-analysis/query` lädt `objects` und `readableText` nur, wenn `includeObjects` bzw.
+  `includeReadableText` gesetzt sind. `limit` wird auf 500 begrenzt.
 
 ## 10. Tests
 
@@ -385,6 +471,7 @@ expliziter Berechtigung ausgeführt werden.
 - AuthService, TokenService, Refresh-Rotation
 - MediaQueryService
 - DuplicateService
+- ImageAnalysisService, Query-Builder und Volltextfilter
 - DTO-Mapping
 - Rechte- und Tenant-Prüfungen
 
@@ -397,7 +484,11 @@ expliziter Berechtigung ausgeführt werden.
 - Insert mit Thumbnail und Metadaten
 - Suche und Query-Modi
 - Thumbnail-Abruf
+- Image-Analyse: GET, PUT, DELETE, Kaskade und vollständiges Ersetzen der Kindzeilen
+- Image-Analyse-Suche mit Filtern, Volltext und Pagination
+- Image-Analyse-Write mit kleinem `max_allowed_packet` (Batch-Fallback)
 - Tenant-Isolation
+- Image-Analyse-Endpunkte führen keine Dateisystem-Schreiboperationen aus
 
 ### Vertragstests
 
@@ -476,7 +567,18 @@ MEDIABROWSER_CONTENT_ROOT=/mnt/media-readonly
 - GPS und Meteorologie
 - Benutzerdefinierte Requests
 
-### Phase 7: Härtung und Betrieb
+### Phase 7: Image-Analyse (KI/OCR)
+
+- Repository und Service für `IMAGE_ANALYSIS`, `IMAGE_OBJECTS` und `IMAGE_READABLE_TEXT`
+- `GET /mediafiles/{id}/image-analysis` inklusive Kindzeilen
+- `PUT /mediafiles/{id}/image-analysis` als transaktionales Upsert mit vollständigem Ersetzen der
+  Kindzeilen
+- `DELETE /mediafiles/{id}/image-analysis` mit Kaskade
+- `POST /image-analysis/query` mit Filtern, Volltext, Pagination und optionalen Kindzeilen
+- Berechtigungsprüfung für Schreiben und Löschen
+- Integrationstests inklusive Cascade, Volltext und Mandantenisolierung
+
+### Phase 8: Härtung und Betrieb
 
 - Lasttests
 - Tenant-Isolation
@@ -496,6 +598,10 @@ MEDIABROWSER_CONTENT_ROOT=/mnt/media-readonly
 - Die API führt keine Schreiboperationen auf dem Medien-Dateisystem aus.
 - Keine Upload-, Rename-, Move-, Delete- oder Recycle-Endpunkte für Dateien.
 - Thumbnails werden mit `PREVIEW_WIDTH=0` und `PREVIEW_HEIGHT=0` ausgeliefert.
+- Image-Analyse: `GET`, `PUT` und `DELETE` funktionieren; `PUT` ersetzt Analyse und Kindzeilen
+  transaktional.
+- Die Image-Analyse-Suche unterstützt Filter, Volltext und Pagination.
+- Image-Analyse-Endpunkte führen keine Schreiboperationen auf dem Dateisystem aus.
 - Keine MariaDB-Zugangsdaten im Client oder in API-Logs.
 - Integrationstests laufen gegen eine echte MariaDB in Testcontainers.
 - Content-Tests prüfen Range, ETag und fehlende Dateien ohne Schreibzugriffe.
@@ -512,8 +618,136 @@ MariaDB-Provider und dem MariaDB-Insert:
 - `MediaBrowserInsertService.java`: Insert-Pipeline mit Ordner-, Duplikat-, History-,
   Thumbnail-, Layer-, Kategorie- und Metadatenlogik.
 
+Ergänzende Artefakte für die Image-Analyse:
+
+- `docs/openapi.yaml`: Schemas `ImageAnalysis`, `ImageAnalysisUpsert`, `ImageAnalysisQuery`,
+  `ImageObject` und `ImageReadableText`.
+- `MediaBrowser4Lib\DB\Api\ApiDtos.cs`: `ApiImageAnalysisDto`, `ApiImageAnalysisUpsertDto`,
+  `ApiImageAnalysisQueryDto`, `ApiImageObjectDto` und `ApiImageReadableTextDto`.
+- `scripts/Migrate-ImageAnalysisToMariaDb.ps1`: einmaliger Import der drei Analyse-Tabellen aus
+  `mediabrowser` nach `mediabrowser-new` mit Zuordnung über Ordner/Dateiname und eindeutigen
+  Dateinamen-Fallback.
+
 Die detaillierten Backend-Endpunkte und das Verbot von Dateisystem-Schreiboperationen sind in
 `docs/api-filesystem-access-plan.md` beschrieben.
 
 Diese Klassen sind als Datenzugriffsschicht gedacht und müssen noch in die Controller-,
 Security- und DTO-Schicht des Backends eingebunden werden.
+
+## 15. Image-Analyse: konkrete Umsetzung
+
+### 15.1 Klassen und Verantwortlichkeiten
+
+- `ImageAnalysisController`: Mapping der vier Endpunkte, Pfad-/Query-Validierung.
+- `ImageAnalysisService`: Berechtigungen, Transaktionsgrenzen, DTO-Mapping.
+- `ImageAnalysisRepository`: SQL für `IMAGE_ANALYSIS`.
+- `ImageObjectRepository`: SQL für `IMAGE_OBJECTS`.
+- `ImageReadableTextRepository`: SQL für `IMAGE_READABLE_TEXT`.
+- `ImageAnalysisQueryBuilder`: dynamische Filter und Sortierung mit benannten Parametern.
+
+### 15.2 Lesen
+
+Ablauf für `GET /mediafiles/{id}/image-analysis`:
+
+1. Prüfen, ob `MEDIAFILES.ID` existiert; sonst `404`.
+2. Analyse über `MEDIA_ID` laden.
+3. `IMAGE_OBJECTS` und `IMAGE_READABLE_TEXT` über `IMAGE_ANALYSIS_ID` laden.
+4. Auf `ImageAnalysis` mappen.
+
+Beispielabfrage:
+
+```sql
+SELECT a.ID, a.MEDIA_ID, a.ANIMAL_COUNT, a.WEATHER_DESCRIPTION, a.OBJECT_COUNT,
+       a.CREATION_DATE, a.LOCATION_DESCRIPTION, a.FORMAT_OF_DOCUMENT_OR_IMAGE,
+       a.DETAILED_IMAGE_ANALYSIS, a.TEMPERATUR_MIN_CELSIUS, a.TEMPERATUR_MAX_CELSIUS,
+       a.MODEL_TEMPERATURE, a.CREATED_IN_MILLISECONDS, a.MODEL, a.PERSON_COUNT,
+       a.CREATED_AT, m.FILENAME, f.FOLDERNAME, m.TYPE AS MEDIA_TYPE, m.MEDIADATE
+FROM IMAGE_ANALYSIS a
+JOIN MEDIAFILES m ON m.ID = a.MEDIA_ID
+JOIN FOLDERS f ON f.ID = m.FOLDERS_FK
+WHERE a.MEDIA_ID = ?
+```
+
+Kindzeilen:
+
+```sql
+SELECT ID, OBJECT_NAME
+FROM IMAGE_OBJECTS
+WHERE IMAGE_ANALYSIS_ID = ?
+ORDER BY ID;
+
+SELECT ID, TEXT_LINE
+FROM IMAGE_READABLE_TEXT
+WHERE IMAGE_ANALYSIS_ID = ?
+ORDER BY ID;
+```
+
+### 15.3 Schreiben (Upsert)
+
+Ablauf für `PUT /mediafiles/{id}/image-analysis`:
+
+1. Medium prüfen; sonst `404`.
+2. Transaktion starten.
+3. `SELECT ID FROM IMAGE_ANALYSIS WHERE MEDIA_ID = ? FOR UPDATE`.
+4. Vorhandene Zeile aktualisieren oder neue Zeile einfügen. `MEDIA_ID` darf nicht auf ein anderes
+   Medium geändert werden.
+5. `DELETE FROM IMAGE_OBJECTS WHERE IMAGE_ANALYSIS_ID = ?`.
+6. Objekte in Batches einfügen.
+7. `DELETE FROM IMAGE_READABLE_TEXT WHERE IMAGE_ANALYSIS_ID = ?`.
+8. Lesbaren Text in Batches einfügen.
+9. Commit; Antwort `204`.
+
+Regeln:
+
+- `OBJECT_COUNT`, `ANIMAL_COUNT` und `PERSON_COUNT` werden so gespeichert, wie sie geliefert
+  werden. Sie werden nicht aus den Kindzeilen neu berechnet.
+- `CREATED_AT` wird nur gesetzt, wenn der Client einen Wert liefert; sonst gilt der
+  Datenbank-Default.
+- Batch-Größe an `max_allowed_packet` anpassen, z. B. 500 Zeilen oder 256 KB pro Batch.
+- Leere Listen bedeuten: keine Kindzeilen. `null` wird wie eine leere Liste behandelt.
+
+### 15.4 Löschen
+
+Ablauf für `DELETE /mediafiles/{id}/image-analysis`:
+
+1. Medium prüfen; sonst `404`.
+2. `DELETE FROM IMAGE_ANALYSIS WHERE MEDIA_ID = ?` in einer Transaktion.
+3. Kindzeilen werden über `ON DELETE CASCADE` entfernt.
+4. Antwort `204`.
+
+### 15.5 Suche
+
+Ablauf für `POST /image-analysis/query`:
+
+- Aus allen gesetzten Filtern eine `WHERE`-Klausel mit benannten Parametern bauen. Keine
+  String-Verkettung von Benutzerwerten.
+- `MEDIAFILES` und `FOLDERS` für Dateiname, Ordner und Mediendatum joinen.
+- `objectName`: `EXISTS (SELECT 1 FROM IMAGE_OBJECTS o WHERE o.IMAGE_ANALYSIS_ID = a.ID AND o.OBJECT_NAME = :objectName)`.
+- `hasObjects`/`hasReadableText`: `EXISTS` bzw. `NOT EXISTS`.
+- `text`:
+  `MATCH(a.DETAILED_IMAGE_ANALYSIS) AGAINST (:text IN NATURAL LANGUAGE MODE)` oder
+  `EXISTS (SELECT 1 FROM IMAGE_READABLE_TEXT t WHERE t.IMAGE_ANALYSIS_ID = a.ID AND MATCH(t.TEXT_LINE) AGAINST (:text IN NATURAL LANGUAGE MODE))`.
+- `includeObjects` und `includeReadableText`: Kindzeilen in einer zweiten Abfrage für die
+  Ergebnis-IDs laden, nicht als N+1-Abfrage pro Treffer.
+- Sortierung nur über eine Whitelist der erlaubten Werte.
+- `limit` auf 500 begrenzen, `offset` validieren.
+
+### 15.6 Tests
+
+- Unit: Query-Builder, DTO-Mapping, Validierung der Zähler und Berechtigungen.
+- Integration mit Testcontainers:
+  - Anlegen, Lesen, Ersetzen und Löschen einer Analyse.
+  - Cascade beim Löschen.
+  - Volltextsuche über `DETAILED_IMAGE_ANALYSIS` und `TEXT_LINE`.
+  - Filterkombinationen und Pagination.
+  - Kleines `max_allowed_packet` mit Batch-Fallback.
+  - Mandantenisolierung und keine Dateisystem-Schreiboperationen.
+- Vertragstests gegen `docs/openapi.yaml`.
+
+### 15.7 Abnahmekriterien
+
+- `GET`, `PUT` und `DELETE` entsprechen dem OpenAPI-Vertrag.
+- `PUT` ersetzt Analyse und Kindzeilen atomar.
+- Die Suche liefert reproduzierbare, paginierte Ergebnisse.
+- Kindzeilen werden nur bei Bedarf geladen.
+- Es werden keine Dateien gelesen, geschrieben oder gelöscht.

@@ -15,6 +15,9 @@ Verbindliche Leitentscheidung:
   Kategorien, Metadaten, Beschreibungen, Rollen, Thumbnail-BLOBs in `THUMBS`, GPS- und
   Meteorologiedaten. „Keine Schreiboperationen“ bezieht sich auf das Medien-Dateisystem,
   nicht auf MariaDB.
+- Die Image-Analyse-Tabellen `IMAGE_ANALYSIS`, `IMAGE_OBJECTS` und `IMAGE_READABLE_TEXT` sind
+  reine Datenbankdaten. `GET`, `PUT` und `DELETE` der Image-Analyse-API lesen und schreiben nur
+  MariaDB und führen keine Dateisystemoperationen aus.
 - Originalmedien müssen, wenn sie im API-Modus lesbar sein sollen, bereits in einem vom Backend
   **read-only** eingebundenen Content Store liegen. Das Backend liest und streamt nur.
 - Das Bereitstellen oder Aktualisieren der Originaldateien erfolgt außerhalb der MediaBrowser-API,

@@ -342,6 +342,16 @@ namespace MediaBrowser4
             get { return mainDBProvider is ApiProvider; }
         }
 
+        public static ApiImageAnalysisDto GetImageAnalysis(MediaItem item)
+        {
+            ApiProvider apiProvider = mainDBProvider as ApiProvider;
+
+            if (apiProvider != null && item != null)
+                return apiProvider.GetImageAnalysis(item.Id);
+
+            return null;
+        }
+
         public static string GetLocalMediaContentPath(MediaItem item)
         {
             ApiProvider apiProvider = mainDBProvider as ApiProvider;

@@ -19,5 +19,9 @@
         <Expander Name="ExifExpander" Header="Meta-Daten" IsExpanded="True" Collapsed="Expander_Expanded" Expanded="Expander_Expanded">
             <uc:InfoContainerExif x:Name="infoExif" VerticalAlignment="Stretch" />
         </Expander>
+
+        <Expander Name="ImageAnalysisExpander" Header="Image Analysis" IsExpanded="False" Collapsed="Expander_Expanded" Expanded="Expander_Expanded">
+            <uc:InfoContainerImageAnalysis x:Name="infoImageAnalysis" VerticalAlignment="Stretch" />
+        </Expander>
     </StackPanel>
 </UserControl>
