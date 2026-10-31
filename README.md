@@ -204,6 +204,27 @@ aus. Originaldateien werden nur aus einem read-only Content Store gelesen. Uploa
 Delete und Recycle von Dateien sind nicht Teil der API. Details stehen in
 `docs/api-filesystem-access-plan.md`.
 
+### Lokaler API-Mock
+
+Für Frontend-Tests gibt es einen eigenständigen Mock in `tools\ApiMock`. Er bildet den API-Vertrag
+mit einem kleinen Testkatalog inklusive Original-Content, Thumbnails und Varianten nach. Die
+Geo-Cluster-Endpunkte aus API-Version 1.5.0 sind ebenfalls implementiert.
+
+```powershell
+.\tools\ApiMock\start.cmd
+```
+
+Danach:
+
+```powershell
+.\MediaBrowserWPF.exe `
+  --provider api `
+  --api-base-url http://localhost:8282 `
+  --api-key mock
+```
+
+Build, Seed-Erzeugung und Details stehen in `tools\ApiMock\README.md`.
+
 ### Launcher
 
 `MediaBrowserLauncher` startet standardmäßig:

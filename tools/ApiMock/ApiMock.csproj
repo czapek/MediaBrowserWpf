@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <AssemblyName>ApiMock</AssemblyName>
+    <RootNamespace>ApiMock</RootNamespace>
+    <InvariantGlobalization>false</InvariantGlobalization>
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>true</SelfContained>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+    <StaticWebAssetsEnabled>false</StaticWebAssetsEnabled>
+    <IsTransformWebConfigDisabled>true</IsTransformWebConfigDisabled>
+    <DebugType>none</DebugType>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\ApiMock.Shared\SeedModels.cs" Link="SeedModels.cs" />
+    <Compile Include="..\..\MediaBrowser4Lib\DB\Api\ApiDtos.cs" Link="ApiDtos.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Remove="data\**\*" />
+    <None Remove="data\**\*" />
+  </ItemGroup>
+  <ItemGroup Condition="Exists('data\seed.json')">
+    <EmbeddedResource Include="data\**\*">
+      <LogicalName>data/%(RecursiveDir)%(Filename)%(Extension)</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+</Project>

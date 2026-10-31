@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: MediaBrowser Spring API
-  version: 1.4.0
+  version: 1.5.0
   description: >
     REST-Vertrag für das Spring-Boot-Backend des MediaBrowserWpf-ApiProviders.
     Die API verwendet JSON (UTF-8). Binärdaten wie Thumbnails werden als
@@ -377,6 +377,58 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/MediaItem'
+  /mediafiles/geo/clusters:
+    post:
+      tags: [mediafiles]
+      operationId: queryGeoClusters
+      summary: Geo-Cluster im sichtbaren Kartenausschnitt
+      description: >
+        Liefert eine serverseitige Grid-Aggregation der aktiven MediaItems mit
+        Koordinaten im angegebenen Rechteck. Die Zellgröße wird in Pixeln bei
+        der angegebenen OSM-Zoomstufe interpretiert (Web-Mercator-Projektion).
+        MediaItems ohne Koordinaten, gelöschte und historische Einträge werden
+        ignoriert.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GeoClusterQuery'
+      responses:
+        '200':
+          description: Cluster und Einzelpunkte im Ausschnitt
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeoClusterResult'
+        '400':
+          description: Ungültiger Kartenausschnitt oder ungültige Parameter
+  /mediafiles/geo/items:
+    post:
+      tags: [mediafiles]
+      operationId: queryGeoItems
+      summary: MediaItems im sichtbaren Kartenausschnitt
+      description: >
+        Liefert die aktiven MediaItems mit Koordinaten im angegebenen Rechteck
+        als vollständige MediaItem-Objekte. Geeignet für die Listenansicht
+        unterhalb der Karte. Gelöschte und historische Einträge werden ignoriert.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GeoItemsQuery'
+      responses:
+        '200':
+          description: MediaItems im Ausschnitt
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MediaItem'
+        '400':
+          description: Ungültiger Kartenausschnitt oder ungültige Parameter
   /mediafiles/sql-query:
     post:
       tags: [mediafiles]
@@ -1724,6 +1776,124 @@ components:
             type: string
         criteria:
           type: string
+    GeoClusterQuery:
+      type: object
+      required: [minLongitude, minLatitude, maxLongitude, maxLatitude, zoom]
+      properties:
+        minLongitude:
+          type: number
+          minimum: -180
+          maximum: 180
+        minLatitude:
+          type: number
+          minimum: -85.05112878
+          maximum: 85.05112878
+        maxLongitude:
+          type: number
+          minimum: -180
+          maximum: 180
+        maxLatitude:
+          type: number
+          minimum: -85.05112878
+          maximum: 85.05112878
+        zoom:
+          type: integer
+          minimum: 0
+          maximum: 22
+        cellSize:
+          type: integer
+          default: 64
+          minimum: 16
+          maximum: 512
+          description: Zielzellgröße in Pixeln bei der angegebenen Zoomstufe.
+        limit:
+          type: integer
+          default: 2000
+          minimum: 1
+          maximum: 10000
+          description: Maximale Anzahl zurückgegebener Cluster.
+        includeSingles:
+          type: boolean
+          default: true
+          description: Cluster mit count=1 als Einzelpunkte mitliefern.
+    GeoItemsQuery:
+      type: object
+      required: [minLongitude, minLatitude, maxLongitude, maxLatitude]
+      properties:
+        minLongitude:
+          type: number
+          minimum: -180
+          maximum: 180
+        minLatitude:
+          type: number
+          minimum: -85.05112878
+          maximum: 85.05112878
+        maxLongitude:
+          type: number
+          minimum: -180
+          maximum: 180
+        maxLatitude:
+          type: number
+          minimum: -85.05112878
+          maximum: 85.05112878
+        limit:
+          type: integer
+          default: 500
+          minimum: 1
+          maximum: 10000
+          description: Maximale Anzahl MediaItems.
+        offset:
+          type: integer
+          default: 0
+          minimum: 0
+          description: Anzahl der zu überspringenden MediaItems.
+        sort:
+          type: string
+          default: MEDIA_DATE_ASC
+          enum: [MEDIA_DATE_ASC, MEDIA_DATE_DESC, ID_ASC]
+          description: Sortierung der Liste.
+    GeoClusterResult:
+      type: object
+      required: [clusters, totalCount, truncated, zoom, cellSize]
+      properties:
+        clusters:
+          type: array
+          items:
+            $ref: '#/components/schemas/GeoCluster'
+        totalCount:
+          type: integer
+          description: Gesamtzahl der MediaItems im Ausschnitt, nicht die Anzahl der Cluster.
+        truncated:
+          type: boolean
+          description: true, wenn die Clusterliste wegen limit gekürzt wurde.
+        zoom:
+          type: integer
+        cellSize:
+          type: integer
+    GeoCluster:
+      type: object
+      required: [latitude, longitude, count]
+      properties:
+        latitude:
+          type: number
+          description: Mittelpunkt des Clusters (Mittelwert der Punkte).
+        longitude:
+          type: number
+        count:
+          type: integer
+          minimum: 1
+        minLatitude:
+          type: number
+        minLongitude:
+          type: number
+        maxLatitude:
+          type: number
+        maxLongitude:
+          type: number
+        mediaItemId:
+          type: integer
+          nullable: true
+          description: Repräsentatives MediaItem (kleinste ID im Cluster).
     SqlParameter:
       type: object
       properties:

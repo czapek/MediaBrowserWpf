@@ -616,4 +616,48 @@ namespace MediaBrowser4.DB.Api
         public int Width { get; set; }
         public int Height { get; set; }
     }
+
+    public sealed class ApiGeoClusterQueryDto
+    {
+        public double MinLongitude { get; set; }
+        public double MinLatitude { get; set; }
+        public double MaxLongitude { get; set; }
+        public double MaxLatitude { get; set; }
+        public int Zoom { get; set; }
+        public int CellSize { get; set; }
+        public int Limit { get; set; }
+        public bool IncludeSingles { get; set; }
+    }
+
+    public sealed class ApiGeoClusterResultDto
+    {
+        public List<ApiGeoClusterDto> Clusters { get; set; }
+        public int TotalCount { get; set; }
+        public bool Truncated { get; set; }
+        public int Zoom { get; set; }
+        public int CellSize { get; set; }
+    }
+
+    public sealed class ApiGeoClusterDto
+    {
+        public double Latitude { get; set; }
+        public double Longitude { get; set; }
+        public int Count { get; set; }
+        public double MinLatitude { get; set; }
+        public double MinLongitude { get; set; }
+        public double MaxLatitude { get; set; }
+        public double MaxLongitude { get; set; }
+        public int? MediaItemId { get; set; }
+    }
+
+    public sealed class ApiGeoItemsQueryDto
+    {
+        public double MinLongitude { get; set; }
+        public double MinLatitude { get; set; }
+        public double MaxLongitude { get; set; }
+        public double MaxLatitude { get; set; }
+        public int Limit { get; set; }
+        public int Offset { get; set; }
+        public string Sort { get; set; }
+    }
 }

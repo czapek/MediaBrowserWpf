@@ -333,3 +333,12 @@ ASALocalRun/
 .vscode/db.env
 temp/mediafilesNew.150.mb4t
 temp/mediafilesNew.mb4
+
+# Local API mock data and build output
+tools/ApiMock/data/
+tools/ApiMock/dist/
+tools/ApiMock/bin/
+tools/ApiMock/obj/
+tools/ApiMock/ApiMock-win-x64.zip
+tools/ApiMock.SeedExport/bin/
+tools/ApiMock.SeedExport/obj/
