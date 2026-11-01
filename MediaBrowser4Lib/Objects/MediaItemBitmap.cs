@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Text;
 using System.Drawing;
+using MediaProcessing;
 
 namespace MediaBrowser4.Objects
 {
@@ -64,6 +65,27 @@ namespace MediaBrowser4.Objects
             {
                 this.MetaData = MetaDataList.GetList(exif, "MDEX");
                 this.SetOrientationByNumber(MediaProcessing.ImageExif.GetExifOrientation(exif));
+
+                MetaData gpsLatitudeData = this.MetaData.Find("GPS Latitude", null, null);
+                MetaData gpsLongitudeData = this.MetaData.Find("GPS Longitude", null, null);
+
+                if (!gpsLatitudeData.Null && !gpsLongitudeData.Null)
+                {
+                    MetaData gpsLatitudeRef = this.MetaData.Find("GPS Latitude Ref", null, null);
+                    MetaData gpsLongitudeRef = this.MetaData.Find("GPS Longitude Ref", null, null);
+
+                    double latitude;
+                    double longitude;
+
+                    if (ExifValueValidator.TryParseGpsCoordinate(gpsLatitudeData.Value, true,
+                            gpsLatitudeRef.Null ? null : gpsLatitudeRef.Value, out latitude)
+                        && ExifValueValidator.TryParseGpsCoordinate(gpsLongitudeData.Value, false,
+                            gpsLongitudeRef.Null ? null : gpsLongitudeRef.Value, out longitude))
+                    {
+                        this.Latitude = latitude;
+                        this.Longitude = longitude;
+                    }
+                }
             }
 
             System.Drawing.Bitmap sourceImage = (System.Drawing.Bitmap)System.Drawing.Bitmap.FromFile(this.FileObject.FullName);

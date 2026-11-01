@@ -11,6 +11,7 @@ using MediaBrowser4.Objects;
 using System.IO;
 using System.Data.Common;
 using MediaBrowser4.Utilities;
+using MediaProcessing;
 
 namespace MediaBrowser4.DB.SQLite
 {
@@ -267,11 +268,42 @@ namespace MediaBrowser4.DB.SQLite
                 //Metatdata
                 if (mItem.MetaData != null)
                 {
+                    double? gpsLatitude = null;
+                    double? gpsLongitude = null;
+
+                    MetaData gpsLatitudeData = mItem.MetaData.Find("GPS Latitude", null, null);
+                    MetaData gpsLongitudeData = mItem.MetaData.Find("GPS Longitude", null, null);
+
+                    if (!gpsLatitudeData.Null && !gpsLongitudeData.Null)
+                    {
+                        MetaData gpsLatitudeRef = mItem.MetaData.Find("GPS Latitude Ref", null, null);
+                        MetaData gpsLongitudeRef = mItem.MetaData.Find("GPS Longitude Ref", null, null);
+
+                        double latitude;
+                        double longitude;
+
+                        if (ExifValueValidator.TryParseGpsCoordinate(gpsLatitudeData.Value, true,
+                                gpsLatitudeRef.Null ? null : gpsLatitudeRef.Value, out latitude)
+                            && ExifValueValidator.TryParseGpsCoordinate(gpsLongitudeData.Value, false,
+                                gpsLongitudeRef.Null ? null : gpsLongitudeRef.Value, out longitude))
+                        {
+                            gpsLatitude = latitude;
+                            gpsLongitude = longitude;
+                        }
+                    }
+
                     foreach (MetaData mData in mItem.MetaData)
                     {
                         if (mData.Value.Length > 0 && mData.Name.Length > 0 && !mData.Name.StartsWith("Camera State")
-                                            && mData.GroupName.Length > 0 && mData.Type.Length > 0 && !mData.Null)
+                                            && mData.GroupName.Length > 0 && mData.Type.Length > 0 && !mData.Null
+                                            && !ExifValueValidator.IsInvalidValue(mData.Value))
                         {
+                            if ((mData.Name == "GPS Latitude" || mData.Name == "GPS Longitude")
+                                && (!gpsLatitude.HasValue || !gpsLongitude.HasValue))
+                            {
+                                continue;
+                            }
+
                             trans.SetParameter("@metaname", mData.Name, DbType.String);
                             trans.SetParameter("@metavalue", mData.Value, DbType.String);
                             trans.SetParameter("@type", mData.Type, DbType.String);
@@ -301,24 +333,18 @@ namespace MediaBrowser4.DB.SQLite
                             trans.SetParameter("@metadataId", metaData.Id, DbType.Int32);
                             trans.ExecuteNonQuery("INSERT INTO METADATA(MEDIAFILES_FK, METANAME_FK, VALUE) VALUES("
                                 + mItem.Id + ", @metadataId, @metavalue)");
-
-                            if ((mData.Name == "GPS Latitude" || mData.Name == "GPS Longitude") && !String.IsNullOrWhiteSpace(mData.Value))
-                            {
-                                double degree = Double.Parse(mData.Value.Split('"')[0]);
-                                double minute = Double.Parse(mData.Value.Split('"')[1].Split('\'')[0]);
-                                double second = Double.Parse(mData.Value.Split('"')[1].Split('\'')[1]);
-
-                                double gps = degree + (minute * (1.0 / 60.0)) + ((second / 60.0) * (1.0 / 60.0));
-
-                                trans.SetParameter("@gps", gps, DbType.Double);
-
-                                if (mData.Name == "GPS Longitude")
-                                    trans.ExecuteNonQuery("UPDATE MEDIAFILES SET LONGITUDE=@gps WHERE ID=" + mItem.Id);
-
-                                if (mData.Name == "GPS Latitude")
-                                    trans.ExecuteNonQuery("UPDATE MEDIAFILES SET LATITUDE=@gps WHERE ID=" + mItem.Id);
-                            }
                         }
+                    }
+
+                    if (gpsLatitude.HasValue && gpsLongitude.HasValue)
+                    {
+                        trans.SetParameter("@latitude", gpsLatitude.Value, DbType.Double);
+                        trans.SetParameter("@longitude", gpsLongitude.Value, DbType.Double);
+                        trans.ExecuteNonQuery(
+                            "UPDATE MEDIAFILES SET LATITUDE=@latitude, LONGITUDE=@longitude WHERE ID=" + mItem.Id);
+
+                        mItem.Latitude = gpsLatitude;
+                        mItem.Longitude = gpsLongitude;
                     }
                 }
 

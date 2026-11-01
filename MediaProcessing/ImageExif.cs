@@ -1,6 +1,7 @@
 ﻿using System;
 using com.drew.metadata;
 using com.drew.imaging.jpg;
+using com.drew.lang;
 using System.IO;
 using System.Collections;
 using System.Text;
@@ -13,6 +14,9 @@ namespace MediaProcessing
     {
         private static bool IsValidMetaData(string metadata)
         {
+            if (ExifValueValidator.IsInvalidValue(metadata))
+                return false;
+
             string[] split = metadata.Split(' ');
             if (split.Length > 1)
             {
@@ -145,7 +149,10 @@ namespace MediaProcessing
                         Console.Error.WriteLine(e.Message);
                     }
                     lcTagName = lcTag.GetTagName();
-                    if (lcTagName != null && lcTagDescription != null
+                    bool validGpsRationals = !(lcDirectory is GpsDirectory)
+                        || IsValidGpsRationals((GpsDirectory)lcDirectory, lcTag.GetTagType());
+
+                    if (validGpsRationals && lcTagName != null && lcTagDescription != null
                         && !lcTagName.StartsWith("Unknown") && !lcTagName.StartsWith("Component 1")
                         && !lcTagName.StartsWith("Component 2")
                         && !lcTagName.StartsWith("Component 3")
@@ -165,6 +172,58 @@ namespace MediaProcessing
             lcMetadata = null;
 
             return metaList;
+        }
+
+        private static bool IsValidGpsRationals(GpsDirectory directory, int tagType)
+        {
+            if (tagType != GpsDirectory.TAG_GPS_LATITUDE
+                && tagType != GpsDirectory.TAG_GPS_LONGITUDE
+                && tagType != GpsDirectory.TAG_GPS_ALTITUDE)
+                return true;
+
+            Rational[] values;
+            try
+            {
+                values = directory.GetRationalArray(tagType);
+            }
+            catch (MetadataException)
+            {
+                return false;
+            }
+
+            if (values == null || values.Length == 0)
+                return true;
+
+            foreach (Rational value in values)
+            {
+                if (value == null
+                    || value.GetDenominator() == 0
+                    || value.GetNumerator() == Int32.MinValue
+                    || value.GetDenominator() == Int32.MinValue)
+                    return false;
+
+                double number = value.DoubleValue();
+                if (Double.IsNaN(number) || Double.IsInfinity(number))
+                    return false;
+            }
+
+            if (tagType == GpsDirectory.TAG_GPS_LATITUDE || tagType == GpsDirectory.TAG_GPS_LONGITUDE)
+            {
+                if (values.Length < 3)
+                    return false;
+
+                double maxDegrees = tagType == GpsDirectory.TAG_GPS_LATITUDE ? 90.0 : 180.0;
+                double degrees = values[0].DoubleValue();
+                double minutes = values[1].DoubleValue();
+                double seconds = values[2].DoubleValue();
+
+                if (degrees < 0 || degrees > maxDegrees
+                    || minutes < 0 || minutes >= 60
+                    || seconds < 0 || seconds >= 60)
+                    return false;
+            }
+
+            return true;
         }
 
         public static int GetExifOrientation(Dictionary<string, Dictionary<string, string>> metaDic)

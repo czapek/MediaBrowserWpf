@@ -115,6 +115,7 @@
     <Compile Include="FaceDetection\OpenCVFaceDetector.cs" />
     <Compile Include="FFMpeg.cs" />
     <Compile Include="ImageExif.cs" />
+    <Compile Include="ExifValueValidator.cs" />
     <Compile Include="MediaInfoLib.cs" />
     <Compile Include="NReco\FrameGrabber.cs" />
     <Compile Include="PaintDotNet\ColorBgra.cs" />

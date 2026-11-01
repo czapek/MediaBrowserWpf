@@ -2,12 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using MediaBrowser4.Objects;
 using MediaBrowser4.Utilities;
+using MediaProcessing;
 
 namespace MediaBrowser4.DB.Maria
 {
@@ -267,11 +267,42 @@ namespace MediaBrowser4.DB.Maria
 
                 if (mediaItem.MetaData != null)
                 {
+                    double? gpsLatitude = null;
+                    double? gpsLongitude = null;
+
+                    MetaData gpsLatitudeData = mediaItem.MetaData.Find("GPS Latitude", null, null);
+                    MetaData gpsLongitudeData = mediaItem.MetaData.Find("GPS Longitude", null, null);
+
+                    if (!gpsLatitudeData.Null && !gpsLongitudeData.Null)
+                    {
+                        MetaData gpsLatitudeRef = mediaItem.MetaData.Find("GPS Latitude Ref", null, null);
+                        MetaData gpsLongitudeRef = mediaItem.MetaData.Find("GPS Longitude Ref", null, null);
+
+                        double latitude;
+                        double longitude;
+
+                        if (ExifValueValidator.TryParseGpsCoordinate(gpsLatitudeData.Value, true,
+                                gpsLatitudeRef.Null ? null : gpsLatitudeRef.Value, out latitude)
+                            && ExifValueValidator.TryParseGpsCoordinate(gpsLongitudeData.Value, false,
+                                gpsLongitudeRef.Null ? null : gpsLongitudeRef.Value, out longitude))
+                        {
+                            gpsLatitude = latitude;
+                            gpsLongitude = longitude;
+                        }
+                    }
+
                     foreach (MetaData metaData in mediaItem.MetaData)
                     {
                         if (String.IsNullOrEmpty(metaData.Value) || String.IsNullOrEmpty(metaData.Name)
                             || metaData.Name.StartsWith("Camera State") || String.IsNullOrEmpty(metaData.GroupName)
-                            || String.IsNullOrEmpty(metaData.Type) || metaData.Null)
+                            || String.IsNullOrEmpty(metaData.Type) || metaData.Null
+                            || ExifValueValidator.IsInvalidValue(metaData.Value))
+                        {
+                            continue;
+                        }
+
+                        if ((metaData.Name == "GPS Latitude" || metaData.Name == "GPS Longitude")
+                            && (!gpsLatitude.HasValue || !gpsLongitude.HasValue))
                         {
                             continue;
                         }
@@ -284,25 +315,18 @@ namespace MediaBrowser4.DB.Maria
                         transaction.ExecuteNonQuery(
                             "INSERT INTO METADATA (MEDIAFILES_FK, METANAME_FK, `VALUE`) " +
                             "VALUES (@mediaId, @metadataId, @metadataValue)");
+                    }
 
-                        if ((metaData.Name == "GPS Latitude" || metaData.Name == "GPS Longitude")
-                            && !String.IsNullOrWhiteSpace(metaData.Value))
-                        {
-                            double gps = ParseGps(metaData.Value);
-                            transaction.SetParameter("@gps", gps, DbType.Double);
+                    if (gpsLatitude.HasValue && gpsLongitude.HasValue)
+                    {
+                        transaction.SetParameter("@latitude", gpsLatitude.Value, DbType.Double);
+                        transaction.SetParameter("@longitude", gpsLongitude.Value, DbType.Double);
+                        transaction.ExecuteNonQuery(
+                            "UPDATE MEDIAFILES SET LATITUDE=@latitude, LONGITUDE=@longitude WHERE ID=" +
+                            mediaItem.Id);
 
-                            if (metaData.Name == "GPS Longitude")
-                            {
-                                transaction.ExecuteNonQuery("UPDATE MEDIAFILES SET LONGITUDE=@gps WHERE ID=" +
-                                                            mediaItem.Id);
-                            }
-
-                            if (metaData.Name == "GPS Latitude")
-                            {
-                                transaction.ExecuteNonQuery("UPDATE MEDIAFILES SET LATITUDE=@gps WHERE ID=" +
-                                                            mediaItem.Id);
-                            }
-                        }
+                        mediaItem.Latitude = gpsLatitude;
+                        mediaItem.Longitude = gpsLongitude;
                     }
                 }
 
@@ -366,17 +390,6 @@ namespace MediaBrowser4.DB.Maria
                 "INSERT INTO METADATANAME (NAME, `TYPE`, GROUPNAME, ISVISIBLE) VALUES (@name, @type, @group, 1)");
 
             return transaction.ExecuteScalar<int>("SELECT LAST_INSERT_ID()");
-        }
-
-        private static double ParseGps(string value)
-        {
-            string[] parts = value.Split('"');
-
-            double degree = Double.Parse(parts[0], CultureInfo.InvariantCulture);
-            double minute = Double.Parse(parts[1].Split('\'')[0], CultureInfo.InvariantCulture);
-            double second = Double.Parse(parts[1].Split('\'')[1], CultureInfo.InvariantCulture);
-
-            return degree + minute * (1.0 / 60.0) + second / 60.0 / 60.0;
         }
     }
 }
