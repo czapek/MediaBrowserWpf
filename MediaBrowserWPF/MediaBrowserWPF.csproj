@@ -224,6 +224,9 @@
     <Compile Include="UserControls\AttachmentsContainer\AttachmentsContainer.xaml.cs">
       <DependentUpon>AttachmentsContainer.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UserControls\AttachmentsContainer\AttachmentsWindow.xaml.cs">
+      <DependentUpon>AttachmentsWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UserControls\CategoryContainer\AutoCompleteComboBoxCategory.cs" />
     <Compile Include="UserControls\CategoryContainer\CategorizeMenuItem.xaml.cs">
       <DependentUpon>CategorizeMenuItem.xaml</DependentUpon>
@@ -261,6 +264,9 @@
     <Compile Include="UserControls\InfoContainer\InfoContainerBaseInfo.xaml.cs">
       <DependentUpon>InfoContainerBaseInfo.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UserControls\InfoContainer\DescriptionContainer.xaml.cs">
+      <DependentUpon>DescriptionContainer.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UserControls\InfoContainer\InfoContainerCategories.xaml.cs">
       <DependentUpon>InfoContainerCategories.xaml</DependentUpon>
     </Compile>
@@ -282,6 +288,12 @@
     <Compile Include="UserControls\MapControl\BitmapStore.cs" />
     <Compile Include="UserControls\MapControl\MapSearchWindow.xaml.cs">
       <DependentUpon>MapSearchWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\GeoDataContainer\GeoDataContainer.xaml.cs">
+      <DependentUpon>GeoDataContainer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\GeoDataContainer\GeoMapWindow.xaml.cs">
+      <DependentUpon>GeoMapWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="UserControls\MapControl\MapCanvas.cs" />
     <Compile Include="UserControls\MapControl\MapCanvas.MapOffset.cs" />
@@ -451,6 +463,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="UserControls\AttachmentsContainer\AttachmentsWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UserControls\CategoryContainer\CategorizeMenuItem.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -487,6 +503,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="UserControls\InfoContainer\DescriptionContainer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UserControls\InfoContainer\InfoContainerCategories.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -508,6 +528,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UserControls\MapControl\MapSearchWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UserControls\GeoDataContainer\GeoDataContainer.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UserControls\GeoDataContainer\GeoMapWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

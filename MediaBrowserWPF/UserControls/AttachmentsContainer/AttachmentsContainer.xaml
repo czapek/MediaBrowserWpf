@@ -10,8 +10,8 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition />
-            <RowDefinition Height="5" />
-            <RowDefinition Height="3*" />
+            <RowDefinition Height="0" />
+            <RowDefinition Height="0" />
         </Grid.RowDefinitions>
 
         <ListBox Grid.Row="0" Name="ListBoxAttachments" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" MouseDoubleClick="ListBoxAttachments_MouseDoubleClick" SelectionMode="Extended">
@@ -39,11 +39,11 @@
             </ListBox.ContextMenu>
         </ListBox>
 
-        <GridSplitter ResizeDirection="Rows" IsTabStop="False" Grid.Row="1" Mouse.MouseEnter="GridSplitter_MouseEnter" Mouse.MouseLeave="GridSplitter_MouseLeave"
+        <GridSplitter ResizeDirection="Rows" IsTabStop="False" Grid.Row="1" Visibility="Collapsed" Mouse.MouseEnter="GridSplitter_MouseEnter" Mouse.MouseLeave="GridSplitter_MouseLeave"
                   HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
                   ResizeBehavior="PreviousAndNext" />
 
-        <Grid Grid.Row="2">
+        <Grid Grid.Row="2" Visibility="Collapsed">
             <Grid.RowDefinitions>
                 <RowDefinition Height="35"/>
                 <RowDefinition Height="*"/>

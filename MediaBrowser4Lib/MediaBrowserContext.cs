@@ -1245,6 +1245,34 @@ namespace MediaBrowser4
                 return new List<MediaItem>();
         }
 
+        public static bool SupportsGeoData
+        {
+            get { return MainDBProvider is IGeoDataProvider; }
+        }
+
+        public static GeoClusterResult GetGeoClusters(double minLongitude, double minLatitude,
+            double maxLongitude, double maxLatitude, int zoom, int cellSize, int limit,
+            bool includeSingles)
+        {
+            IGeoDataProvider provider = MainDBProvider as IGeoDataProvider;
+            if (provider == null)
+                throw new NotSupportedException("Geo-Cluster werden von diesem Datenbank-Provider nicht unterstützt.");
+
+            return provider.GetGeoClusters(minLongitude, minLatitude, maxLongitude, maxLatitude,
+                zoom, cellSize, limit, includeSingles);
+        }
+
+        public static List<MediaItem> GetGeoItems(double minLongitude, double minLatitude,
+            double maxLongitude, double maxLatitude, int limit, int offset, GeoItemsSort sort)
+        {
+            IGeoDataProvider provider = MainDBProvider as IGeoDataProvider;
+            if (provider == null)
+                throw new NotSupportedException("Geo-Suche wird von diesem Datenbank-Provider nicht unterstützt.");
+
+            return provider.GetGeoItems(minLongitude, minLatitude, maxLongitude, maxLatitude,
+                limit, offset, sort);
+        }
+
         public static Dictionary<MediaBrowser4.Objects.Category, int> GetCategoriesFromMediaItems(List<MediaItem> mItemList)
         {
             if (MainDBProvider != null)

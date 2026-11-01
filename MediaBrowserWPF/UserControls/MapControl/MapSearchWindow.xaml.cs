@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Threading;
 using System.Windows;
 using System.Windows.Input;
@@ -58,7 +59,10 @@ namespace MapControl
         {
             // Very important we set the CacheFolder before doing anything so the MapCanvas knows where
             // to save the downloaded files to.
-            TileGenerator.CacheFolder = @"ImageCache";
+            TileGenerator.CacheFolder = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "MediaBrowserWpf", "osm-cache");
+            TileGenerator.UserAgent = "MediaBrowserWPF/1.0";
             TileGenerator.DownloadCountChanged += this.OnDownloadCountChanged;
             TileGenerator.DownloadError += this.OnDownloadError;
 

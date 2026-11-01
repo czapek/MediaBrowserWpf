@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -115,7 +115,8 @@ namespace MediaBrowserWPF
             this.CategoryTree.RenameCategory += new EventHandler<UserControls.CategoryContainer.CategoryEventArgs>(CategoryTree_RenameCategory);
             this.SearchContainer.OnRequest += new EventHandler<MediaItemRequestMessageArgs>(OnMediaItemRequest);
             this.RequestFavorites.OnRequest += new EventHandler<MediaItemRequestMessageArgs>(OnMediaItemRequest);
-            this.AttachmentsContainer.OnRequest += new EventHandler<MediaItemRequestMessageArgs>(OnMediaItemRequest);
+            this.MediaItemInfoContainer.OnRequest += new EventHandler<MediaItemRequestMessageArgs>(OnMediaItemRequest);
+            this.GeoDataContainer.OnRequest += new EventHandler<MediaItemRequestMessageArgs>(OnMediaItemRequest);
             this.BookmarkedListContainer.OnRequest += new EventHandler<MediaItemRequestMessageArgs>(OnMediaItemRequest);
             this.DeletedListContainer.OnRequest += new EventHandler<MediaItemRequestMessageArgs>(OnMediaItemRequest);
             MapSearchWindow.OnRequest += new EventHandler<MediaItemRequestMessageArgs>(OnMediaItemRequest);
@@ -313,6 +314,11 @@ namespace MediaBrowserWPF
         }
 
         void OnMediaItemRequest(object sender, MediaItemRequestMessageArgs e)
+        {
+            this.AddRequest(e.Request);
+        }
+
+        public void HandleGeoDataRequest(MediaItemRequestMessageArgs e)
         {
             this.AddRequest(e.Request);
         }
@@ -552,10 +558,11 @@ namespace MediaBrowserWPF
             {
                 this.DeletedListContainer.Build(MediaBrowserContext.DeletedSingleton, "Gelöscht", "Liste aller als gelöscht markierten Medien");
             }
-            else if (tabItem.Name == "AttachmentsTab")
+            else if (tabItem.Name == "GeoDataTab")
             {
+                this.GeoDataContainer.Build();
                 if (this.ThumbListTabControl.SelectedItem != null)
-                    this.AttachmentsContainer.SetInfo(((ThumblistContainerTabItem)this.ThumbListTabControl.SelectedItem).SelectedMediaItems);
+                    this.GeoDataContainer.SetInfo(((ThumblistContainerTabItem)this.ThumbListTabControl.SelectedItem).SelectedMediaItems);
             }
         }
 
@@ -569,9 +576,9 @@ namespace MediaBrowserWPF
                 this.MediaItemInfoContainer.SetInfo(((ThumblistContainerTabItem)this.ThumbListTabControl.SelectedItem).SelectedMediaItems);
                 e.Handled = true;
             }
-            else if (((TabItem)TabControlControls.SelectedItem).Name == "AttachmentsTab")
+            else if (((TabItem)TabControlControls.SelectedItem).Name == "GeoDataTab")
             {
-                this.AttachmentsContainer.SetInfo(((ThumblistContainerTabItem)this.ThumbListTabControl.SelectedItem).SelectedMediaItems);
+                this.GeoDataContainer.SetInfo(((ThumblistContainerTabItem)this.ThumbListTabControl.SelectedItem).SelectedMediaItems);
                 e.Handled = true;
             }
         }
@@ -582,9 +589,9 @@ namespace MediaBrowserWPF
             {
                 this.MediaItemInfoContainer.SetInfo(e.MediaItems);
             }
-            else if (((TabItem)TabControlControls.SelectedItem).Name == "AttachmentsTab")
+            else if (((TabItem)TabControlControls.SelectedItem).Name == "GeoDataTab")
             {
-                this.AttachmentsContainer.SetInfo(((ThumblistContainerTabItem)this.ThumbListTabControl.SelectedItem).SelectedMediaItems);
+                this.GeoDataContainer.SetInfo(e.MediaItems);
             }
         }
 
@@ -709,7 +716,7 @@ namespace MediaBrowserWPF
             this.BookmarkedListContainer.Clear();
             this.DeletedListContainer.Clear();
             this.MediaItemInfoContainer.Clear();
-            this.AttachmentsContainer.Clear();
+            this.GeoDataContainer.Clear();
 
             this.TabControlControls.SelectedIndex = InitalRequestTab;
             this.SelectedTabChanged((TabItem)((TabControl)this.TabControlControls).SelectedItem);
@@ -784,6 +791,20 @@ namespace MediaBrowserWPF
         private void MenuItemRemoveDeleted_Click(object sender, RoutedEventArgs e)
         {
             this.RemoveMediaItemsFinally();
+        }
+
+        private void MenuItemOpenAttachments_Click(object sender, RoutedEventArgs e)
+        {
+            ThumblistContainerTabItem tabItem = this.ThumbListTabControl.SelectedItem as ThumblistContainerTabItem;
+            if (tabItem == null || tabItem.SelectedMediaItems == null || tabItem.SelectedMediaItems.Count == 0)
+            {
+                MessageBox.Show(this, "Bitte zuerst ein oder mehrere Medien auswählen.", "Anhänge",
+                    MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            AttachmentsWindow window = new AttachmentsWindow(tabItem.SelectedMediaItems, this);
+            window.ShowDialog();
         }
 
         private void Window_PreviewKeyDown(object sender, KeyEventArgs e)

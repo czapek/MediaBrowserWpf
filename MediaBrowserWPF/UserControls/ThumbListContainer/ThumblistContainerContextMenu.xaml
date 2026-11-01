@@ -77,6 +77,8 @@
         </MenuItem>
     </MenuItem>
 
+    <MenuItem Name="MenuItemAttachments" Header="Anhänge ..." Click="MenuItemAttachments_Click" />
+
     <MenuItem Header="Geodaten ..." Name="MenuItemGeo">
         <MenuItem Name="MenuItemOpenGeoDay" Header="Geoarchiv Medien Zeitraum" Click="MenuItemOpenGeoDay_Click" />
         <MenuItem Name="MenuItemOpenGeoLast1Day" Header="Geoarchiv heute" Click="MenuItemOpenGeo_Click" />

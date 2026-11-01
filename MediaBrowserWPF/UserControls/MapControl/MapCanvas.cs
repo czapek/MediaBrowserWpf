@@ -80,6 +80,8 @@ namespace MapControl
             private set { this.SetValue(ViewportKey, value); }
         }
 
+        public event EventHandler ViewportChanged;
+
         /// <summary>Gets or sets the zoom level of the map.</summary>
         public int Zoom
         {
@@ -153,6 +155,9 @@ namespace MapControl
         /// <returns>An image of the current map.</returns>
         public ImageSource CreateImage()
         {
+            if (this.ActualWidth <= 0 || this.ActualHeight <= 0)
+                return null;
+
             RenderTargetBitmap bitmap = new RenderTargetBitmap((int)this.ActualWidth, (int)this.ActualHeight, 96, 96, PixelFormats.Default);
             bitmap.Render(_tilePanel);
             bitmap.Freeze();
@@ -341,6 +346,9 @@ namespace MapControl
                 Point topleft = this.GetLocation(new Point(0, 0));
                 Point bottomRight = this.GetLocation(new Point(this.ActualWidth, this.ActualHeight));
                 this.Viewport = new Rect(topleft, bottomRight);
+
+                if (this.ViewportChanged != null)
+                    this.ViewportChanged(this, EventArgs.Empty);
             }
         }
 

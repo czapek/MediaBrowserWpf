@@ -11,7 +11,7 @@ using Newtonsoft.Json;
 
 namespace MediaBrowser4.DB.Api
 {
-    public sealed class ApiProvider : DBProvider
+    public sealed class ApiProvider : DBProvider, IGeoDataProvider
     {
         private readonly ApiConnectionOptions options;
         private readonly SpringApiClient client;
@@ -495,16 +495,9 @@ namespace MediaBrowser4.DB.Api
             if (request is MediaItemRequestGeoData)
             {
                 MediaItemRequestGeoData geoRequest = (MediaItemRequestGeoData)request;
-
-                return this.QueryMedia(new ApiMediaQueryDto
-                {
-                    Mode = "GEO",
-                    Longitude = geoRequest.Longitute,
-                    Latitude = geoRequest.Latitude,
-                    Width = geoRequest.Width,
-                    Height = geoRequest.Height,
-                    Limit = GetLimit(request)
-                });
+                return this.GetGeoItems(geoRequest.Longitute, geoRequest.Latitude,
+                    geoRequest.Longitute + geoRequest.Width, geoRequest.Latitude + geoRequest.Height,
+                    GetLimit(request), 0, geoRequest.Sort);
             }
 
             if (request is MediaItemVirtualRequest)
@@ -601,15 +594,86 @@ namespace MediaBrowser4.DB.Api
         public override List<MediaItem> GetMediaItemsGeoData(double longitute, double width,
             double latitude, double height, int limitRequest)
         {
-            return this.QueryMedia(new ApiMediaQueryDto
+            return this.GetGeoItems(longitute, latitude, longitute + width, latitude + height,
+                limitRequest, 0, GeoItemsSort.MediaDateAsc);
+        }
+
+        public GeoClusterResult GetGeoClusters(double minLongitude, double minLatitude,
+            double maxLongitude, double maxLatitude, int zoom, int cellSize, int limit,
+            bool includeSingles)
+        {
+            ApiGeoClusterResultDto dto = this.client.Post<ApiGeoClusterResultDto>(
+                "/mediafiles/geo/clusters",
+                new ApiGeoClusterQueryDto
+                {
+                    MinLongitude = minLongitude,
+                    MinLatitude = minLatitude,
+                    MaxLongitude = maxLongitude,
+                    MaxLatitude = maxLatitude,
+                    Zoom = zoom,
+                    CellSize = cellSize > 0 ? cellSize : 64,
+                    Limit = limit > 0 ? limit : 2000,
+                    IncludeSingles = includeSingles
+                });
+
+            if (dto == null)
+                return new GeoClusterResult();
+
+            return new GeoClusterResult
             {
-                Mode = "GEO",
-                Longitude = longitute,
-                Width = width,
-                Latitude = latitude,
-                Height = height,
-                Limit = limitRequest
-            });
+                Clusters = (dto.Clusters ?? new List<ApiGeoClusterDto>())
+                    .Where(x => x != null)
+                    .Select(x => new GeoCluster
+                    {
+                        Latitude = x.Latitude,
+                        Longitude = x.Longitude,
+                        Count = x.Count,
+                        MinLatitude = x.MinLatitude,
+                        MinLongitude = x.MinLongitude,
+                        MaxLatitude = x.MaxLatitude,
+                        MaxLongitude = x.MaxLongitude,
+                        MediaItemId = x.MediaItemId
+                    })
+                    .ToList(),
+                TotalCount = dto.TotalCount,
+                Truncated = dto.Truncated,
+                Zoom = dto.Zoom,
+                CellSize = dto.CellSize
+            };
+        }
+
+        public List<MediaItem> GetGeoItems(double minLongitude, double minLatitude,
+            double maxLongitude, double maxLatitude, int limit, int offset, GeoItemsSort sort)
+        {
+            List<ApiMediaItemDto> items = this.client.Post<List<ApiMediaItemDto>>(
+                "/mediafiles/geo/items",
+                new ApiGeoItemsQueryDto
+                {
+                    MinLongitude = minLongitude,
+                    MinLatitude = minLatitude,
+                    MaxLongitude = maxLongitude,
+                    MaxLatitude = maxLatitude,
+                    Limit = limit > 0 ? limit : 500,
+                    Offset = Math.Max(0, offset),
+                    Sort = ToGeoItemsSortString(sort)
+                });
+
+            return items == null
+                ? new List<MediaItem>()
+                : items.Where(x => x != null).Select(ToMediaItem).ToList();
+        }
+
+        private static string ToGeoItemsSortString(GeoItemsSort sort)
+        {
+            switch (sort)
+            {
+                case GeoItemsSort.MediaDateDesc:
+                    return "MEDIA_DATE_DESC";
+                case GeoItemsSort.IdAsc:
+                    return "ID_ASC";
+                default:
+                    return "MEDIA_DATE_ASC";
+            }
         }
 
         public override List<MediaItem> GetMediaItemsFromChecksum(string checksum)

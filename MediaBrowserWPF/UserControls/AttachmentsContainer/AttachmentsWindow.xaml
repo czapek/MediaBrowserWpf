@@ -1,0 +1,10 @@
+<Window x:Class="MediaBrowserWPF.UserControls.AttachmentsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:my="clr-namespace:MediaBrowserWPF.UserControls"
+        Title="Anhänge" Height="520" Width="620"
+        WindowStartupLocation="CenterOwner" ShowInTaskbar="False">
+    <Grid Margin="6">
+        <my:AttachmentsContainer x:Name="attachmentsContainer" />
+    </Grid>
+</Window>

@@ -12,6 +12,10 @@
             <uc:InfoContainerBaseInfo x:Name="infoBase" VerticalAlignment="Stretch" />
         </Expander>
 
+        <Expander Name="DescriptionExpander" Header="Beschreibung" IsExpanded="True" Collapsed="Expander_Expanded" Expanded="Expander_Expanded">
+            <uc:DescriptionContainer x:Name="infoDescription" VerticalAlignment="Stretch" />
+        </Expander>
+
         <Expander Name="CategoryExpander" Header="Alle vergebenen Kategorien" IsExpanded="False" Collapsed="Expander_Expanded" Expanded="Expander_Expanded">
             <uc:InfoContainerCategories x:Name="infoCategories" VerticalAlignment="Stretch" />
         </Expander>

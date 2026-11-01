@@ -225,6 +225,17 @@ Danach:
 
 Build, Seed-Erzeugung und Details stehen in `tools\ApiMock\README.md`.
 
+### Geodaten
+
+Der Reiter `Geodaten` zeigt die aktiven Medien mit Koordinaten auf einer OpenStreetMap-Karte.
+Die Cluster werden im API-Modus über `POST /mediafiles/geo/clusters` geladen, die Trefferliste
+über `POST /mediafiles/geo/items`. Über `Großansicht` lässt sich die Karte in einem eigenen
+Fenster öffnen. In SQLite- und MariaDB-Katalogen zeigt der Reiter einen Hinweis, dass die
+Cluster-Suche nur im API-Modus verfügbar ist.
+
+Beschreibungen werden im Reiter `Info` bearbeitet. Anhänge öffnen sich über das Kontextmenü
+der Medien (`Anhänge ...`) in einem eigenen Dialog.
+
 ### Launcher
 
 `MediaBrowserLauncher` startet standardmäßig:

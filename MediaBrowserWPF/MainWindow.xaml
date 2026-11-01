@@ -1,4 +1,4 @@
-﻿<Window x:Class="MediaBrowserWPF.MainWindow"
+<Window x:Class="MediaBrowserWPF.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="MediabrowserWpf" Height="390" Width="600" xmlns:my="clr-namespace:MediaBrowserWPF.UserControls"
@@ -71,6 +71,7 @@
                     </MenuItem>
                     <MenuItem Header="Virtuell anzeigen" Click="MenuItemVirtuell_Click" ToolTip="Zeigt Medien an ohne sie der Datenbank hinzuzufügen."  />-->
                     <MenuItem Name="MenuItemRemoveDeleted" Header="Als gelöscht markierte entfernen" Click="MenuItemRemoveDeleted_Click" InputGestureText="Strg+Umschalt+Entf" ToolTip="Alle Datenbankweit als gelöscht markierten Medien werden in den Windows Papierkorb verschoben und aus der Datenbank entfernt."  />
+                    <MenuItem Name="MenuItemOpenAttachments" Header="Anhänge ..." Click="MenuItemOpenAttachments_Click" />
                 </MenuItem>
                 <MenuItem Header="Einstellungen" >
                     <MenuItem Name="MenuItemMissingFileBehavior" SubmenuOpened="MenuItemMissingFileBehavior_SubmenuOpened"  Header="Fehlende Dateien ...">
@@ -126,8 +127,8 @@
                             </my:MediaItemListContainer.ContextMenu>
                         </my:MediaItemListContainer>
                     </TabItem>
-                    <TabItem Header="Anhänge" Name="AttachmentsTab">
-                        <my:AttachmentsContainer x:Name="AttachmentsContainer" />
+                    <TabItem Header="Geodaten" Name="GeoDataTab">
+                        <my:GeoDataContainer x:Name="GeoDataContainer" />
                     </TabItem>
                 </TabControl>
                 <GridSplitter Background="AliceBlue" IsTabStop="False" Grid.Column="0" Width="5" Mouse.MouseEnter="GridSplitter_MouseEnter" Mouse.MouseLeave="GridSplitter_MouseLeave"/>

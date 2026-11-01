@@ -166,6 +166,7 @@
   <ItemGroup>
     <Compile Include="ConsoleManager.cs" />
     <Compile Include="DB\DBProvider.cs" />
+    <Compile Include="DB\IGeoDataProvider.cs" />
     <Compile Include="DB\InsertItems.cs" />
     <Compile Include="API\ManualJsonConverter.cs" />
     <Compile Include="API\MediaFileApiClient.cs" />
@@ -204,6 +205,8 @@
     <Compile Include="Events.cs" />
     <Compile Include="Exceptions.cs" />
     <Compile Include="Objects\GeoPoint.cs" />
+    <Compile Include="Objects\GeoCluster.cs" />
+    <Compile Include="Objects\GeoItemsSort.cs" />
     <Compile Include="Objects\GpsAdressComponent.cs" />
     <Compile Include="Objects\GpsFile.cs" />
     <Compile Include="Objects\MediaItemRequestGeoData.cs" />

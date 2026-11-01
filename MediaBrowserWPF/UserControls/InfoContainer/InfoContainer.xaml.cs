@@ -23,12 +23,19 @@ namespace MediaBrowserWPF.UserControls
     {
         private double defaultExpanderColapsedHeight;
         List<Expander> expanderList;
+        public event EventHandler<MediaItemRequestMessageArgs> OnRequest;
+
         public InfoContainer()
         {
             InitializeComponent();
             this.ImageAnalysisExpander.Visibility = MediaBrowserContext.IsApiMode
                 ? Visibility.Visible
                 : Visibility.Collapsed;
+            this.infoDescription.OnRequest += (sender, args) =>
+            {
+                if (this.OnRequest != null)
+                    this.OnRequest(sender, args);
+            };
         }
 
         public void Clear()
@@ -36,6 +43,7 @@ namespace MediaBrowserWPF.UserControls
             this.infoCategories.Clear();
             this.infoExif.Clear();
             this.infoBase.Clear();
+            this.infoDescription.Clear();
             this.infoImageAnalysis.Clear();
         }
 
@@ -57,6 +65,7 @@ namespace MediaBrowserWPF.UserControls
 
             this.infoCategories.SetInfo(mediaItemList);
             this.infoBase.SetInfo(mediaItemList);
+            this.infoDescription.SetInfo(mediaItemList);
             this.infoExif.SetInfo(mediaItemList);
             this.infoImageAnalysis.SetInfo(mediaItemList);
         }
@@ -66,6 +75,7 @@ namespace MediaBrowserWPF.UserControls
             if ( this.ExifExpander == null
                 || this.CategoryExpander == null
                 || this.BaseInfoExpander == null
+                || this.DescriptionExpander == null
                 || this.ImageAnalysisExpander == null)
                 return;
 
@@ -75,6 +85,7 @@ namespace MediaBrowserWPF.UserControls
             this.expanderList = new List<Expander>();
             this.expanderList.Add(this.CategoryExpander);
             this.expanderList.Add(this.BaseInfoExpander);
+            this.expanderList.Add(this.DescriptionExpander);
             this.expanderList.Add(this.ExifExpander);
 
             if (this.ImageAnalysisExpander.Visibility == Visibility.Visible)

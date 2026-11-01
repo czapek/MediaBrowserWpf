@@ -1,0 +1,47 @@
+<UserControl x:Class="MediaBrowserWPF.UserControls.DescriptionContainer"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignHeight="300" d:DesignWidth="300">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Margin="3" VerticalAlignment="Bottom"
+                   Text="Beschreibungen von allen ausgewählten Medien" />
+
+        <TextBox Name="TextBoxDescription" TextChanged="TextBoxDescription_TextChanged" Grid.Row="1"
+                 TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Visible"
+                 FontSize="15" FontFamily="Times New Roman">
+            <TextBox.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Name="MenuItemDeleteDescription" Header="Beschreibung löschen"
+                              Click="MenuItem_Click_DeleteDescription" />
+                    <Separator />
+                    <MenuItem Name="MenuItemDescribeAll" Header="Diese Beschreibung für alle Medien verwenden"
+                              Click="MenuItem_Click_DescribeAll" />
+                    <MenuItem Name="MenuItemDeleteAllDescription" Header="Alle Beschreibungen an allen Medien löschen"
+                              Click="MenuItem_Click_DeleteAllDescription" />
+                    <Separator />
+                    <MenuItem Name="MenuItemOpenMediaItems" Header="Alle Medien mit dieser Beschreibung öffnen"
+                              Click="MenuItem_Click_OpenMediaItems" />
+                </ContextMenu>
+            </TextBox.ContextMenu>
+        </TextBox>
+
+        <ComboBox Name="ComboBoxDescription" Margin="0,5,0,5" Height="25" Grid.Row="2"
+                  DisplayMemberPath="ShortString" SelectedValue="{Binding ShortString}"
+                  SelectionChanged="ComboBoxDescription_SelectionChanged" />
+
+        <WrapPanel HorizontalAlignment="Right" Grid.Row="3">
+            <Button Name="ButtonSaveDescription" Padding="3" Margin="5"
+                    Click="ButtonSaveDescription_Click">Beschreibung speichern</Button>
+        </WrapPanel>
+    </Grid>
+</UserControl>

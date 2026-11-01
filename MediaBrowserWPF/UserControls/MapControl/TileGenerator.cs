@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Globalization;
 using System.Windows.Media.Imaging;
 
@@ -14,7 +14,7 @@ namespace MapControl
         /// <summary>The size of a tile in pixels.</summary>
         internal const double TileSize = 256;
 
-        private const string TileFormat = @"http://tile.openstreetmap.org/{0}/{1}/{2}.png";
+        private const string TileFormat = @"https://tile.openstreetmap.org/{0}/{1}/{2}.png";
 
         /// <summary>This event is never called.</summary>
         [Obsolete("This event has been replaced by DownloadCountChanged.", false)]

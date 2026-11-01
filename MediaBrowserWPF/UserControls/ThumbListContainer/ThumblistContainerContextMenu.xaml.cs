@@ -1536,6 +1536,17 @@ namespace MediaBrowserWPF.UserControls
         }
 
 
+        private void MenuItemAttachments_Click(object sender, RoutedEventArgs e)
+        {
+            if (this.thumblistContainer.SelectedMediaItems == null ||
+                this.thumblistContainer.SelectedMediaItems.Count == 0)
+                return;
+
+            AttachmentsWindow window = new AttachmentsWindow(this.thumblistContainer.SelectedMediaItems,
+                MainWindow.MainWindowStatic);
+            window.ShowDialog();
+        }
+
         private void MenuItemUpdateGeodataDialog_Click(object sender, RoutedEventArgs e)
         {
             MapControl.MapSearchWindow sc = new MapControl.MapSearchWindow(this.thumblistContainer.SelectedMediaItems);
