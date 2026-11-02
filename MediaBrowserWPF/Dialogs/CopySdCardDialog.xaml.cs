@@ -57,6 +57,9 @@ namespace MediaBrowserWPF.Dialogs
             set;
         }
 
+        private const string SourceFoldersFileName = "CopySdCardSources.txt";
+        private bool initializingSources;
+
         public CopySdCardDialog()
         {
             InitializeComponent();
@@ -101,30 +104,172 @@ namespace MediaBrowserWPF.Dialogs
             this.FolderCnt = 0;
             this.CopyDictionary = new SortedDictionary<string, CopyItem>();
             this.NotCopiedList = new List<string>();
+            this.DirectoryList = new List<string>();
 
-            this.MediaSource.Items.Add("");
-
-            foreach (DriveInfo drive in DriveInfo.GetDrives())
+            this.initializingSources = true;
+            try
             {
-                if (drive.IsReady && drive.DriveType == DriveType.Removable)
-                {
-                    this.MediaSource.Items.Add(new { Name = String.Format("{0} ({1}) {2:n1} GB", drive.VolumeLabel, drive.Name, drive.TotalSize / 1024.0 / 1024.0 / 1024.0), Value = drive });
+                this.MediaSource.Items.Clear();
 
-                    if ((this.NotCopiedList.Count + this.CopyDictionary.Count) == 0 && Directory.Exists(drive.Name + "DCIM"))
+                MediaSourceItem emptyItem = new MediaSourceItem { Name = String.Empty, Value = String.Empty };
+                this.MediaSource.Items.Add(emptyItem);
+
+                MediaSourceItem firstRecentItem = null;
+                foreach (string recentFolder in GetRecentSourceFolders())
+                {
+                    if (!Directory.Exists(recentFolder))
+                        continue;
+
+                    MediaSourceItem recentItem = new MediaSourceItem { Name = recentFolder, Value = recentFolder };
+                    this.MediaSource.Items.Add(recentItem);
+
+                    if (firstRecentItem == null)
+                        firstRecentItem = recentItem;
+                }
+
+                MediaSourceItem driveItem = null;
+                foreach (DriveInfo drive in DriveInfo.GetDrives())
+                {
+                    if (drive.IsReady && drive.DriveType == DriveType.Removable)
                     {
-                        this.MediaSource.SelectedIndex = this.MediaSource.Items.Count - 1;
+                        MediaSourceItem item = new MediaSourceItem
+                        {
+                            Name = String.Format("{0} ({1}) {2:n1} GB", drive.VolumeLabel, drive.Name,
+                                drive.TotalSize / 1024.0 / 1024.0 / 1024.0),
+                            Value = drive
+                        };
+                        this.MediaSource.Items.Add(item);
+
+                        if (driveItem == null && Directory.Exists(drive.Name + "DCIM"))
+                            driveItem = item;
                     }
                 }
+
+                MediaSourceItem mobileBackupItem = null;
+                string mobileBackupFolder = @"D:\Photos\MobileBackup";
+                if (Directory.Exists(mobileBackupFolder))
+                {
+                    mobileBackupItem = this.FindSourceFolderItem(mobileBackupFolder);
+                    if (mobileBackupItem == null)
+                    {
+                        mobileBackupItem = new MediaSourceItem
+                        {
+                            Name = "Moments\\MobileBackup",
+                            Value = mobileBackupFolder
+                        };
+                        this.MediaSource.Items.Add(mobileBackupItem);
+                    }
+                }
+
+                MediaSourceItem selectedItem = firstRecentItem ?? mobileBackupItem ?? driveItem ?? emptyItem;
+                this.MediaSource.SelectedItem = selectedItem;
+            }
+            finally
+            {
+                this.initializingSources = false;
             }
 
+            if (this.MediaSource.SelectedIndex > 0)
+                this.MediaSource_SelectionChanged(this.MediaSource, null);
+        }
 
-            if (Directory.Exists(@"D:\Photos\MobileBackup"))
+        private static string SourceFoldersFile
+        {
+            get
             {
-                string sourceFolder = @"D:\Photos\MobileBackup";
-                this.MediaSource.Items.Add(new { Name = String.Format("{0}", "Moments\\MobileBackup"), Value = sourceFolder });
-                this.MediaSource.SelectedIndex = this.MediaSource.Items.Count - 1;
+                string folder = System.IO.Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                    "MediaBrowserWpf");
+                Directory.CreateDirectory(folder);
+                return System.IO.Path.Combine(folder, SourceFoldersFileName);
             }
         }
+
+        private static List<string> GetRecentSourceFolders()
+        {
+            try
+            {
+                string file = SourceFoldersFile;
+                if (!File.Exists(file))
+                    return new List<string>();
+
+                return File
+                    .ReadAllLines(file)
+                    .Select(x => x.Trim())
+                    .Where(x => x.Length > 0)
+                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                    .Take(10)
+                    .ToList();
+            }
+            catch
+            {
+                return new List<string>();
+            }
+        }
+
+        private static void RememberSourceFolder(string folder)
+        {
+            if (String.IsNullOrWhiteSpace(folder) || !Directory.Exists(folder))
+                return;
+
+            try
+            {
+                string normalized = NormalizeFolderPath(folder);
+                List<string> folders = GetRecentSourceFolders();
+                folders.RemoveAll(x => String.Equals(NormalizeFolderPath(x), normalized,
+                    StringComparison.OrdinalIgnoreCase));
+                folders.Insert(0, normalized);
+
+                if (folders.Count > 10)
+                    folders = folders.Take(10).ToList();
+
+                File.WriteAllLines(SourceFoldersFile, folders, Encoding.UTF8);
+            }
+            catch
+            {
+            }
+        }
+
+        private static string NormalizeFolderPath(string folder)
+        {
+            try
+            {
+                string fullPath = System.IO.Path.GetFullPath(folder);
+                if (fullPath.Length > 3)
+                    fullPath = fullPath.TrimEnd(System.IO.Path.DirectorySeparatorChar,
+                        System.IO.Path.AltDirectorySeparatorChar);
+                return fullPath;
+            }
+            catch
+            {
+                return folder;
+            }
+        }
+
+        private MediaSourceItem FindSourceFolderItem(string folder)
+        {
+            string normalized = NormalizeFolderPath(folder);
+            foreach (object item in this.MediaSource.Items)
+            {
+                MediaSourceItem sourceItem = item as MediaSourceItem;
+                if (sourceItem == null)
+                    continue;
+
+                string value = sourceItem.Value as string;
+                if (value != null && String.Equals(NormalizeFolderPath(value), normalized,
+                    StringComparison.OrdinalIgnoreCase))
+                    return sourceItem;
+            }
+
+            return null;
+        }
+
+        public sealed class MediaSourceItem
+        {
+            public string Name { get; set; }
+            public object Value { get; set; }
+        }
+
 
         private void SetData()
         {
@@ -157,25 +302,29 @@ namespace MediaBrowserWPF.Dialogs
 
         private void MediaSource_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            if (this.initializingSources)
+                return;
+
             this.CopyDictionary = new SortedDictionary<string, CopyItem>();
             this.NotCopiedList = new List<string>();
             this.DirectoryList = new List<string>();
+
+            string sourceFolder = this.MediaSource.SelectedValue as String;
 
             if (this.MediaSource.SelectedValue is DriveInfo)
             {
                 this.AddFiles(this.MediaSource.SelectedValue as DriveInfo);
             }
-            else
+            else if (!String.IsNullOrWhiteSpace(sourceFolder) && Directory.Exists(sourceFolder))
             {
-                string sourceFolder = this.MediaSource.SelectedValue as String;
-                if (Directory.Exists(sourceFolder))
-                {
-                    string resultDrainFolder = DrainFolder + "\\" + DateTime.Now.ToString("yyMMdd-HHmm-ss");
-                    AddFiles(sourceFolder, resultDrainFolder);
-                }
+                string resultDrainFolder = DrainFolder + "\\" + DateTime.Now.ToString("yyMMdd-HHmm-ss");
+                AddFiles(sourceFolder, resultDrainFolder);
             }
 
             SetData();
+
+            if (!String.IsNullOrWhiteSpace(sourceFolder) && Directory.Exists(sourceFolder))
+                RememberSourceFolder(sourceFolder);
 
             if (!(this.MediaSource.SelectedValue is DriveInfo))
             {
@@ -662,6 +811,35 @@ namespace MediaBrowserWPF.Dialogs
             catch
             {
 
+            }
+        }
+
+        private void ButtonSourceFolderDialog_Click(object sender, RoutedEventArgs e)
+        {
+            using (System.Windows.Forms.FolderBrowserDialog dialog = new System.Windows.Forms.FolderBrowserDialog())
+            {
+                dialog.ShowNewFolderButton = false;
+
+                string currentFolder = this.MediaSource.SelectedValue as String;
+                if (!String.IsNullOrWhiteSpace(currentFolder) && Directory.Exists(currentFolder))
+                    dialog.SelectedPath = currentFolder;
+
+                if (dialog.ShowDialog() != System.Windows.Forms.DialogResult.OK)
+                    return;
+
+                string folder = NormalizeFolderPath(dialog.SelectedPath);
+                if (!Directory.Exists(folder))
+                    return;
+
+                MediaSourceItem item = this.FindSourceFolderItem(folder);
+                if (item == null)
+                {
+                    item = new MediaSourceItem { Name = folder, Value = folder };
+                    this.MediaSource.Items.Add(item);
+                }
+
+                this.MediaSource.SelectedItem = item;
+                RememberSourceFolder(folder);
             }
         }
 

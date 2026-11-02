@@ -54,7 +54,14 @@
             <StackPanel Grid.Column="0">
                 <WrapPanel Margin="0,0,0,5">
                     <Label Padding="0,0,10,0" VerticalAlignment="Center">Quelle wählen</Label>
-                    <ComboBox Width="180" Name="MediaSource" SelectedValuePath="Value" DisplayMemberPath="Name" SelectionChanged="MediaSource_SelectionChanged"></ComboBox>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="auto" />
+                        </Grid.ColumnDefinitions>
+                        <ComboBox Width="150" Name="MediaSource" SelectedValuePath="Value" DisplayMemberPath="Name" SelectionChanged="MediaSource_SelectionChanged"></ComboBox>
+                        <Button Grid.Column="1" Width="22" Height="22" Margin="2,0,0,0" ToolTip="Quellordner wählen" Click="ButtonSourceFolderDialog_Click">...</Button>
+                    </Grid>
                 </WrapPanel>
                 <CheckBox Name="checkBoxDelete" IsChecked="False">Nach dem Import von der Karte löschen</CheckBox>
                 <TextBlock Name="LabelInfoCopy" Margin="10,0,0,2" Visibility="Collapsed" TextWrapping="WrapWithOverflow"></TextBlock>

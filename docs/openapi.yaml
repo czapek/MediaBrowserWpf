@@ -1714,7 +1714,28 @@ components:
       properties:
         mode:
           type: string
-          enum: [SEARCH, FOLDERS, CATEGORIES, MISSING_CATEGORIES, MISSING_FILES, MISSING_THUMBS, FILES_FROM_LIST, FILES_FROM_CHECKSUM, SORT, DUPLICATES, GEO, VIRTUAL, TRASH, BOOKMARKS, CHECKSUM, FILENAME, FILE_PATH, REQUEST]
+          enum:
+            [
+              SEARCH,
+              FOLDERS,
+              CATEGORIES,
+              MISSING_CATEGORIES,
+              MISSING_FILES,
+              MISSING_THUMBS,
+              MISSING_GEODATA,
+              FILES_FROM_LIST,
+              FILES_FROM_CHECKSUM,
+              SORT,
+              DUPLICATES,
+              GEO,
+              VIRTUAL,
+              TRASH,
+              BOOKMARKS,
+              CHECKSUM,
+              FILENAME,
+              FILE_PATH,
+              REQUEST,
+            ]
         mediaItemIds:
           type: array
           items:
@@ -1741,8 +1762,17 @@ components:
           type: string
         sortString:
           type: string
+          description: Legacy-Sortierausdruck. Die SQL-Schicht wertet derzeit sortFields aus.
         limit:
           type: integer
+          minimum: 1
+          default: 500
+          description: Maximale Anzahl der Treffer pro Anfrage.
+        offset:
+          type: integer
+          minimum: 0
+          default: 0
+          description: Anzahl der zu überspringenden Treffer für echtes Lazy Loading.
         storeView:
           type: boolean
         isIntersection:
@@ -1772,8 +1802,14 @@ components:
             $ref: '#/components/schemas/SqlParameter'
         sortFields:
           type: array
+          description: >
+            Sortierung als FELD oder FELD:ASC|DESC. Unterstützte Felder sind
+            FOLDERNAME, FILENAME, MEDIATYPE, MEDIADATE, LENGTH, DURATION,
+            VIEWED, AREA, RELATION, CHECKSUM und ID. Ohne Angabe wird nach
+            MEDIADATE DESC, ID DESC sortiert.
           items:
             type: string
+            example: MEDIADATE:DESC
         criteria:
           type: string
     GeoClusterQuery:
@@ -1919,7 +1955,26 @@ components:
       properties:
         action:
           type: string
-          enum: [CHECK, SET_ROLE, SET_PRIORITY, SET_BOOKMARK, SET_DELETED, SET_TRASH, SET_GEODATA, ADJUST_MEDIA_DATE, ADD_VIEW_TIME, RENAME, COPY_TO_FOLDER, REMOVE_AND_RECYCLE, REMOVE_FROM_DB, ROTATE_90, CATEGORIZE, UNCATEGORIZE, UPDATE_DUPLICATE]
+          enum:
+            [
+              CHECK,
+              SET_ROLE,
+              SET_PRIORITY,
+              SET_BOOKMARK,
+              SET_DELETED,
+              SET_TRASH,
+              SET_GEODATA,
+              ADJUST_MEDIA_DATE,
+              ADD_VIEW_TIME,
+              RENAME,
+              COPY_TO_FOLDER,
+              REMOVE_AND_RECYCLE,
+              REMOVE_FROM_DB,
+              ROTATE_90,
+              CATEGORIZE,
+              UNCATEGORIZE,
+              UPDATE_DUPLICATE,
+            ]
         mediaItemIds:
           type: array
           items:
@@ -2259,7 +2314,7 @@ components:
           type: array
           items:
             type: string
-          description: "Medientypen aus MEDIAFILES.TYPE, z. B. rgb, video, audio."
+          description: 'Medientypen aus MEDIAFILES.TYPE, z. B. rgb, video, audio.'
         personCount:
           $ref: '#/components/schemas/NumericRange'
         animalCount:
