@@ -726,7 +726,7 @@ namespace MediaBrowser4.DB.Api
                 return;
 
             List<int> variationIds = mediaItemList
-                .Where(x => x.VariationId > 0)
+                .Where(x => x.VariationId > 0 && x.ThumbJpegData == null)
                 .Select(x => x.VariationId)
                 .Distinct()
                 .ToList();

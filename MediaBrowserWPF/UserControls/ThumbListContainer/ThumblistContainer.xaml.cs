@@ -1327,17 +1327,22 @@ namespace MediaBrowserWPF.UserControls
 
                 this.noSelectionEvent = true;
                 int maxLoadNew = ((int)(this.MediaItemContainer.Items.Count / maxLoad) + 1) * maxLoad;
+                List<MediaItem> addedItems = new List<MediaItem>();
                 for (int i = this.MediaItemContainer.Items.Count; i < this.mediaItemList.Count; i++)
                 {
                     if (this.MediaItemContainer.Items.Count < maxLoadNew)
                     {
                         this.MediaItemContainer.Items.Add(this.mediaItemList[i]);
+                        addedItems.Add(this.mediaItemList[i]);
                         if (this.selectedMediaItemList.Contains(this.mediaItemList[i]))
                             (this.MediaItemContainer.ItemContainerGenerator.ContainerFromIndex(this.MediaItemContainer.Items.Count - 1) as ListViewItem).IsSelected = true;
 
                     }
                 }
                 this.noSelectionEvent = false;
+
+                if (MediaBrowserContext.IsApiMode)
+                    MediaBrowserContext.GetThumbsForAllMediaItems(addedItems);
                 //if (allSelected)
                 //{
                 //    this.MediaItemContainer.SelectAll();
@@ -1352,10 +1357,15 @@ namespace MediaBrowserWPF.UserControls
 
         public void ShowAllMediaItems()
         {
+            List<MediaItem> addedItems = new List<MediaItem>();
             for (int i = this.MediaItemContainer.Items.Count; i < this.mediaItemList.Count; i++)
             {
                 this.MediaItemContainer.Items.Add(this.mediaItemList[i]);
+                addedItems.Add(this.mediaItemList[i]);
             }
+
+            if (MediaBrowserContext.IsApiMode)
+                MediaBrowserContext.GetThumbsForAllMediaItems(addedItems);
         }
 
         public void ShowInDbTree()
