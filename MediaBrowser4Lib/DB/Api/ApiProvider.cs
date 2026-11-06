@@ -734,10 +734,45 @@ namespace MediaBrowser4.DB.Api
             if (variationIds.Count == 0)
                 return;
 
-            List<ApiThumbDto> thumbs = this.client.Post<List<ApiThumbDto>>("/mediafiles/thumbs", variationIds);
+            List<ApiThumbDto> thumbs = null;
 
-            if (thumbs == null)
+            try
+            {
+                thumbs = this.client.Post<List<ApiThumbDto>>("/mediafiles/thumbs", variationIds);
+            }
+            catch (Exception ex)
+            {
+                MediaBrowser4.Utilities.Log.Exception(ex, "Bulk-Thumbnail-Abruf");
+            }
+
+            if (thumbs == null || thumbs.Count == 0)
+            {
+                foreach (MediaItem item in mediaItemList)
+                {
+                    if (item.VariationId > 0)
+                        item.MarkThumbJpegDataLoaded();
+                }
+
+                System.Threading.Tasks.Task.Run(() =>
+                {
+                    foreach (MediaItem item in mediaItemList)
+                    {
+                        if (item.VariationId <= 0)
+                            continue;
+
+                        try
+                        {
+                            if (item.ThumbJpegData == null)
+                                item.ThumbJpegData = this.GetThumbJpegData(item.VariationId);
+                        }
+                        catch
+                        {
+                        }
+                    }
+                });
+
                 return;
+            }
 
             Dictionary<int, ApiThumbDto> byVariation = thumbs
                 .Where(x => x != null)
@@ -752,6 +787,10 @@ namespace MediaBrowser4.DB.Api
                 {
                     item.ThumbJpegData = thumb.Thumb;
                     item.IsThumbJpegDataOutdated = thumb.IsOutdated;
+                }
+                else if (item.VariationId > 0)
+                {
+                    item.MarkThumbJpegDataLoaded();
                 }
             }
         }

@@ -542,21 +542,31 @@ namespace MediaBrowser4.Objects
 
         public bool IsThumbJpegDataOutdated { get; set; }
 
+        private bool thumbJpegDataLoaded;
         private byte[] thumbJpegData;
         public byte[] ThumbJpegData
         {
             get
             {
-                if (this.thumbJpegData == null)
+                if (!this.thumbJpegDataLoaded)
+                {
                     this.thumbJpegData = MediaBrowserContext.GetThumbJpegData(this.VariationId);
+                    this.thumbJpegDataLoaded = true;
+                }
                 return thumbJpegData;
             }
 
             internal set
             {
                 this.thumbJpegData = value;
+                this.thumbJpegDataLoaded = true;
                 this.OnPropertyChanged("ThumbJpegData");
             }
+        }
+
+        internal void MarkThumbJpegDataLoaded()
+        {
+            this.thumbJpegDataLoaded = true;
         }
 
         private ObservableCollection<Category> categories;

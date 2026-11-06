@@ -52,19 +52,13 @@ namespace MediaBrowserWPF.UserControls.CategoryContainer
                 this.mediaItemList = value;
 
                 this.categoryStatistic = new Dictionary<Category, int>();
-                foreach (MediaItem item in value)
+                if (value == null)
+                    return;
+
+                foreach (KeyValuePair<Category, int> pair in MediaBrowserContext.GetCategoriesFromMediaItems(value))
                 {
-                    foreach (Category cat in item.Categories)
-                    {
-                        if (!this.categoryStatistic.ContainsKey(cat))
-                        {
-                            this.categoryStatistic.Add(cat, 1);
-                        }
-                        else
-                        {
-                            this.categoryStatistic[cat]++;
-                        }
-                    }
+                    if (!pair.Key.FullPath.StartsWith(MediaBrowserContext.CategoryHistoryName))
+                        this.categoryStatistic[pair.Key] = pair.Value;
                 }
             }
         }
