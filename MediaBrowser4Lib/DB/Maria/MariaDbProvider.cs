@@ -526,7 +526,7 @@ namespace MediaBrowser4.DB.Maria
             transaction.SetParameter("@mediadate",
                 XmlConvert.ToDateTime(node.Attributes["mediadate"].Value, XmlDateTimeSerializationMode.RoundtripKind),
                 DbType.DateTime);
-            transaction.SetParameter("@orientation", Convert.ToInt32(node.Attributes["orientation"].Value),
+            transaction.SetParameter("@orientation", MediaBrowser4.Objects.MediaItem.NormalizeOrientationNumber(Convert.ToInt32(node.Attributes["orientation"].Value)),
                 DbType.Int32);
             transaction.SetParameter("@duration", XmlConvert.ToDouble(node.Attributes["duration"].Value),
                 DbType.Double);

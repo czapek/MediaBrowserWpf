@@ -1644,7 +1644,7 @@ LIMIT 10"
             trans.SetParameter("@insertdate", XmlConvert.ToDateTime(node.Attributes["insertdate"].Value, "o"), DbType.DateTime);
             trans.SetParameter("@editdate", XmlConvert.ToDateTime(node.Attributes["editdate"].Value, "o"), DbType.DateTime);
             trans.SetParameter("@mediadate", XmlConvert.ToDateTime(node.Attributes["mediadate"].Value, "o"), DbType.DateTime);
-            trans.SetParameter("@orientation", Convert.ToInt32(node.Attributes["orientation"].Value), DbType.Int32);
+            trans.SetParameter("@orientation", MediaBrowser4.Objects.MediaItem.NormalizeOrientationNumber(Convert.ToInt32(node.Attributes["orientation"].Value)), DbType.Int32);
             trans.SetParameter("@duration", XmlConvert.ToDouble(node.Attributes["duration"].Value), DbType.Double);
             trans.SetParameter("@frames", Convert.ToInt32(node.Attributes["frames"].Value), DbType.Int32);
             trans.SetParameter("@priority", Convert.ToInt32(node.Attributes["priority"].Value), DbType.Int32);
