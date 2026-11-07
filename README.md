@@ -314,13 +314,8 @@ Die Migration:
 - übernimmt `VARIATIONS.DESCRIPTION` und `CATEGORIZE.USERDEFINED`,
 - legt die Haupt-Thumbnails als `THUMBS`-Einträge mit `PREVIEW_WIDTH=0` und `PREVIEW_HEIGHT=0` ab,
 - setzt `CATEGORY.DATE`-Werte vor `1000-01-01` auf `NULL` (typischerweise `0001-01-01`),
-- normalisiert `MEDIAFILES.ORIENTATION` auf die Enum-Werte `0` bis `3`; ältere Gradwerte wie
-  `90`, `180` und `270` werden auf `1`, `2` und `3` abgebildet,
 - übernimmt keine verwaisten Datensätze,
 - validiert am Ende die Zeilenzahlen und startet die Anwendung neu.
-
-Bereits vorhandene Gradwerte in einer MariaDB-Datenbank können mit
-`scripts\Repair-MediaOrientation.ps1` (vorab mit `-DryRun`) auf die Enum-Werte korrigiert werden.
 
 Die Spalte `VARIATIONS.THUMB` wird vom MariaDB-Provider nicht für die normale
 Thumbnail-Anzeige verwendet. Maßgeblich sind die Einträge in `THUMBS` mit

@@ -132,36 +132,10 @@ namespace MediaBrowser4.Objects
             internal set;
         }
 
-        private MediaOrientation orientation;
-
         public MediaOrientation Orientation
         {
-            get
-            {
-                return this.orientation;
-            }
-            set
-            {
-                this.orientation = (MediaOrientation)NormalizeOrientationNumber((int)value);
-            }
-        }
-
-        public static int NormalizeOrientationNumber(int number)
-        {
-            if (number >= 0 && number <= 3)
-                return number;
-
-            if (number % 90 == 0)
-            {
-                int steps = (number / 90) % 4;
-
-                if (steps < 0)
-                    steps += 4;
-
-                return steps;
-            }
-
-            return (int)MediaOrientation.BOTTOMisBOTTOM;
+            get;
+            set;
         }
 
         public int VariationId
@@ -815,7 +789,25 @@ namespace MediaBrowser4.Objects
 
         public MediaOrientation SetOrientationByNumber(int number)
         {
-            this.Orientation = (MediaOrientation)NormalizeOrientationNumber(number);
+            switch (number)
+            {
+                case 0:
+                    this.Orientation = MediaOrientation.BOTTOMisBOTTOM;
+                    break;
+                case 1:
+                    this.Orientation = MediaOrientation.RIGHTisBOTTOM;
+                    break;
+                case 2:
+                    this.Orientation = MediaOrientation.TOPisBOTTOM;
+                    break;
+                case 3:
+                    this.Orientation = MediaOrientation.LEFTisBOTTOM;
+                    break;
+                default:
+                    this.Orientation = MediaOrientation.BOTTOMisBOTTOM;
+                    break;
+
+            }
             return Orientation;
         }
 
