@@ -1507,12 +1507,7 @@ namespace MediaBrowser4.DB.Api
             if (mItem == null)
                 return;
 
-            this.PostAction(new ApiMediaActionDto
-            {
-                Action = "ROTATE_90",
-                MediaItemIds = new List<int> { mItem.Id },
-                VariationIds = new List<int> { mItem.VariationId }
-            });
+            this.UpdateMediaItem(mItem);
         }
 
         public override void CategorizeMediaItems(List<MediaItem> mList, List<Category> cList)

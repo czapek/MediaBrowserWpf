@@ -504,6 +504,9 @@ namespace ApiMock
                 }
                 if (dto.DefaultVariationId > 0)
                     item.DefaultVariationId = dto.DefaultVariationId;
+
+                if (dto.Orientation >= 0 && dto.Orientation <= 3)
+                    item.Orientation = dto.Orientation;
             }
         }
 
